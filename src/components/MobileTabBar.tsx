@@ -1,8 +1,8 @@
 import React from 'react';
-import { Bus, Search, Navigation, Star, Moon, Sun } from 'lucide-react';
+import { Bus, Train, Search, Navigation, Star, Moon, Sun } from 'lucide-react';
 
 interface MobileTabBarProps {
-  currentTab: 'home' | 'search' | 'near' | 'favorites';
+  currentTab?: 'home' | 'search' | 'near' | 'favorites';
   onGoHome: () => void;
   onOpenSearch: () => void;
   onNearMe: () => void;
@@ -11,7 +11,8 @@ interface MobileTabBarProps {
   favoritesCount: number;
   isDark: boolean;
   onToggleTheme: () => void;
-  hasActiveStop: boolean;
+  hasActiveStop?: boolean;
+  activeType?: 'bus' | 'metro' | null;
 }
 
 export const MobileTabBar: React.FC<MobileTabBarProps> = ({
@@ -23,8 +24,12 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
   favoritesCount,
   isDark,
   onToggleTheme,
-  hasActiveStop,
+  hasActiveStop = false,
+  activeType = null,
 }) => {
+  const isMetroActive = activeType === 'metro';
+  const isBusActive = activeType === 'bus' || (hasActiveStop && !isMetroActive);
+
   return (
     <nav
       aria-label="Navegación principal inferior"
@@ -42,10 +47,22 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
           className="flex-1 flex flex-col items-center justify-center py-1 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 active:scale-90 transition-all cursor-pointer min-h-[44px]"
         >
           <div className="relative">
-            <Bus className={`w-5 h-5 ${hasActiveStop ? 'text-blue-600 dark:text-blue-400' : ''}`} />
+            {isMetroActive ? (
+              <Train className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+            ) : (
+              <Bus className={`w-5 h-5 ${isBusActive ? 'text-blue-600 dark:text-blue-400' : ''}`} />
+            )}
           </div>
-          <span className={`text-[10px] mt-0.5 font-medium ${hasActiveStop ? 'text-blue-600 dark:text-blue-400 font-bold' : ''}`}>
-            {hasActiveStop ? 'Parada' : 'Inicio'}
+          <span
+            className={`text-[10px] mt-0.5 font-medium ${
+              isMetroActive
+                ? 'text-rose-600 dark:text-rose-400 font-bold'
+                : isBusActive
+                ? 'text-blue-600 dark:text-blue-400 font-bold'
+                : ''
+            }`}
+          >
+            {isMetroActive ? 'Estación' : isBusActive ? 'Parada' : 'Inicio'}
           </span>
         </button>
 

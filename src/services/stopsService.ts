@@ -76,6 +76,13 @@ export function getCachedStops(): Stop[] {
 }
 
 /**
+ * Sets stops cache directly (used for testing or preloading)
+ */
+export function setCachedStops(stops: Stop[]): void {
+  stopsCache = stops;
+}
+
+/**
  * Retrieves a specific stop by its ID
  */
 export function getStopById(id: string): Stop | undefined {

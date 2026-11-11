@@ -1,11 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Stop, BusEstimate, StopEstimatesResponse, FavoriteStop } from './types/emt';
+import type { MetroStation, FavoriteMetroStation } from './types/metro';
+import type { TransportMode } from './types/transport';
 import { loadStops, getStopById, findNearestStops, type NearestStop } from './services/stopsService';
+import {
+  loadMetroStations,
+  getMetroStationByCode,
+  findNearestMetroStations,
+  type NearestMetroStation,
+} from './services/metroService';
 import { fetchStopEstimates } from './services/emtParser';
 import {
   getFavorites,
   toggleFavorite,
   setLastVisitedStopId,
+  getFavoriteMetroStations,
+  toggleFavoriteMetroStation,
+  removeFavoriteMetroStation,
+  setLastVisitedMetroStationId,
+  getTransportModePreference,
+  setTransportModePreference,
   getThemePreference,
   setThemePreference,
   type ThemePreference,
@@ -20,6 +34,7 @@ import { NearestStopsModal } from './components/NearestStopsModal';
 import { FavoritesModal } from './components/FavoritesModal';
 import { MobileTabBar } from './components/MobileTabBar';
 import { HomeSearchLanding } from './components/HomeSearchLanding';
+import { MetroStationView } from './components/MetroStationView';
 
 const REFRESH_INTERVAL_SECONDS = 30;
 
@@ -34,22 +49,48 @@ export const App: React.FC = () => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  // Data Loading & Current Stop (Start as null so user searches first!)
-  const [stopsLoaded, setStopsLoaded] = useState(false);
-  const [currentStopId, setCurrentStopId] = useState<string | null>(() => {
-    // Only pre-fill if an explicit URL param or hash is passed
-    const urlParams = new URLSearchParams(window.location.search);
-    const stopParam = urlParams.get('stop') || window.location.hash.replace('#', '');
-    return stopParam ? stopParam : null;
+  // Transport mode state ('all' | 'bus' | 'metro')
+  const [transportMode, setTransportMode] = useState<TransportMode>(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const modeParam = urlParams.get('mode') as TransportMode;
+      if (modeParam === 'all' || modeParam === 'bus' || modeParam === 'metro') {
+        return modeParam;
+      }
+    }
+    return getTransportModePreference();
   });
 
+  // Datasets loaded state
+  const [stopsLoaded, setStopsLoaded] = useState(false);
+  const [metroStationsLoaded, setMetroStationsLoaded] = useState(false);
+
+  // Active item IDs (from URL param or hash)
+  const [currentStopId, setCurrentStopId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const stopParam = urlParams.get('stop') || window.location.hash.replace('#', '');
+    return stopParam || null;
+  });
+
+  const [currentMetroStationId, setCurrentMetroStationId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const metroParam = urlParams.get('metro');
+    return metroParam || null;
+  });
+
+  // Entity objects
   const [currentStop, setCurrentStop] = useState<Stop | null>(null);
+  const [currentMetroStation, setCurrentMetroStation] = useState<MetroStation | null>(null);
+
+  // Bus estimates state
   const [estimates, setEstimates] = useState<BusEstimate[]>([]);
   const [isLoadingEstimates, setIsLoadingEstimates] = useState(false);
   const [errorEstimates, setErrorEstimates] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
 
-  // Auto-refresh countdown state
+  // Auto-refresh countdown for Bus view
   const [countdown, setCountdown] = useState<number>(REFRESH_INTERVAL_SECONDS);
   const [isAutoRefreshPaused, setIsAutoRefreshPaused] = useState(false);
 
@@ -60,9 +101,15 @@ export const App: React.FC = () => {
   const [isNearestOpen, setIsNearestOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [nearestStops, setNearestStops] = useState<NearestStop[]>([]);
+  const [nearestMetroStations, setNearestMetroStations] = useState<NearestMetroStation[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+
+  // Favorites
   const [favorites, setFavorites] = useState<FavoriteStop[]>(() => getFavorites());
+  const [metroFavorites, setMetroFavorites] = useState<FavoriteMetroStation[]>(() =>
+    getFavoriteMetroStations()
+  );
 
   // Apply dark class to documentElement
   useEffect(() => {
@@ -81,6 +128,11 @@ export const App: React.FC = () => {
     setThemePreference(nextPref);
   };
 
+  const handleTransportModeChange = (newMode: TransportMode) => {
+    setTransportMode(newMode);
+    setTransportModePreference(newMode);
+  };
+
   // Keyboard shortcut ⌘K / Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -93,7 +145,7 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // 1. Initial stops dataset load
+  // 1. Initial datasets load
   useEffect(() => {
     loadStops()
       .then((stops) => {
@@ -108,18 +160,30 @@ export const App: React.FC = () => {
       .catch((err) => {
         console.error('Error loading stops:', err);
       });
+
+    loadMetroStations()
+      .then(() => {
+        setMetroStationsLoaded(true);
+        if (currentMetroStationId) {
+          getMetroStationByCode(currentMetroStationId).then((found) => {
+            if (found) {
+              setCurrentMetroStation(found);
+            }
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('Error loading metro stations:', err);
+      });
   }, []);
 
-  // Sync currentStop whenever currentStopId or stopsLoaded changes
+  // 2. Sync Bus stop state with URL
   useEffect(() => {
     if (!stopsLoaded) return;
     if (!currentStopId) {
       setCurrentStop(null);
       setEstimates([]);
       setErrorEstimates(null);
-      const url = new URL(window.location.href);
-      url.searchParams.delete('stop');
-      window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
       return;
     }
 
@@ -127,12 +191,11 @@ export const App: React.FC = () => {
     if (found) {
       setCurrentStop(found);
       setLastVisitedStopId(found.id);
-      // Update URL search param without reloading
       const url = new URL(window.location.href);
       url.searchParams.set('stop', found.id);
+      url.searchParams.delete('metro');
       window.history.replaceState({}, '', url.toString());
     } else {
-      // Create minimal stop info if not in dataset
       setCurrentStop({
         id: currentStopId,
         name: `Parada ${currentStopId}`,
@@ -144,7 +207,27 @@ export const App: React.FC = () => {
     }
   }, [currentStopId, stopsLoaded]);
 
-  // Fetch estimates callback
+  // 3. Sync Metro station state with URL
+  useEffect(() => {
+    if (!metroStationsLoaded) return;
+    if (!currentMetroStationId) {
+      setCurrentMetroStation(null);
+      return;
+    }
+
+    getMetroStationByCode(currentMetroStationId).then((found) => {
+      if (found) {
+        setCurrentMetroStation(found);
+        setLastVisitedMetroStationId(found.id);
+        const url = new URL(window.location.href);
+        url.searchParams.set('metro', found.id);
+        url.searchParams.delete('stop');
+        window.history.replaceState({}, '', url.toString());
+      }
+    });
+  }, [currentMetroStationId, metroStationsLoaded]);
+
+  // Fetch Bus estimates callback
   const loadEstimates = useCallback(
     async (stopId: string) => {
       setIsLoadingEstimates(true);
@@ -156,7 +239,6 @@ export const App: React.FC = () => {
         if (res.error) {
           setErrorEstimates(res.error);
         }
-        // If stop name or address returned from PMV is fresher, enrich stop
         if (res.stopName && (!currentStop || !currentStop.lines.length)) {
           setCurrentStop((prev) =>
             prev
@@ -190,7 +272,7 @@ export const App: React.FC = () => {
     loadEstimates(currentStopId);
   }, [currentStopId, loadEstimates]);
 
-  // Auto-refresh timer loop
+  // Auto-refresh timer loop for Bus view
   useEffect(() => {
     if (!currentStopId) return;
     const timer = setInterval(() => {
@@ -200,7 +282,6 @@ export const App: React.FC = () => {
 
       setCountdown((prev) => {
         if (prev <= 1) {
-          // Trigger refresh
           loadEstimates(currentStopId);
           return REFRESH_INTERVAL_SECONDS;
         }
@@ -211,14 +292,13 @@ export const App: React.FC = () => {
     return () => clearInterval(timer);
   }, [isAutoRefreshPaused, isLoadingEstimates, currentStopId, loadEstimates]);
 
-  // Manual refresh handler
   const handleManualRefresh = () => {
     if (!currentStopId) return;
     setCountdown(REFRESH_INTERVAL_SECONDS);
     loadEstimates(currentStopId);
   };
 
-  // Toggle favorite
+  // Bus Favorites Handlers
   const handleToggleFavorite = () => {
     if (!currentStop) return;
     const { favorites: updated } = toggleFavorite(currentStop);
@@ -238,22 +318,51 @@ export const App: React.FC = () => {
     }
   };
 
-  const isCurrentFav = favorites.some((f) => f.id === currentStopId);
+  // Metro Favorites Handlers
+  const handleToggleMetroFavorite = () => {
+    if (!currentMetroStation) return;
+    const { favorites: updated } = toggleFavoriteMetroStation(currentMetroStation);
+    setMetroFavorites(updated);
+  };
 
-  // Select stop from search, modal, or pill
+  const handleRemoveMetroFavorite = (stationId: string) => {
+    const updated = removeFavoriteMetroStation(stationId);
+    setMetroFavorites(updated);
+  };
+
+  const isCurrentBusFav = favorites.some((f) => f.id === currentStopId);
+  const isCurrentMetroFav = metroFavorites.some((f) => f.id === currentMetroStationId);
+
+  // Select Bus Stop
   const handleSelectStop = (stopId: string) => {
+    setCurrentMetroStationId(null);
+    setCurrentMetroStation(null);
     setCurrentStopId(stopId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Clear current stop and return to the search landing
-  const handleGoHome = () => {
+  // Select Metro Station
+  const handleSelectMetroStation = (stationId: string) => {
     setCurrentStopId(null);
     setCurrentStop(null);
     setEstimates([]);
     setErrorEstimates(null);
+    setCurrentMetroStationId(stationId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Clear selection & Return to search landing
+  const handleGoHome = () => {
+    setCurrentStopId(null);
+    setCurrentStop(null);
+    setCurrentMetroStationId(null);
+    setCurrentMetroStation(null);
+    setEstimates([]);
+    setErrorEstimates(null);
+
     const url = new URL(window.location.href);
     url.searchParams.delete('stop');
+    url.searchParams.delete('metro');
     window.history.pushState({}, '', url.pathname + (url.search ? url.search : ''));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -267,13 +376,16 @@ export const App: React.FC = () => {
 
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         setIsLocating(false);
         const { latitude, longitude } = pos.coords;
         setUserLocation({ lat: latitude, lon: longitude });
 
-        const nearest = findNearestStops(latitude, longitude, 25);
-        setNearestStops(nearest);
+        const nearestBuses = findNearestStops(latitude, longitude, 25);
+        const nearestMetros = await findNearestMetroStations(latitude, longitude, 25);
+
+        setNearestStops(nearestBuses);
+        setNearestMetroStations(nearestMetros);
         setIsNearestOpen(true);
       },
       (err) => {
@@ -291,6 +403,13 @@ export const App: React.FC = () => {
     );
   };
 
+  const hasActiveItem = Boolean(currentStopId || currentMetroStationId);
+  const activeType: 'bus' | 'metro' | null = currentMetroStationId
+    ? 'metro'
+    : currentStopId
+    ? 'bus'
+    : null;
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors overscroll-none">
       {/* Top Header */}
@@ -302,29 +421,69 @@ export const App: React.FC = () => {
         isDark={isDark}
         onToggleTheme={toggleTheme}
         favorites={favorites}
+        metroFavorites={metroFavorites}
         currentStopId={currentStopId}
+        currentMetroStationId={currentMetroStationId}
         onSelectStop={handleSelectStop}
+        onSelectMetroStation={handleSelectMetroStation}
+        transportMode={transportMode}
+        onTransportModeChange={handleTransportModeChange}
       />
 
-      {/* Main Content Area: pb-24 on mobile gives breathing room for bottom tab bar */}
+      {/* Main Content Area */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-4 sm:py-6 pb-24 md:pb-8 flex flex-col gap-4">
-        {!currentStopId ? (
-          /* Search & Discovery Landing when no stop is selected */
+        {!hasActiveItem ? (
+          /* Search & Discovery Landing when no stop/station is selected */
           <HomeSearchLanding
             onSelectStop={handleSelectStop}
+            onSelectMetroStation={handleSelectMetroStation}
             onNearMe={handleNearMe}
             isLocating={isLocating}
             favorites={favorites}
+            metroFavorites={metroFavorites}
             userLocation={userLocation}
+            transportMode={transportMode}
+            onTransportModeChange={handleTransportModeChange}
           />
-        ) : (
-          /* Real-time Stop Details, Live Map & Estimations */
+        ) : currentMetroStationId ? (
+          /* Metro Station View & Map */
           <>
-            {/* Stop Header */}
+            {currentMetroStation ? (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                {/* Map Column */}
+                <div className="lg:col-span-5 order-2 lg:order-1">
+                  <div className="sticky top-20 flex flex-col gap-2">
+                    <BusMap
+                      metroStation={currentMetroStation}
+                      userLocation={userLocation}
+                      isDark={isDark}
+                    />
+                  </div>
+                </div>
+
+                {/* Metro Station Details Column */}
+                <div className="lg:col-span-7 order-1 lg:order-2 flex flex-col gap-4">
+                  <MetroStationView
+                    station={currentMetroStation}
+                    isFav={isCurrentMetroFav}
+                    onToggleFavorite={handleToggleMetroFavorite}
+                    onBackToSearch={handleGoHome}
+                    onSelectStation={handleSelectMetroStation}
+                    isDark={isDark}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="h-48 bg-white dark:bg-slate-900 rounded-2xl animate-pulse" />
+            )}
+          </>
+        ) : (
+          /* EMT Bus Stop View & Map */
+          <>
             {currentStop ? (
               <StopHeader
                 stop={currentStop}
-                isFav={isCurrentFav}
+                isFav={isCurrentBusFav}
                 onToggleFavorite={handleToggleFavorite}
                 selectedLineFilter={selectedLineFilter}
                 onSelectLineFilter={setSelectedLineFilter}
@@ -382,7 +541,6 @@ export const App: React.FC = () => {
                   selectedLineFilter={selectedLineFilter}
                   onSelectBusOnMap={(bus) => {
                     setSelectedBus(bus);
-                    // Scroll up smoothly if on mobile
                     if (window.innerWidth < 1024) {
                       window.scrollTo({ top: 320, behavior: 'smooth' });
                     }
@@ -400,30 +558,39 @@ export const App: React.FC = () => {
         <p>
           Datos oficiales en tiempo real de{' '}
           <a
+            href="https://www.metromadrid.es"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-rose-600 dark:text-rose-400 font-semibold hover:underline"
+          >
+            Metro de Madrid
+          </a>{' '}
+          y{' '}
+          <a
             href="https://www.emtmadrid.es"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
           >
             EMT Madrid
-          </a>{' '}
-          • Open Data & PMV
+          </a>
         </p>
-        <p className="mt-1">PWA moderna adaptada para iPhone y navegación nativa.</p>
+        <p className="mt-1">PWA moderna de movilidad multimodal para Madrid.</p>
       </footer>
 
       {/* Mobile iOS Tab Bar */}
       <MobileTabBar
-        currentTab={currentStopId ? 'home' : 'search'}
+        currentTab={hasActiveItem ? 'home' : 'search'}
         onGoHome={handleGoHome}
         onOpenSearch={() => setIsSearchOpen(true)}
         onNearMe={handleNearMe}
         onOpenFavorites={() => setIsFavoritesOpen(true)}
         isLocating={isLocating}
-        favoritesCount={favorites.length}
+        favoritesCount={favorites.length + metroFavorites.length}
         isDark={isDark}
         onToggleTheme={toggleTheme}
-        hasActiveStop={Boolean(currentStopId)}
+        hasActiveStop={hasActiveItem}
+        activeType={activeType}
       />
 
       {/* Search Modal */}
@@ -431,7 +598,9 @@ export const App: React.FC = () => {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onSelectStop={handleSelectStop}
+        onSelectMetroStation={handleSelectMetroStation}
         userLocation={userLocation}
+        activeMode={transportMode}
       />
 
       {/* Nearest Stops (GPS) Modal */}
@@ -439,7 +608,9 @@ export const App: React.FC = () => {
         isOpen={isNearestOpen}
         onClose={() => setIsNearestOpen(false)}
         stops={nearestStops}
+        metroStations={nearestMetroStations}
         onSelectStop={handleSelectStop}
+        onSelectMetroStation={handleSelectMetroStation}
       />
 
       {/* Favorites Modal for Mobile */}
@@ -447,9 +618,13 @@ export const App: React.FC = () => {
         isOpen={isFavoritesOpen}
         onClose={() => setIsFavoritesOpen(false)}
         favorites={favorites}
+        metroFavorites={metroFavorites}
         onSelectStop={handleSelectStop}
+        onSelectMetroStation={handleSelectMetroStation}
         onRemoveFavorite={handleRemoveFavorite}
+        onRemoveMetroFavorite={handleRemoveMetroFavorite}
         currentStopId={currentStopId}
+        currentMetroStationId={currentMetroStationId}
       />
     </div>
   );

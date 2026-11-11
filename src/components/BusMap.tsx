@@ -1,37 +1,44 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import type { BusEstimate, Stop } from '../types/emt';
-import { Crosshair, Layers, MapPin } from 'lucide-react';
+import type { MetroStation } from '../types/metro';
+import { Crosshair, Layers, MapPin, Train } from 'lucide-react';
 import { GoogleBusMap } from './GoogleBusMap';
+import { formatMetroLineBadge } from '../data/metroLines';
 
 interface BusMapProps {
-  stop: Stop;
-  estimates: BusEstimate[];
+  stop?: Stop | null;
+  metroStation?: MetroStation | null;
+  estimates?: BusEstimate[];
   userLocation: { lat: number; lon: number } | null;
-  selectedBus: BusEstimate | null;
-  onClearSelectedBus: () => void;
+  selectedBus?: BusEstimate | null;
+  onClearSelectedBus?: () => void;
   isDark: boolean;
 }
 
 export const BusMap: React.FC<BusMapProps> = ({
   stop,
-  estimates,
+  metroStation,
+  estimates = [],
   userLocation,
-  selectedBus,
-  onClearSelectedBus,
+  selectedBus = null,
+  onClearSelectedBus = () => {},
   isDark,
 }) => {
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
   // Default to Google Maps if API key exists, otherwise fallback to Leaflet
   const [mapProvider, setMapProvider] = useState<'google' | 'leaflet'>(() =>
-    googleMapsApiKey ? 'google' : 'leaflet'
+    googleMapsApiKey && stop ? 'google' : 'leaflet'
   );
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
+
+  const targetLat = metroStation?.lat ?? stop?.lat ?? 40.4168;
+  const targetLon = metroStation?.lon ?? stop?.lon ?? -3.7038;
 
   // Initialize Leaflet Map (when provider is leaflet)
   useEffect(() => {
@@ -46,7 +53,7 @@ export const BusMap: React.FC<BusMapProps> = ({
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: [stop.lat, stop.lon],
+      center: [targetLat, targetLon],
       zoom: 16,
       zoomControl: false,
     });
@@ -93,37 +100,82 @@ export const BusMap: React.FC<BusMapProps> = ({
 
     markersGroup.clearLayers();
 
-    const bounds = L.latLngBounds([stop.lat, stop.lon], [stop.lat, stop.lon]);
+    const bounds = L.latLngBounds([targetLat, targetLon], [targetLat, targetLon]);
 
-    // 1. Stop Marker
-    const stopHtml = `
-      <div class="relative flex items-center justify-center">
-        <div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-bold text-xs ring-4 ring-blue-500/30">
-          <span>${stop.id}</span>
+    // 1. Metro Station Marker (if active)
+    if (metroStation) {
+      const lineBadgesHtml = metroStation.lines
+        .map((lineId) => {
+          const badge = formatMetroLineBadge(lineId);
+          return `<span style="background-color: ${badge.bg}; color: ${
+            badge.text
+          };" class="inline-block px-1.5 py-0.2 rounded text-[10px] font-black mr-1 shadow-2xs">${badge.label}</span>`;
+        })
+        .join('');
+
+      const metroHtml = `
+        <div class="relative flex items-center justify-center cursor-pointer group">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-600 to-red-600 border-2 border-white dark:border-slate-900 shadow-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-rose-500/30 group-hover:scale-110 transition-transform">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 12l10 10 10-10L12 2z"/>
+            </svg>
+            <span class="absolute text-[9px] font-black">M</span>
+          </div>
+          <div class="absolute -bottom-1 w-2.5 h-2.5 bg-rose-600 rotate-45"></div>
         </div>
-        <div class="absolute -bottom-1 w-2 h-2 bg-blue-600 rotate-45"></div>
-      </div>
-    `;
+      `;
 
-    const stopIcon = L.divIcon({
-      html: stopHtml,
-      className: 'stop-pin',
-      iconSize: [32, 36],
-      iconAnchor: [16, 36],
-      popupAnchor: [0, -36],
-    });
+      const metroIcon = L.divIcon({
+        html: metroHtml,
+        className: 'metro-pin',
+        iconSize: [40, 44],
+        iconAnchor: [20, 44],
+        popupAnchor: [0, -44],
+      });
 
-    L.marker([stop.lat, stop.lon], { icon: stopIcon })
-      .bindPopup(
-        `<div class="p-1 text-slate-900">
-          <div class="text-xs font-bold text-blue-600 uppercase">Parada ${stop.id}</div>
-          <div class="font-semibold text-sm">${stop.name}</div>
-          <div class="text-xs text-slate-500 mt-0.5">${stop.address}</div>
-        </div>`
-      )
-      .addTo(markersGroup);
+      L.marker([metroStation.lat, metroStation.lon], { icon: metroIcon })
+        .bindPopup(
+          `<div class="p-1 text-slate-900">
+            <div class="text-[10px] font-black text-rose-600 uppercase tracking-wider">Metro de Madrid</div>
+            <div class="font-bold text-sm text-slate-900">${metroStation.name}</div>
+            <div class="text-xs text-slate-500 mt-0.5">${metroStation.address || ''}</div>
+            <div class="mt-2 flex flex-wrap gap-1">${lineBadgesHtml}</div>
+          </div>`
+        )
+        .addTo(markersGroup);
+    }
 
-    // 2. Approaching Bus Markers
+    // 2. Bus Stop Marker (if active)
+    if (stop) {
+      const stopHtml = `
+        <div class="relative flex items-center justify-center">
+          <div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-bold text-xs ring-4 ring-blue-500/30">
+            <span>${stop.id}</span>
+          </div>
+          <div class="absolute -bottom-1 w-2 h-2 bg-blue-600 rotate-45"></div>
+        </div>
+      `;
+
+      const stopIcon = L.divIcon({
+        html: stopHtml,
+        className: 'stop-pin',
+        iconSize: [32, 36],
+        iconAnchor: [16, 36],
+        popupAnchor: [0, -36],
+      });
+
+      L.marker([stop.lat, stop.lon], { icon: stopIcon })
+        .bindPopup(
+          `<div class="p-1 text-slate-900">
+            <div class="text-xs font-bold text-blue-600 uppercase">Parada ${stop.id}</div>
+            <div class="font-semibold text-sm">${stop.name}</div>
+            <div class="text-xs text-slate-500 mt-0.5">${stop.address}</div>
+          </div>`
+        )
+        .addTo(markersGroup);
+    }
+
+    // 3. Approaching Bus Markers (if any)
     const busesWithGps = estimates.filter((e) => e.coordinates !== null);
 
     busesWithGps.forEach((bus) => {
@@ -185,7 +237,7 @@ export const BusMap: React.FC<BusMapProps> = ({
         .addTo(markersGroup);
     });
 
-    // 3. User Geolocation Marker
+    // 4. User Geolocation Marker
     if (userLocation) {
       bounds.extend([userLocation.lat, userLocation.lon]);
       const userHtml = `
@@ -218,19 +270,19 @@ export const BusMap: React.FC<BusMapProps> = ({
         animate: true,
       });
     } else {
-      map.setView([stop.lat, stop.lon], 16);
+      map.setView([targetLat, targetLon], 16);
     }
-  }, [stop, estimates, userLocation, selectedBus, mapProvider]);
+  }, [stop, metroStation, estimates, userLocation, selectedBus, mapProvider, targetLat, targetLon]);
 
-  const handleCenterOnStop = () => {
+  const handleCenterOnTarget = () => {
     if (!mapInstanceRef.current) return;
-    mapInstanceRef.current.flyTo([stop.lat, stop.lon], 16, { animate: true });
+    mapInstanceRef.current.flyTo([targetLat, targetLon], 16, { animate: true });
     onClearSelectedBus();
   };
 
   const handleFitAll = () => {
     if (!mapInstanceRef.current) return;
-    const bounds = L.latLngBounds([stop.lat, stop.lon], [stop.lat, stop.lon]);
+    const bounds = L.latLngBounds([targetLat, targetLon], [targetLat, targetLon]);
     estimates.forEach((e) => {
       if (e.coordinates) {
         bounds.extend([e.coordinates.lat, e.coordinates.lon]);
@@ -250,37 +302,45 @@ export const BusMap: React.FC<BusMapProps> = ({
       {/* Map Provider Selector Header */}
       <div className="flex items-center justify-between px-1">
         <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-          <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>Mapa en Tiempo Real</span>
+          {metroStation ? (
+            <Train className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+          ) : (
+            <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          )}
+          <span>
+            {metroStation ? 'Ubicación de la Estación' : 'Mapa en Tiempo Real'}
+          </span>
         </span>
 
-        {/* Toggle between Google Maps and OpenStreetMap */}
-        <div className="flex items-center p-0.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 text-[11px] font-bold">
-          <button
-            onClick={() => setMapProvider('google')}
-            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-              mapProvider === 'google'
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Google Maps
-          </button>
-          <button
-            onClick={() => setMapProvider('leaflet')}
-            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-              mapProvider === 'leaflet'
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            OpenStreetMap
-          </button>
-        </div>
+        {/* Toggle between Google Maps and OpenStreetMap (if bus stop has google map key) */}
+        {stop && (
+          <div className="flex items-center p-0.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 text-[11px] font-bold">
+            <button
+              onClick={() => setMapProvider('google')}
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                mapProvider === 'google'
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Google Maps
+            </button>
+            <button
+              onClick={() => setMapProvider('leaflet')}
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                mapProvider === 'leaflet'
+                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              OpenStreetMap
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Render selected map provider */}
-      {mapProvider === 'google' && googleMapsApiKey ? (
+      {mapProvider === 'google' && googleMapsApiKey && stop ? (
         <GoogleBusMap
           apiKey={googleMapsApiKey}
           stop={stop}
@@ -293,9 +353,12 @@ export const BusMap: React.FC<BusMapProps> = ({
       ) : mapProvider === 'google' && !googleMapsApiKey ? (
         <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md p-6 flex flex-col items-center justify-center text-center bg-slate-100 dark:bg-slate-900">
           <MapPin className="w-8 h-8 text-blue-500 mb-2 opacity-60" />
-          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">Google Maps no configurado</h4>
+          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">
+            Google Maps no configurado
+          </h4>
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1">
-            Configura la variable <code>VITE_GOOGLE_MAPS_API_KEY</code> o pulsa en <strong>OpenStreetMap</strong> para ver el mapa libre sin clave.
+            Configura la variable <code>VITE_GOOGLE_MAPS_API_KEY</code> o pulsa en{' '}
+            <strong>OpenStreetMap</strong> para ver el mapa libre sin clave.
           </p>
           <button
             onClick={() => setMapProvider('leaflet')}
@@ -310,11 +373,18 @@ export const BusMap: React.FC<BusMapProps> = ({
 
           {/* Floating map status badge */}
           <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-md text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/50 dark:border-slate-700/50">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span
+              className={`w-2 h-2 rounded-full ${
+                metroStation ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse'
+              }`}
+            ></span>
             <span>
-              OpenStreetMap •{' '}
-              {busesCountWithGps > 0
-                ? `${busesCountWithGps} ${busesCountWithGps === 1 ? 'autobús' : 'autobuses'} en mapa`
+              {metroStation
+                ? `Metro • ${metroStation.name}`
+                : busesCountWithGps > 0
+                ? `${busesCountWithGps} ${
+                    busesCountWithGps === 1 ? 'autobús' : 'autobuses'
+                  } en mapa`
                 : 'Sin autobuses con GPS activo'}
             </span>
           </div>
@@ -322,8 +392,8 @@ export const BusMap: React.FC<BusMapProps> = ({
           {/* Map Action Controls */}
           <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
             <button
-              onClick={handleCenterOnStop}
-              title="Centrar en la parada"
+              onClick={handleCenterOnTarget}
+              title={metroStation ? 'Centrar en la estación' : 'Centrar en la parada'}
               className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/50 dark:border-slate-700/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <Crosshair className="w-4 h-4 text-blue-600 dark:text-blue-400" />

@@ -63,4 +63,74 @@ describe('storageService', () => {
     setLastVisitedStopId('4514');
     expect(getLastVisitedStopId()).toBe('4514');
   });
+
+  it('manages metro favorites correctly', async () => {
+    const {
+      getFavoriteMetroStations,
+      addFavoriteMetroStation,
+      removeFavoriteMetroStation,
+      isFavoriteMetroStation,
+      toggleFavoriteMetroStation,
+    } = await import('../storageService');
+
+    expect(getFavoriteMetroStations()).toEqual([]);
+    expect(isFavoriteMetroStation('0112')).toBe(false);
+
+    const station = {
+      id: '0112',
+      name: 'Sol',
+      lines: ['1', '2', '3'],
+      address: 'Plaza de la Puerta del Sol',
+    };
+    addFavoriteMetroStation(station);
+
+    expect(isFavoriteMetroStation('0112')).toBe(true);
+    expect(getFavoriteMetroStations().length).toBe(1);
+    expect(getFavoriteMetroStations()[0].id).toBe('0112');
+    expect(getFavoriteMetroStations()[0].name).toBe('Sol');
+
+    // Duplicate add should be no-op
+    addFavoriteMetroStation(station);
+    expect(getFavoriteMetroStations().length).toBe(1);
+
+    // Toggle removes it
+    const toggleRes1 = toggleFavoriteMetroStation(station);
+    expect(toggleRes1.isFav).toBe(false);
+    expect(isFavoriteMetroStation('0112')).toBe(false);
+
+    // Toggle adds it back
+    const toggleRes2 = toggleFavoriteMetroStation(station);
+    expect(toggleRes2.isFav).toBe(true);
+    expect(isFavoriteMetroStation('0112')).toBe(true);
+
+    // Remove
+    removeFavoriteMetroStation('0112');
+    expect(isFavoriteMetroStation('0112')).toBe(false);
+  });
+
+  it('persists last visited metro station ID', async () => {
+    const { getLastVisitedMetroStationId, setLastVisitedMetroStationId } = await import(
+      '../storageService'
+    );
+    expect(getLastVisitedMetroStationId()).toBeNull();
+    setLastVisitedMetroStationId('0209');
+    expect(getLastVisitedMetroStationId()).toBe('0209');
+  });
+
+  it('persists transport mode preference', async () => {
+    const { getTransportModePreference, setTransportModePreference } = await import(
+      '../storageService'
+    );
+    expect(getTransportModePreference()).toBe('all');
+
+    setTransportModePreference('metro');
+    expect(getTransportModePreference()).toBe('metro');
+
+    setTransportModePreference('bus');
+    expect(getTransportModePreference()).toBe('bus');
+
+    setTransportModePreference('all');
+    expect(getTransportModePreference()).toBe('all');
+  });
 });
+

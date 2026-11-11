@@ -1,0 +1,3494 @@
+[
+  {
+    "id": "0722",
+    "name": "ARROYO FRESNO",
+    "address": "Calle de Federica Montseny 2",
+    "lat": 40.4909,
+    "lon": -3.72604,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0722"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1102",
+    "name": "Abrantes",
+    "address": "Avda de Abrantes 77",
+    "lat": 40.38083,
+    "lon": -3.7279,
+    "lines": [
+      "11"
+    ],
+    "allCodes": [
+      "1102"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0519",
+    "name": "Acacias",
+    "address": "Paseo de las Acacias 20",
+    "lat": 40.40387,
+    "lon": -3.70664,
+    "lines": [
+      "3",
+      "5"
+    ],
+    "allCodes": [
+      "0519"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0808",
+    "name": "Aeropuerto T-4",
+    "address": "Ctra de Alcobendas a Barajas SN",
+    "lat": 40.49177,
+    "lon": -3.59325,
+    "lines": [
+      "8"
+    ],
+    "allCodes": [
+      "0808"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0806",
+    "name": "Aeropuerto T1-T2-T3",
+    "address": "Avda de la Hispanidad SN",
+    "lat": 40.46864,
+    "lon": -3.56954,
+    "lines": [
+      "8"
+    ],
+    "allCodes": [
+      "0806"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0552",
+    "name": "Alameda de Osuna",
+    "address": "Calle de la Corbeta 14",
+    "lat": 40.45779,
+    "lon": -3.58752,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0552"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1203",
+    "name": "Alcorcón Central",
+    "address": "Avda de Móstoles 12",
+    "lat": 40.35008,
+    "lon": -3.83178,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1203"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0413",
+    "name": "Alfonso XIII",
+    "address": "Calle de López de Hoyos 190",
+    "lat": 40.44825,
+    "lon": -3.66791,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0413"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0351",
+    "name": "Almendrales",
+    "address": "Avda de Córdoba 21",
+    "lat": 40.38409,
+    "lon": -3.69788,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0351"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0712",
+    "name": "Alonso Cano",
+    "address": "Calle de José Abascal 18",
+    "lat": 40.43838,
+    "lon": -3.69925,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0712"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0404",
+    "name": "Alonso Martínez",
+    "address": "Plaza de Alonso Martínez 4",
+    "lat": 40.42772,
+    "lon": -3.69594,
+    "lines": [
+      "4",
+      "5",
+      "10"
+    ],
+    "allCodes": [
+      "0404",
+      "0512",
+      "1009"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1219",
+    "name": "Alonso de Mendoza",
+    "address": "Calle del Greco 6",
+    "lat": 40.30081,
+    "lon": -3.73664,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1219"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0253",
+    "name": "Alsacia",
+    "address": "Plaza de Alsacia S/N",
+    "lat": 40.41829,
+    "lon": -3.62351,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0253"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0627",
+    "name": "Alto de Extremadura",
+    "address": "Paseo de Extremadura 154",
+    "lat": 40.40993,
+    "lon": -3.73894,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0627"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0123",
+    "name": "Alto del Arenal",
+    "address": "Calle de Santillana del Mar 21",
+    "lat": 40.38977,
+    "lon": -3.64522,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0123"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0527",
+    "name": "Aluche",
+    "address": "Calle de Valmojado 293",
+    "lat": 40.38563,
+    "lon": -3.7608,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0527"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0105",
+    "name": "Alvarado",
+    "address": "Calle de Bravo Murillo 138",
+    "lat": 40.45033,
+    "lon": -3.70331,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0105"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0718",
+    "name": "Antonio Machado",
+    "address": "Calle de Valderrodrigo 55",
+    "lat": 40.47022,
+    "lon": -3.71769,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0718"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0114",
+    "name": "Antón Martín",
+    "address": "Calle de Atocha 50",
+    "lat": 40.41246,
+    "lon": -3.69937,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0114"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0928",
+    "name": "Arganda del Rey",
+    "address": "Paseo de la Estación 37",
+    "lat": 40.30367,
+    "lon": -3.44752,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0928"
+    ],
+    "zone": "B3"
+  },
+  {
+    "id": "0608",
+    "name": "Arganzuela-Planetario",
+    "address": "Calle del Bronce 1 A",
+    "lat": 40.3931,
+    "lon": -3.68864,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0608"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0310",
+    "name": "Argüelles",
+    "address": "Calle de Alberto Aguilera 72",
+    "lat": 40.43066,
+    "lon": -3.71596,
+    "lines": [
+      "3",
+      "4",
+      "6"
+    ],
+    "allCodes": [
+      "0310",
+      "0401",
+      "0624"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1217",
+    "name": "Arroyo Culebro",
+    "address": "Paseo de Juan José Rosón 1",
+    "lat": 40.28874,
+    "lon": -3.75682,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1217"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0917",
+    "name": "Artilleros",
+    "address": "Calle del Camino de los Vinateros 210",
+    "lat": 40.40522,
+    "lon": -3.64181,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0917"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0415",
+    "name": "Arturo Soria",
+    "address": "Calle de Arturo Soria 172",
+    "lat": 40.45583,
+    "lon": -3.65618,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0415"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0705",
+    "name": "Ascao",
+    "address": "Calle de Ascao 29",
+    "lat": 40.43021,
+    "lon": -3.64106,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0705"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0116",
+    "name": "Atocha",
+    "address": "Avda de la Ciudad de Barcelona 2 B",
+    "lat": 40.40659,
+    "lon": -3.68938,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0116"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0411",
+    "name": "Avenida de América",
+    "address": "Avda de América 9 A",
+    "lat": 40.43803,
+    "lon": -3.67664,
+    "lines": [
+      "4",
+      "6",
+      "7",
+      "9"
+    ],
+    "allCodes": [
+      "0411",
+      "0616",
+      "0710",
+      "0910"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0254",
+    "name": "Avenida de Guadalajara",
+    "address": "Avda de Guadalajara 110",
+    "lat": 40.42239,
+    "lon": -3.61206,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0254"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0414",
+    "name": "Avenida de La Paz",
+    "address": "Avda de Ramón y Cajal 107",
+    "lat": 40.45354,
+    "lon": -3.66118,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0414"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0720",
+    "name": "Avenida de la Ilustración",
+    "address": "Calle de las Islas Cíes 23",
+    "lat": 40.4801,
+    "lon": -3.7184,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0720"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1018",
+    "name": "Aviación Española",
+    "address": "Paseo de Extremadura 463",
+    "lat": 40.38364,
+    "lon": -3.78392,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1018"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0152",
+    "name": "Bambú",
+    "address": "Calle del Bambú 14",
+    "lat": 40.47682,
+    "lon": -3.67637,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0152"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0206",
+    "name": "Banco de España",
+    "address": "Calle de Alcalá 49",
+    "lat": 40.41922,
+    "lon": -3.69497,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0206"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0807",
+    "name": "Barajas",
+    "address": "Cmno  Viejo de Hortaleza 10",
+    "lat": 40.47577,
+    "lon": -3.58253,
+    "lines": [
+      "8"
+    ],
+    "allCodes": [
+      "0807"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0707",
+    "name": "Barrio de la Concepción",
+    "address": "Calle de Martínez Villergas 1",
+    "lat": 40.4391,
+    "lon": -3.652,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0707"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0902",
+    "name": "Barrio del Pilar",
+    "address": "Calle de Ginzo de Limia 22",
+    "lat": 40.47689,
+    "lon": -3.70316,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0902"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0754",
+    "name": "Barrio del Puerto",
+    "address": "Avda de España 8",
+    "lat": 40.4225,
+    "lon": -3.56919,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0754"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1014",
+    "name": "Batán",
+    "address": "Paseo de la Venta 1",
+    "lat": 40.40786,
+    "lon": -3.75311,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1014"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1059",
+    "name": "Baunatal",
+    "address": "Avda de las Lomas del Rey 2",
+    "lat": 40.55442,
+    "lon": -3.63513,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1059"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1002",
+    "name": "Begoña",
+    "address": "Paseo de la Castellana 261",
+    "lat": 40.48041,
+    "lon": -3.68585,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1002"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0109",
+    "name": "Bilbao",
+    "address": "Calle de Sagasta 2",
+    "lat": 40.42906,
+    "lon": -3.70218,
+    "lines": [
+      "1",
+      "4"
+    ],
+    "allCodes": [
+      "0109",
+      "0403"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0122",
+    "name": "Buenos Aires",
+    "address": "Avda de la Albufera 179",
+    "lat": 40.39156,
+    "lon": -3.65391,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0122"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0307",
+    "name": "Callao",
+    "address": "Plaza del Callao 3",
+    "lat": 40.42014,
+    "lon": -3.70566,
+    "lines": [
+      "3",
+      "5"
+    ],
+    "allCodes": [
+      "0307",
+      "0515"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0529",
+    "name": "Campamento",
+    "address": "Avda del Padre Piquer 7",
+    "lat": 40.39481,
+    "lon": -3.76813,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0529"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0214",
+    "name": "Canal",
+    "address": "Calle de Bravo Murillo 40",
+    "lat": 40.43841,
+    "lon": -3.70433,
+    "lines": [
+      "2",
+      "7"
+    ],
+    "allCodes": [
+      "0214",
+      "0713"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0417",
+    "name": "Canillas",
+    "address": "Avda de Machupichu 64",
+    "lat": 40.46381,
+    "lon": -3.6356,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0417"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0501",
+    "name": "Canillejas",
+    "address": "Calle de Alcalá 631",
+    "lat": 40.44942,
+    "lon": -3.60816,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0501"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0525",
+    "name": "Carabanchel",
+    "address": "Gta del Ejército 1",
+    "lat": 40.38783,
+    "lon": -3.74487,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0525"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1105",
+    "name": "Carabanchel Alto",
+    "address": "Avda de Carabanchel Alto 40",
+    "lat": 40.372,
+    "lon": -3.75191,
+    "lines": [
+      "11"
+    ],
+    "allCodes": [
+      "1105"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0602",
+    "name": "Carpetana",
+    "address": "Calle   Vía Carpetana 141",
+    "lat": 40.3927,
+    "lon": -3.74099,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0602"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0709",
+    "name": "Cartagena",
+    "address": "Avda de América 35",
+    "lat": 40.43934,
+    "lon": -3.67215,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0709"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0530",
+    "name": "Casa de Campo",
+    "address": "Ctra del Zoo 1",
+    "lat": 40.40324,
+    "lon": -3.76101,
+    "lines": [
+      "5",
+      "10"
+    ],
+    "allCodes": [
+      "0530",
+      "1015"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1227",
+    "name": "Casa del Reloj",
+    "address": "Avda   Gibraltar 11",
+    "lat": 40.3266,
+    "lon": -3.75942,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1227"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0151",
+    "name": "Chamartín",
+    "address": "Calle de Agustín de Foxá 40",
+    "lat": 40.47203,
+    "lon": -3.68259,
+    "lines": [
+      "1",
+      "10"
+    ],
+    "allCodes": [
+      "0151",
+      "1003"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0513",
+    "name": "Chueca",
+    "address": "Plaza de Chueca 7",
+    "lat": 40.42293,
+    "lon": -3.69762,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0513"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0504",
+    "name": "Ciudad Lineal",
+    "address": "Calle de Arturo Soria 2",
+    "lat": 40.43805,
+    "lon": -3.63816,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0504"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0622",
+    "name": "Ciudad Universitaria",
+    "address": "Avda  Complutense 1",
+    "lat": 40.44356,
+    "lon": -3.72678,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0622"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0354",
+    "name": "Ciudad de los Ángeles",
+    "address": "Avda de Andalucía 38",
+    "lat": 40.35959,
+    "lon": -3.69363,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0354"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0802",
+    "name": "Colombia",
+    "address": "Calle del Príncipe de Vergara 258",
+    "lat": 40.45634,
+    "lon": -3.67682,
+    "lines": [
+      "8",
+      "9"
+    ],
+    "allCodes": [
+      "0802",
+      "0907"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1016",
+    "name": "Colonia Jardín",
+    "address": "Calle de Arenas de San Pedro 2",
+    "lat": 40.39698,
+    "lon": -3.77462,
+    "lines": [
+      "10",
+      "ML2",
+      "ML3"
+    ],
+    "allCodes": [
+      "1016"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0405",
+    "name": "Colón",
+    "address": "Plaza de Colón 2",
+    "lat": 40.42542,
+    "lon": -3.69101,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0405"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0908",
+    "name": "Concha Espina",
+    "address": "Calle del Príncipe de Vergara 210",
+    "lat": 40.45145,
+    "lon": -3.67738,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0908"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0611",
+    "name": "Conde de Casal",
+    "address": "Plaza del Conde de Casal 3",
+    "lat": 40.40697,
+    "lon": -3.67041,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0611"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0127",
+    "name": "Congosto",
+    "address": "Calle del Congosto 48",
+    "lat": 40.37238,
+    "lon": -3.61884,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0127"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1218",
+    "name": "Conservatorio",
+    "address": "Avda de las Arcas del Agua 5",
+    "lat": 40.29324,
+    "lon": -3.74576,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1218"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0755",
+    "name": "Coslada Central",
+    "address": "Calle del Doctor Fleming 41",
+    "lat": 40.42374,
+    "lon": -3.56119,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0755"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0909",
+    "name": "Cruz del Rayo",
+    "address": "Calle del Príncipe de Vergara 138",
+    "lat": 40.44427,
+    "lon": -3.67821,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0909"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0106",
+    "name": "Cuatro Caminos",
+    "address": "Gta de Cuatro Caminos 2",
+    "lat": 40.44697,
+    "lon": -3.70397,
+    "lines": [
+      "1",
+      "2",
+      "6"
+    ],
+    "allCodes": [
+      "0106",
+      "0215",
+      "0619"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1019",
+    "name": "Cuatro Vientos",
+    "address": "Col   Militar de Cuatro Vientos 6 B",
+    "lat": 40.37771,
+    "lon": -3.79152,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1019"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1005",
+    "name": "Cuzco",
+    "address": "Paseo de la Castellana 162",
+    "lat": 40.45842,
+    "lon": -3.68985,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1005"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0302",
+    "name": "Delicias",
+    "address": "Paseo de las Delicias 60",
+    "lat": 40.3999,
+    "lon": -3.6942,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0302"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0410",
+    "name": "Diego de León",
+    "address": "Calle de Diego de León 69",
+    "lat": 40.43468,
+    "lon": -3.67495,
+    "lines": [
+      "4",
+      "5",
+      "6"
+    ],
+    "allCodes": [
+      "0410",
+      "0509",
+      "0615"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0905",
+    "name": "Duque de Pastrana",
+    "address": "Calle de Mateo Inurria 41",
+    "lat": 40.46763,
+    "lon": -3.67917,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0905"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1224",
+    "name": "El Bercial",
+    "address": "Avda   Comandante José Manuel Ripollés 4",
+    "lat": 40.32907,
+    "lon": -3.72963,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1224"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0551",
+    "name": "El Capricho",
+    "address": "Calle de Pinos de Osuna 15",
+    "lat": 40.45347,
+    "lon": -3.59401,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0551"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0507",
+    "name": "El Carmen",
+    "address": "Calle de Raquel Méller 2",
+    "lat": 40.43189,
+    "lon": -3.65757,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0507"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1225",
+    "name": "El Carrascal",
+    "address": "Avda   Rey Juan Carlos I 85",
+    "lat": 40.33664,
+    "lon": -3.74018,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1225"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "358",
+    "name": "El Casar",
+    "address": "Avda del Casar 2",
+    "lat": 40.31862,
+    "lon": -3.70985,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "358"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0304",
+    "name": "Embajadores",
+    "address": "Gta de Embajadores 10",
+    "lat": 40.40513,
+    "lon": -3.70268,
+    "lines": [
+      "3",
+      "5"
+    ],
+    "allCodes": [
+      "0304"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0528",
+    "name": "Empalme",
+    "address": "Calle de Tembleque 105",
+    "lat": 40.39057,
+    "lon": -3.76535,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0528"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0416",
+    "name": "Esperanza",
+    "address": "Calle de Andorra 51",
+    "lat": 40.45945,
+    "lon": -3.64582,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0416"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0115",
+    "name": "Estación del Arte",
+    "address": "Plaza del Emperador Carlos V 11",
+    "lat": 40.40885,
+    "lon": -3.69249,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0115"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0751",
+    "name": "Estadio Metropolitano",
+    "address": "Avda de Arcentales 28",
+    "lat": 40.43339,
+    "lon": -3.60015,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0751"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0104",
+    "name": "Estrecho",
+    "address": "Calle de Bravo Murillo 191",
+    "lat": 40.45429,
+    "lon": -3.70302,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0104"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0915",
+    "name": "Estrella",
+    "address": "Calle del Camino de los Vinateros 1",
+    "lat": 40.41147,
+    "lon": -3.66179,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0915"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0526",
+    "name": "Eugenia de Montijo",
+    "address": "Calle de Ocaña 86",
+    "lat": 40.38439,
+    "lon": -3.75121,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0526"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0805",
+    "name": "Feria de Madrid",
+    "address": "Avda del Partenón 5",
+    "lat": 40.46389,
+    "lon": -3.6162,
+    "lines": [
+      "8"
+    ],
+    "allCodes": [
+      "0805"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0716",
+    "name": "Francos Rodríguez",
+    "address": "Avda de Pablo Iglesias 87",
+    "lat": 40.45648,
+    "lon": -3.71239,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0716"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1001",
+    "name": "Fuencarral",
+    "address": "Calle de la Fuente Chica 21",
+    "lat": 40.49509,
+    "lon": -3.69283,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1001"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1214",
+    "name": "Fuenlabrada Central",
+    "address": "Calle de la Vía SN",
+    "lat": 40.28268,
+    "lon": -3.79891,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1214"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0704",
+    "name": "García Noblejas",
+    "address": "Calle de Luis del Campo 1",
+    "lat": 40.42842,
+    "lon": -3.6333,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0704"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1220",
+    "name": "Getafe Central",
+    "address": "Calle  Ferrocarril 2",
+    "lat": 40.30993,
+    "lon": -3.73403,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1220"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0203",
+    "name": "Goya",
+    "address": "Calle de Alcalá 96",
+    "lat": 40.42455,
+    "lon": -3.67591,
+    "lines": [
+      "2",
+      "4"
+    ],
+    "allCodes": [
+      "0203",
+      "0408"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0111",
+    "name": "Gran Vía",
+    "address": "Calle   Gran Vía 23",
+    "lat": 40.42001,
+    "lon": -3.7018,
+    "lines": [
+      "1",
+      "5"
+    ],
+    "allCodes": [
+      "0111",
+      "0514"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0711",
+    "name": "Gregorio Marañón",
+    "address": "Calle de José Abascal 65",
+    "lat": 40.43825,
+    "lon": -3.69148,
+    "lines": [
+      "7",
+      "10"
+    ],
+    "allCodes": [
+      "0711",
+      "1008"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0620",
+    "name": "Guzmán el Bueno",
+    "address": "Calle de Guzmán el Bueno 118",
+    "lat": 40.44637,
+    "lon": -3.71229,
+    "lines": [
+      "6",
+      "7"
+    ],
+    "allCodes": [
+      "0620",
+      "0715"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0759",
+    "name": "Henares",
+    "address": "Avda de Algorta 12",
+    "lat": 40.41777,
+    "lon": -3.52718,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0759"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0901",
+    "name": "Herrera Oria",
+    "address": "Calle de Valencia de Don Juan 1",
+    "lat": 40.48466,
+    "lon": -3.70751,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0901"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0421",
+    "name": "Hortaleza",
+    "address": "Calle del Capitán Cortés 4",
+    "lat": 40.47537,
+    "lon": -3.65257,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0421"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0352",
+    "name": "Hospital 12 de Octubre",
+    "address": "Avda de Córdoba 49",
+    "lat": 40.37503,
+    "lon": -3.69585,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0352"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1061",
+    "name": "Hospital Infanta Sofía",
+    "address": "Paseo   Europa 11",
+    "lat": 40.55977,
+    "lon": -3.61145,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1061"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1228",
+    "name": "Hospital Severo Ochoa",
+    "address": "Avda   Orellana 3",
+    "lat": 40.32177,
+    "lon": -3.76797,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1228"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1212",
+    "name": "Hospital de Fuenlabrada",
+    "address": "Cmno del Molino 3",
+    "lat": 40.28576,
+    "lon": -3.81642,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1212"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "1208",
+    "name": "Hospital de Móstoles",
+    "address": "Calle del Río Sella 10",
+    "lat": 40.31652,
+    "lon": -3.87471,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1208"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0760",
+    "name": "Hospital del Henares",
+    "address": "Cmno del Tiro SN",
+    "lat": 40.41761,
+    "lon": -3.53453,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0760"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0913",
+    "name": "Ibiza",
+    "address": "Calle de Ibiza 1",
+    "lat": 40.41839,
+    "lon": -3.67858,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0913"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0108",
+    "name": "Iglesia",
+    "address": "Gta del Pintor Sorolla 2",
+    "lat": 40.43492,
+    "lon": -3.69898,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0108"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0714",
+    "name": "Islas Filipinas",
+    "address": "Calle de Cea Bermúdez 54",
+    "lat": 40.43907,
+    "lon": -3.71373,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0714"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0758",
+    "name": "Jarama",
+    "address": "Plaza   Guernica 1",
+    "lat": 40.42295,
+    "lon": -3.52549,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0758"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1020",
+    "name": "Joaquín Vilumbrales",
+    "address": "Avda de la Libertad 13",
+    "lat": 40.34985,
+    "lon": -3.8072,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1020"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1221",
+    "name": "Juan de la Cierva",
+    "address": "Avda de España 20",
+    "lat": 40.3118,
+    "lon": -3.72224,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1221"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1226",
+    "name": "Julián Besteiro",
+    "address": "Avda   Rey Juan Carlos I 23 A",
+    "lat": 40.33475,
+    "lon": -3.75266,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1226"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0252",
+    "name": "La Almudena",
+    "address": "Calle de Arriaga 75",
+    "lat": 40.42361,
+    "lon": -3.63914,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0252"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0251",
+    "name": "La Elipa",
+    "address": "Avda del Marqués de Corbera 58",
+    "lat": 40.42662,
+    "lon": -3.65052,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0251"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1107",
+    "name": "La Fortuna",
+    "address": "Calle   San José 40",
+    "lat": 40.35795,
+    "lon": -3.77783,
+    "lines": [
+      "11"
+    ],
+    "allCodes": [
+      "1107"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0128",
+    "name": "La Gavia",
+    "address": "Avda del Ensanche de Vallecas 16",
+    "lat": 40.37019,
+    "lon": -3.61346,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0128"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1055",
+    "name": "La Granja",
+    "address": "Calle de Sepúlveda 1",
+    "lat": 40.5276,
+    "lon": -3.65859,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1055"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0517",
+    "name": "La Latina",
+    "address": "Calle de San Millán 5",
+    "lat": 40.41128,
+    "lon": -3.70816,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0517"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1056",
+    "name": "La Moraleja",
+    "address": "Avda de la Ermita 5",
+    "lat": 40.53196,
+    "lon": -3.63556,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1056"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1106",
+    "name": "La Peseta",
+    "address": "Calle de Salvador Allende 3",
+    "lat": 40.36422,
+    "lon": -3.7569,
+    "lines": [
+      "11"
+    ],
+    "allCodes": [
+      "1106"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0927",
+    "name": "La Poveda",
+    "address": "Parcela   9017 Polígono 1 S/N",
+    "lat": 40.31902,
+    "lon": -3.47745,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0927"
+    ],
+    "zone": "B3"
+  },
+  {
+    "id": "0756",
+    "name": "La Rambla",
+    "address": "Calle   Honduras 2",
+    "lat": 40.42514,
+    "lon": -3.54792,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0756"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0721",
+    "name": "Lacoma",
+    "address": "Calle de Riscos de Polanco 3",
+    "lat": 40.48502,
+    "lon": -3.72305,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0721"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1013",
+    "name": "Lago",
+    "address": "Ronda del Lago 3",
+    "lat": 40.41641,
+    "lon": -3.73563,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1013"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0601",
+    "name": "Laguna",
+    "address": "Calle de Cuart de Poblet 1",
+    "lat": 40.39923,
+    "lon": -3.74429,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0601"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0701",
+    "name": "Las Musas",
+    "address": "Avda de Niza 61",
+    "lat": 40.43299,
+    "lon": -3.60788,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0701"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0255",
+    "name": "Las Rosas",
+    "address": "Paseo de Ginebra 35",
+    "lat": 40.42375,
+    "lon": -3.60331,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0255"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0129",
+    "name": "Las Suertes",
+    "address": "Calle de Cañada del Santísimo 45",
+    "lat": 40.36323,
+    "lon": -3.59953,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0129"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1053",
+    "name": "Las Tablas",
+    "address": "Calle de Palas de Rey 30",
+    "lat": 40.50833,
+    "lon": -3.66944,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1053"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0305",
+    "name": "Lavapiés",
+    "address": "Plaza de Lavapiés 7",
+    "lat": 40.40851,
+    "lon": -3.7009,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0305"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1229",
+    "name": "Leganés Central",
+    "address": "Calle  Virgen del Camino 1",
+    "lat": 40.32899,
+    "lon": -3.77154,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1229"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0301",
+    "name": "Legazpi",
+    "address": "Plaza de Legazpi 2 B",
+    "lat": 40.39116,
+    "lon": -3.69511,
+    "lines": [
+      "3",
+      "6"
+    ],
+    "allCodes": [
+      "0301",
+      "0607"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0409",
+    "name": "Lista",
+    "address": "Calle del Conde de Peñalver 45",
+    "lat": 40.42917,
+    "lon": -3.67541,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0409"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1210",
+    "name": "Loranca",
+    "address": "Calle de la Alegría 4",
+    "lat": 40.29681,
+    "lon": -3.83768,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1210"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "1223",
+    "name": "Los Espartales",
+    "address": "Avda   Rigoberta Menchú 3",
+    "lat": 40.32423,
+    "lon": -3.7182,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1223"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0628",
+    "name": "Lucero",
+    "address": "Calle de las Higueras 47",
+    "lat": 40.4051,
+    "lon": -3.74534,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0628"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0422",
+    "name": "Manoteras",
+    "address": "Calle de Bacares 24",
+    "lat": 40.47687,
+    "lon": -3.6629,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0422"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0202",
+    "name": "Manuel Becerra",
+    "address": "Plaza de Manuel Becerra 1",
+    "lat": 40.4279,
+    "lon": -3.66926,
+    "lines": [
+      "2",
+      "6"
+    ],
+    "allCodes": [
+      "0202",
+      "0614"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1058",
+    "name": "Manuel de Falla",
+    "address": "Calle   Manuel de Falla 59",
+    "lat": 40.55048,
+    "lon": -3.64688,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1058"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1209",
+    "name": "Manuela Malasaña",
+    "address": "Plaza   Sol de 9001 SN",
+    "lat": 40.30903,
+    "lon": -3.86402,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1209"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0418",
+    "name": "Mar de Cristal",
+    "address": "Gta del Mar de Cristal 1 B",
+    "lat": 40.46943,
+    "lon": -3.63832,
+    "lines": [
+      "4",
+      "8"
+    ],
+    "allCodes": [
+      "0418",
+      "0804"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0521",
+    "name": "Marqués de Vadillo",
+    "address": "Gta del Marqués de Vadillo 4",
+    "lat": 40.39736,
+    "lon": -3.71596,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0521"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1057",
+    "name": "Marqués de la Valdavia",
+    "address": "Calle del Marqués de la Valdavia 21",
+    "lat": 40.54102,
+    "lon": -3.63738,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1057"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0117",
+    "name": "Menéndez Pelayo",
+    "address": "Avda de la Ciudad de Barcelona 23",
+    "lat": 40.40445,
+    "lon": -3.68098,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0117"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0124",
+    "name": "Miguel Hernández",
+    "address": "Calle de León Felipe 4 A",
+    "lat": 40.38732,
+    "lon": -3.63951,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0124"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0951",
+    "name": "Mirasierra",
+    "address": "Avda del Ventisquero de la Condesa 28",
+    "lat": 40.4911,
+    "lon": -3.71634,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0951"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0311",
+    "name": "Moncloa",
+    "address": "Plaza de la Moncloa 1",
+    "lat": 40.43502,
+    "lon": -3.71945,
+    "lines": [
+      "3",
+      "6"
+    ],
+    "allCodes": [
+      "0311",
+      "0623"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1052",
+    "name": "Montecarmelo",
+    "address": "Avda de Monasterio de Silos 63 A",
+    "lat": 40.50525,
+    "lon": -3.69575,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1052"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0609",
+    "name": "Méndez Álvaro",
+    "address": "Calle del Ombu 16",
+    "lat": 40.39538,
+    "lon": -3.67814,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0609"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1206",
+    "name": "Móstoles Central",
+    "address": "Paseo de la Estación 13",
+    "lat": 40.3285,
+    "lon": -3.86354,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1206"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0211",
+    "name": "Noviciado",
+    "address": "Calle de San Bernardo 49",
+    "lat": 40.42484,
+    "lon": -3.70742,
+    "lines": [
+      "2",
+      "3",
+      "10"
+    ],
+    "allCodes": [
+      "0211"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0120",
+    "name": "Nueva Numancia",
+    "address": "Avda de la Albufera 70",
+    "lat": 40.39554,
+    "lon": -3.66414,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0120"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0618",
+    "name": "Nuevos Ministerios",
+    "address": "Calle de Raimundo Fernández Villaverde 67",
+    "lat": 40.44662,
+    "lon": -3.69241,
+    "lines": [
+      "6",
+      "8",
+      "10"
+    ],
+    "allCodes": [
+      "0618",
+      "0801",
+      "1007"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0510",
+    "name": "Núñez de Balboa",
+    "address": "Calle de Juan Bravo 20",
+    "lat": 40.43278,
+    "lon": -3.68258,
+    "lines": [
+      "5",
+      "9"
+    ],
+    "allCodes": [
+      "0510",
+      "0911"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0604",
+    "name": "Opañel",
+    "address": "Calle del Valle de Oro 50 A",
+    "lat": 40.3869,
+    "lon": -3.72313,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0604"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0523",
+    "name": "Oporto",
+    "address": "Gta del Valle de Oro 13",
+    "lat": 40.38846,
+    "lon": -3.73132,
+    "lines": [
+      "5",
+      "6"
+    ],
+    "allCodes": [
+      "0523",
+      "0603"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0613",
+    "name": "O´Donnell",
+    "address": "Calle del Doctor Esquerdo 47",
+    "lat": 40.42289,
+    "lon": -3.6686,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0613"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0952",
+    "name": "Paco de Lucía",
+    "address": "Calle de Monasterio de Las Huelgas 5",
+    "lat": 40.49965,
+    "lon": -3.70908,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0952"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0118",
+    "name": "Pacífico",
+    "address": "Avda de la Ciudad de Barcelona 79",
+    "lat": 40.40126,
+    "lon": -3.67514,
+    "lines": [
+      "1",
+      "6"
+    ],
+    "allCodes": [
+      "0118",
+      "0610"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0303",
+    "name": "Palos de la Frontera",
+    "address": "Calle de Palos de la Frontera 33",
+    "lat": 40.40307,
+    "lon": -3.69423,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0303"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1103",
+    "name": "Pan Bendito",
+    "address": "Avda de Abrantes 289",
+    "lat": 40.37587,
+    "lon": -3.73417,
+    "lines": [
+      "11"
+    ],
+    "allCodes": [
+      "1103"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1213",
+    "name": "Parque Europa",
+    "address": "Calle de Francia 34",
+    "lat": 40.28518,
+    "lon": -3.80632,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1213"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "1204",
+    "name": "Parque Oeste",
+    "address": "Calle de Estambul 5",
+    "lat": 40.34589,
+    "lon": -3.84934,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1204"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1202",
+    "name": "Parque de Lisboa",
+    "address": "Calle de Porto Lagos 7",
+    "lat": 40.34969,
+    "lon": -3.8212,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1202"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0420",
+    "name": "Parque de Santa María",
+    "address": "Calle de Santa Virgilia 1",
+    "lat": 40.47711,
+    "lon": -3.64524,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0420"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0708",
+    "name": "Parque de las Avenidas",
+    "address": "Avda de Bruselas 56",
+    "lat": 40.43945,
+    "lon": -3.66297,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0708"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1215",
+    "name": "Parque de los Estados",
+    "address": "Calle de Venezuela 2",
+    "lat": 40.28684,
+    "lon": -3.78697,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1215"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0918",
+    "name": "Pavones",
+    "address": "Calle de la Hacienda de Pavones 342",
+    "lat": 40.40051,
+    "lon": -3.63512,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0918"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0719",
+    "name": "Peñagrande",
+    "address": "Cmno de Ganapanes 35",
+    "lat": 40.47592,
+    "lon": -3.71582,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0719"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0153",
+    "name": "Pinar de Chamartín",
+    "address": "Calle de Arturo Soria 330",
+    "lat": 40.48014,
+    "lon": -3.6668,
+    "lines": [
+      "1",
+      "4",
+      "ML1"
+    ],
+    "allCodes": [
+      "0153",
+      "0423"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0803",
+    "name": "Pinar del Rey",
+    "address": "Avda de la Gran Vía de Hortaleza 47",
+    "lat": 40.468,
+    "lon": -3.64867,
+    "lines": [
+      "8"
+    ],
+    "allCodes": [
+      "0803"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0520",
+    "name": "Pirámides",
+    "address": "Paseo del Doctor Vallejo Nágera 37",
+    "lat": 40.4026,
+    "lon": -3.71138,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0520"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0723",
+    "name": "Pitis",
+    "address": "Ctra a la Estación de Pitis 19",
+    "lat": 40.49511,
+    "lon": -3.72589,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0723"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0605",
+    "name": "Plaza Elíptica",
+    "address": "Plaza de Fernández Ladreda 2",
+    "lat": 40.3846,
+    "lon": -3.71837,
+    "lines": [
+      "6",
+      "11"
+    ],
+    "allCodes": [
+      "0605",
+      "1101"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0101",
+    "name": "Plaza de Castilla",
+    "address": "Paseo de la Castellana 189",
+    "lat": 40.4669,
+    "lon": -3.68917,
+    "lines": [
+      "1",
+      "9",
+      "10"
+    ],
+    "allCodes": [
+      "0101",
+      "0904",
+      "1004"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0308",
+    "name": "Plaza de España",
+    "address": "Plaza de España 1",
+    "lat": 40.42342,
+    "lon": -3.7112,
+    "lines": [
+      "2",
+      "3",
+      "10"
+    ],
+    "allCodes": [
+      "0308",
+      "1011"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0121",
+    "name": "Portazgo",
+    "address": "Avda de la Albufera 131",
+    "lat": 40.39266,
+    "lon": -3.65868,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0121"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1207",
+    "name": "Pradillo",
+    "address": "Calle de Agustina de Aragón 23",
+    "lat": 40.32168,
+    "lon": -3.86489,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1207"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0412",
+    "name": "Prosperidad",
+    "address": "Plaza de la Prosperidad 4",
+    "lat": 40.44419,
+    "lon": -3.67482,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0412"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0625",
+    "name": "Príncipe Pío",
+    "address": "Paseo de la Florida 2",
+    "lat": 40.42107,
+    "lon": -3.72032,
+    "lines": [
+      "6",
+      "10",
+      "R"
+    ],
+    "allCodes": [
+      "0002",
+      "0625",
+      "1012"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0204",
+    "name": "Príncipe de Vergara",
+    "address": "Calle de Alcalá 123",
+    "lat": 40.42294,
+    "lon": -3.68012,
+    "lines": [
+      "2",
+      "9"
+    ],
+    "allCodes": [
+      "0204",
+      "0912"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0505",
+    "name": "Pueblo Nuevo",
+    "address": "Calle de Alcalá 372",
+    "lat": 40.43569,
+    "lon": -3.64282,
+    "lines": [
+      "5",
+      "7"
+    ],
+    "allCodes": [
+      "0505",
+      "0706"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0119",
+    "name": "Puente de Vallecas",
+    "address": "Avda de la Albufera 1",
+    "lat": 40.39819,
+    "lon": -3.66906,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0119"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0922",
+    "name": "Puerta de Arganda",
+    "address": "Calle de San Cipriano 85",
+    "lat": 40.40132,
+    "lon": -3.59598,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0922"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0518",
+    "name": "Puerta de Toledo",
+    "address": "Gta de Puerta de Toledo 1",
+    "lat": 40.40704,
+    "lon": -3.71105,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0518"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1021",
+    "name": "Puerta del Sur",
+    "address": "Avda de la Libertad 2",
+    "lat": 40.34524,
+    "lon": -3.81211,
+    "lines": [
+      "10",
+      "12"
+    ],
+    "allCodes": [
+      "1021",
+      "1201"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0626",
+    "name": "Puerta del Ángel",
+    "address": "Paseo de Extremadura 26",
+    "lat": 40.4139,
+    "lon": -3.72724,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0626"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0906",
+    "name": "Pío XII",
+    "address": "Avda de Pío XII 27",
+    "lat": 40.463,
+    "lon": -3.67579,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0906"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0213",
+    "name": "Quevedo",
+    "address": "Gta de Quevedo 1",
+    "lat": 40.43322,
+    "lon": -3.70433,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0213"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0506",
+    "name": "Quintana",
+    "address": "Calle de la Virgen del Sagrario 2",
+    "lat": 40.43358,
+    "lon": -3.64736,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0506"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0617",
+    "name": "República Argentina",
+    "address": "Calle de Joaquín Costa 24",
+    "lat": 40.44379,
+    "lon": -3.68406,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0617"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0205",
+    "name": "Retiro",
+    "address": "Calle de Alcalá 81",
+    "lat": 40.42031,
+    "lon": -3.68624,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0205"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1060",
+    "name": "Reyes Católicos",
+    "address": "Avda de la Plaza de Toros 7",
+    "lat": 40.55037,
+    "lon": -3.6234,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1060"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0925",
+    "name": "Rivas Futura",
+    "address": "Calle   Concepción Arenal 1",
+    "lat": 40.34134,
+    "lon": -3.52479,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0925"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0924",
+    "name": "Rivas Urbanizaciones",
+    "address": "Plaza de Galicia 5",
+    "lat": 40.36677,
+    "lon": -3.54728,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0924"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "0926",
+    "name": "Rivas Vaciamadrid",
+    "address": "Calle   Areneros 6",
+    "lat": 40.32837,
+    "lon": -3.5206,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0926"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "1054",
+    "name": "Ronda de la Comunicación",
+    "address": "Ronda de la Comunicación 22",
+    "lat": 40.51553,
+    "lon": -3.66277,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1054"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0511",
+    "name": "Rubén Darío",
+    "address": "Paseo de Eduardo Dato 33",
+    "lat": 40.43316,
+    "lon": -3.68954,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0511"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0107",
+    "name": "Ríos Rosas",
+    "address": "Calle de Ríos Rosas 22",
+    "lat": 40.44198,
+    "lon": -3.70133,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0107"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0212",
+    "name": "San Bernardo",
+    "address": "Calle de San Bernardo 94",
+    "lat": 40.43001,
+    "lon": -3.70557,
+    "lines": [
+      "2",
+      "4"
+    ],
+    "allCodes": [
+      "0212",
+      "0402"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0702",
+    "name": "San Blas",
+    "address": "Calle de Pobladura del Valle 27",
+    "lat": 40.42799,
+    "lon": -3.61547,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0702"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0921",
+    "name": "San Cipriano",
+    "address": "Calle de San Cipriano 68",
+    "lat": 40.40381,
+    "lon": -3.60239,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0921"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0356",
+    "name": "San Cristóbal",
+    "address": "Avda de Andalucía 81",
+    "lat": 40.34154,
+    "lon": -3.69318,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0356"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0353",
+    "name": "San Fermín-Orcasur",
+    "address": "Avda de Andalucía 9",
+    "lat": 40.36999,
+    "lon": -3.69418,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0353"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0757",
+    "name": "San Fernando",
+    "address": "Calle de Gonzalo de Córdoba 24",
+    "lat": 40.42441,
+    "lon": -3.53541,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0757"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1104",
+    "name": "San Francisco",
+    "address": "Avda de los Poblados 102",
+    "lat": 40.3736,
+    "lon": -3.7391,
+    "lines": [
+      "11"
+    ],
+    "allCodes": [
+      "1104"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0419",
+    "name": "San Lorenzo",
+    "address": "Avda de la Barranquilla 9",
+    "lat": 40.47447,
+    "lon": -3.63958,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0419"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1230",
+    "name": "San Nicasio",
+    "address": "Avda   Mar Mediterráneo SN",
+    "lat": 40.33616,
+    "lon": -3.77587,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1230"
+    ],
+    "zone": "B1"
+  },
+  {
+    "id": "1006",
+    "name": "Santiago Bernabéu",
+    "address": "Paseo de la Castellana 97",
+    "lat": 40.45159,
+    "lon": -3.69038,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1006"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0210",
+    "name": "Santo Domingo",
+    "address": "Calle de San Bernardo 11",
+    "lat": 40.42132,
+    "lon": -3.70796,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0210"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0406",
+    "name": "Serrano",
+    "address": "Calle de Goya 19",
+    "lat": 40.42543,
+    "lon": -3.68663,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0406"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0207",
+    "name": "Sevilla",
+    "address": "Calle de Alcalá 23",
+    "lat": 40.41805,
+    "lon": -3.69925,
+    "lines": [
+      "2"
+    ],
+    "allCodes": [
+      "0207"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0125",
+    "name": "Sierra de Guadalupe",
+    "address": "Avda de la Democracia 1",
+    "lat": 40.38216,
+    "lon": -3.62472,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0125"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0703",
+    "name": "Simancas",
+    "address": "Calle del Castillo de Madrigal de las Altas Torres 15",
+    "lat": 40.42799,
+    "lon": -3.62572,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0703"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0112",
+    "name": "Sol",
+    "address": "Plaza de la Puerta del Sol 6",
+    "lat": 40.41688,
+    "lon": -3.70326,
+    "lines": [
+      "1",
+      "2",
+      "3"
+    ],
+    "allCodes": [
+      "0112",
+      "0208",
+      "0306"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0503",
+    "name": "Suanzes",
+    "address": "Calle de Alcalá 527",
+    "lat": 40.44085,
+    "lon": -3.62684,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0503"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0612",
+    "name": "Sáinz de Baranda",
+    "address": "Calle del Doctor Esquerdo 103",
+    "lat": 40.41507,
+    "lon": -3.66951,
+    "lines": [
+      "6",
+      "9"
+    ],
+    "allCodes": [
+      "0612",
+      "0914"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0103",
+    "name": "Tetuán",
+    "address": "Calle de Bravo Murillo 264",
+    "lat": 40.46055,
+    "lon": -3.69825,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0103"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0113",
+    "name": "Tirso de Molina",
+    "address": "Plaza de Tirso de Molina 7",
+    "lat": 40.41235,
+    "lon": -3.70466,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0113"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0502",
+    "name": "Torre Arias",
+    "address": "Calle de Alcalá 557",
+    "lat": 40.44374,
+    "lon": -3.61699,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0502"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1051",
+    "name": "Tres Olivos",
+    "address": "Acces   M-607 SN",
+    "lat": 40.5012,
+    "lon": -3.6952,
+    "lines": [
+      "10"
+    ],
+    "allCodes": [
+      "1051"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0110",
+    "name": "Tribunal",
+    "address": "Calle de Fuencarral 81",
+    "lat": 40.42619,
+    "lon": -3.7011,
+    "lines": [
+      "1",
+      "10"
+    ],
+    "allCodes": [
+      "0110",
+      "1010"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "1205",
+    "name": "Universidad Rey Juan Carlos",
+    "address": "Calle   Tulipán 2",
+    "lat": 40.33512,
+    "lon": -3.87218,
+    "lines": [
+      "12"
+    ],
+    "allCodes": [
+      "1205"
+    ],
+    "zone": "B2"
+  },
+  {
+    "id": "0522",
+    "name": "Urgel",
+    "address": "Calle del Camino Viejo de Leganés 1",
+    "lat": 40.39335,
+    "lon": -3.7236,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0522"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0606",
+    "name": "Usera",
+    "address": "Calle de Amparo Usera 44",
+    "lat": 40.3871,
+    "lon": -3.7069,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0606"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0102",
+    "name": "Valdeacederas",
+    "address": "Calle de Bravo Murillo 332",
+    "lat": 40.46442,
+    "lon": -3.69506,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0102"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0919",
+    "name": "Valdebernardo",
+    "address": "Bulv de Indalecio Prieto 26",
+    "lat": 40.40005,
+    "lon": -3.62156,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0919"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0130",
+    "name": "Valdecarros",
+    "address": "Avda del Ensanche de Vallecas 120 A",
+    "lat": 40.36007,
+    "lon": -3.59316,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0130"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0717",
+    "name": "Valdezarza",
+    "address": "Calle de San Restituto 70",
+    "lat": 40.46482,
+    "lon": -3.71597,
+    "lines": [
+      "7"
+    ],
+    "allCodes": [
+      "0717"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0407",
+    "name": "Velázquez",
+    "address": "Calle de Núñez de Balboa 33",
+    "lat": 40.42503,
+    "lon": -3.68292,
+    "lines": [
+      "4"
+    ],
+    "allCodes": [
+      "0407"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0201",
+    "name": "Ventas",
+    "address": "Calle de Alcalá 204",
+    "lat": 40.43088,
+    "lon": -3.66366,
+    "lines": [
+      "2",
+      "5"
+    ],
+    "allCodes": [
+      "0201",
+      "0508"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0903",
+    "name": "Ventilla",
+    "address": "Avda de Asturias 39",
+    "lat": 40.46944,
+    "lon": -3.69588,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0903"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0309",
+    "name": "Ventura Rodríguez",
+    "address": "Calle de la Princesa 22",
+    "lat": 40.42709,
+    "lon": -3.71341,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0309"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0621",
+    "name": "Vicente Aleixandre",
+    "address": "Avda de Gregorio del Amo 4",
+    "lat": 40.44644,
+    "lon": -3.71943,
+    "lines": [
+      "6"
+    ],
+    "allCodes": [
+      "0621"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0920",
+    "name": "Vicálvaro",
+    "address": "Calle de San Cipriano 11",
+    "lat": 40.40422,
+    "lon": -3.60886,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0920"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0126",
+    "name": "Villa de Vallecas",
+    "address": "Paseo de Federico García Lorca 2",
+    "lat": 40.3796,
+    "lon": -3.6213,
+    "lines": [
+      "1"
+    ],
+    "allCodes": [
+      "0126"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0357",
+    "name": "Villaverde Alto",
+    "address": "Calle del Valle de Tobalina 56",
+    "lat": 40.34123,
+    "lon": -3.71199,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0357"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0355",
+    "name": "Villaverde Bajo-Cruce",
+    "address": "Avda de Andalucía 38",
+    "lat": 40.35089,
+    "lon": -3.69265,
+    "lines": [
+      "3"
+    ],
+    "allCodes": [
+      "0355"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0916",
+    "name": "Vinateros",
+    "address": "Calle del Camino de los Vinateros 70",
+    "lat": 40.41024,
+    "lon": -3.65273,
+    "lines": [
+      "9"
+    ],
+    "allCodes": [
+      "0916"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0524",
+    "name": "Vista Alegre",
+    "address": "Calle de la Oca 74",
+    "lat": 40.38885,
+    "lon": -3.73982,
+    "lines": [
+      "5"
+    ],
+    "allCodes": [
+      "0524"
+    ],
+    "zone": "A"
+  },
+  {
+    "id": "0209",
+    "name": "Ópera",
+    "address": "Plaza de Isabel II 9",
+    "lat": 40.41809,
+    "lon": -3.70942,
+    "lines": [
+      "2",
+      "5",
+      "R"
+    ],
+    "allCodes": [
+      "0001",
+      "0209",
+      "0516"
+    ],
+    "zone": "A"
+  }
+]

@@ -15,6 +15,14 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/pmv/, '/PMVVisor/pmv.aspx'),
       },
+      '/api/metro': {
+        target: 'https://serviciosapp.metromadrid.es',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/metro/, '/servicios/rest/teleindicadores'),
+        headers: {
+          Accept: 'application/json',
+        },
+      },
     },
   },
 })

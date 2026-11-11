@@ -4,6 +4,14 @@
   "outputDirectory": "dist",
   "routes": [
     {
+      "src": "/api/metro/(.*)",
+      "dest": "https://serviciosapp.metromadrid.es/servicios/rest/teleindicadores/$1"
+    },
+    {
+      "src": "/api/metro/?$",
+      "dest": "https://serviciosapp.metromadrid.es/servicios/rest/teleindicadores"
+    },
+    {
       "src": "/sw.js",
       "headers": {
         "cache-control": "no-cache, no-store, must-revalidate"
