@@ -26,6 +26,7 @@ export interface GoogleBusMapProps {
   userLocation: { lat: number; lon: number } | null;
   selectedBus?: BusEstimate | null;
   onClearSelectedBus?: () => void;
+  onAuthError?: () => void;
   isDark: boolean;
   fullBleed?: boolean;
   className?: string;
@@ -46,14 +47,22 @@ const MapBoundsController: React.FC<{
   useEffect(() => {
     if (!map) return;
 
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    // On mobile, the bottom half of the map container is covered by the BottomSheet in 'half' snap,
+    // so we offset the camera slightly southward (or add bottom padding) so the pin sits in the top visible half!
+    const latOffset = isMobile ? -0.0014 : 0;
+
     if (selectedBus && selectedBus.coordinates) {
-      map.panTo({ lat: selectedBus.coordinates.lat, lng: selectedBus.coordinates.lon });
+      map.panTo({
+        lat: selectedBus.coordinates.lat + latOffset * 0.5,
+        lng: selectedBus.coordinates.lon,
+      });
       map.setZoom(17);
       return;
     }
 
     if (typeof google === 'undefined' || !google.maps?.LatLngBounds) {
-      map.panTo({ lat: targetLat, lng: targetLon });
+      map.panTo({ lat: targetLat + latOffset, lng: targetLon });
       map.setZoom(16);
       return;
     }
@@ -70,9 +79,14 @@ const MapBoundsController: React.FC<{
     });
 
     if (hasBuses) {
-      map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
+      map.fitBounds(bounds, {
+        top: 45,
+        right: 40,
+        bottom: isMobile ? 220 : 45,
+        left: 40,
+      });
     } else {
-      map.panTo({ lat: targetLat, lng: targetLon });
+      map.panTo({ lat: targetLat + latOffset, lng: targetLon });
       map.setZoom(16);
     }
   }, [map, stop, metroStation, estimates, selectedBus, targetLat, targetLon]);
@@ -88,11 +102,24 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
   userLocation,
   selectedBus = null,
   onClearSelectedBus = () => {},
+  onAuthError,
   isDark,
   fullBleed = false,
   className = '',
 }) => {
   const [activeInfoWindow, setActiveInfoWindow] = useState<'stop' | 'metro' | string | null>(null);
+
+  // Detect Google Maps auth/billing/key failure and auto-fallback to OpenStreetMap
+  useEffect(() => {
+    if (typeof window === 'undefined' || !onAuthError) return;
+    const prevAuthFailure = (window as unknown as Record<string, unknown>).gm_authFailure;
+    (window as unknown as Record<string, unknown>).gm_authFailure = () => {
+      onAuthError();
+    };
+    return () => {
+      (window as unknown as Record<string, unknown>).gm_authFailure = prevAuthFailure;
+    };
+  }, [onAuthError]);
 
   const targetLat = metroStation?.lat ?? stop?.lat ?? 40.4168;
   const targetLon = metroStation?.lon ?? stop?.lon ?? -3.7038;
@@ -101,21 +128,26 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
   const busesWithGps = estimates.filter((e) => e.coordinates !== null);
 
   const containerClassName = fullBleed
-    ? className || 'relative w-full h-full overflow-hidden bg-slate-100 dark:bg-slate-900'
+    ? className || 'relative w-full flex-1 min-h-[260px] h-full overflow-hidden bg-slate-100 dark:bg-slate-900'
     : className ||
-      'relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-900';
+      'relative w-full flex-1 min-h-[280px] h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-900';
 
   return (
     <div className={containerClassName} data-testid="google-bus-map">
-      <APIProvider apiKey={apiKey} language="es" region="ES">
+      <APIProvider
+        apiKey={apiKey}
+        language="es"
+        region="ES"
+        onError={() => onAuthError?.()}
+      >
         <Map
           mapId="DEMO_MAP_ID"
           defaultCenter={{ lat: targetLat, lng: targetLon }}
           defaultZoom={16}
           gestureHandling="greedy"
-          disableDefaultUI={fullBleed}
+          disableDefaultUI={false}
           colorScheme={isDark ? 'DARK' : 'LIGHT'}
-          style={{ width: '100%', height: '100%' }}
+          style={{ width: '100%', height: '100%', minHeight: '260px' }}
         >
           <MapBoundsController
             stop={stop}

@@ -64,7 +64,7 @@ export const BusMap: React.FC<BusMapProps> = ({
       zoomControl: false,
     });
 
-    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    L.control.zoom({ position: 'topright' }).addTo(map);
 
     const tileUrl = isDark
       ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
@@ -283,31 +283,42 @@ export const BusMap: React.FC<BusMapProps> = ({
         .addTo(markersGroup);
     }
 
-    // Camera adjustment
+    // Camera adjustment (with mobile offset so the pin sits in the visible upper half above the BottomSheet)
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    const latOffset = isMobile ? -0.0014 : 0;
+
     if (selectedBus && selectedBus.coordinates) {
-      map.flyTo?.([selectedBus.coordinates.lat, selectedBus.coordinates.lon], 17, {
-        animate: true,
-        duration: 0.8,
-      });
+      map.flyTo?.(
+        [selectedBus.coordinates.lat + latOffset * 0.5, selectedBus.coordinates.lon],
+        17,
+        {
+          animate: true,
+          duration: 0.8,
+        }
+      );
     } else if (busesWithGps.length > 0) {
       map.fitBounds(bounds, {
-        padding: [45, 45],
+        paddingTopLeft: [40, 40],
+        paddingBottomRight: [40, isMobile ? 220 : 45],
         maxZoom: 16,
         animate: true,
       });
     } else {
-      map.setView([targetLat, targetLon], 16);
+      map.setView([targetLat + latOffset, targetLon], 16);
     }
   }, [stop, metroStation, estimates, userLocation, selectedBus, mapProvider, targetLat, targetLon]);
 
   const handleCenterOnTarget = () => {
     if (!mapInstanceRef.current) return;
-    mapInstanceRef.current.flyTo?.([targetLat, targetLon], 16, { animate: true });
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+    const latOffset = isMobile ? -0.0014 : 0;
+    mapInstanceRef.current.flyTo?.([targetLat + latOffset, targetLon], 16, { animate: true });
     onClearSelectedBus();
   };
 
   const handleFitAll = () => {
     if (!mapInstanceRef.current) return;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
     const bounds = L.latLngBounds([targetLat, targetLon], [targetLat, targetLon]);
     estimates.forEach((e) => {
       if (e.coordinates) {
@@ -317,31 +328,41 @@ export const BusMap: React.FC<BusMapProps> = ({
     if (userLocation) {
       bounds.extend([userLocation.lat, userLocation.lon]);
     }
-    mapInstanceRef.current.fitBounds(bounds, { padding: [40, 40], maxZoom: 17 });
+    mapInstanceRef.current.fitBounds(bounds, {
+      paddingTopLeft: [40, 40],
+      paddingBottomRight: [40, isMobile ? 220 : 40],
+      maxZoom: 17,
+    });
     onClearSelectedBus();
   };
 
   const busesCountWithGps = estimates.filter((e) => e.coordinates !== null).length;
 
   return (
-    <div className={fullBleed ? 'relative w-full h-full' : 'flex flex-col gap-2'}>
-      {/* Map Provider Selector Header (card mode) */}
+    <div
+      className={
+        fullBleed
+          ? 'relative w-full h-full flex flex-col'
+          : 'flex flex-col gap-2 w-full h-full'
+      }
+    >
+      {/* Map Provider Selector Header (card / top bar mode) */}
       {!fullBleed && (
-        <div className="flex items-center justify-between px-1">
-          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <div className="flex items-center justify-between px-2.5 py-1.5 lg:px-1 lg:py-0 bg-white/90 dark:bg-slate-900/90 lg:bg-transparent lg:dark:bg-transparent backdrop-blur-md lg:backdrop-blur-none border-b lg:border-0 border-slate-200/70 dark:border-slate-800/70 shrink-0 z-20">
+          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5 truncate">
             {metroStation ? (
-              <Train className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+              <Train className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
             ) : (
-              <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
             )}
-            <span>
-              {metroStation ? 'Ubicación de la Estación' : 'Mapa en Tiempo Real'}
+            <span className="truncate">
+              {metroStation ? `Estación ${metroStation.name}` : stop ? `Parada #${stop.id}` : 'Mapa en Tiempo Real'}
             </span>
           </span>
 
           {/* Toggle between Google Maps and OpenStreetMap for both Bus stops and Metro stations */}
           {(stop || metroStation) && (
-            <div className="flex items-center p-0.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 text-xs font-bold">
+            <div className="flex items-center p-0.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 text-xs font-bold shrink-0">
               <button
                 type="button"
                 onClick={() => setMapProvider('google')}
@@ -371,28 +392,28 @@ export const BusMap: React.FC<BusMapProps> = ({
 
       {/* Floating Provider Switcher in Full-Bleed Mode */}
       {fullBleed && (stop || metroStation) && (
-        <div className="absolute top-3 right-3 z-20 flex items-center p-0.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 shadow-md text-[11px] font-bold">
+        <div className="absolute top-3 right-3 z-20 flex items-center p-0.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 shadow-md text-xs font-bold">
           <button
             type="button"
             onClick={() => setMapProvider('google')}
-            className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
               mapProvider === 'google'
                 ? 'bg-blue-600 text-white shadow-2xs'
                 : 'text-slate-600 dark:text-slate-300'
             }`}
           >
-            Google
+            Google Maps
           </button>
           <button
             type="button"
             onClick={() => setMapProvider('leaflet')}
-            className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
               mapProvider === 'leaflet'
                 ? 'bg-blue-600 text-white shadow-2xs'
                 : 'text-slate-600 dark:text-slate-300'
             }`}
           >
-            OSM
+            OpenStreetMap
           </button>
         </div>
       )}
@@ -407,16 +428,22 @@ export const BusMap: React.FC<BusMapProps> = ({
           userLocation={userLocation}
           selectedBus={selectedBus}
           onClearSelectedBus={onClearSelectedBus}
+          onAuthError={() => setMapProvider('leaflet')}
           isDark={isDark}
           fullBleed={fullBleed}
-          className={className}
+          className={
+            className ||
+            (fullBleed
+              ? 'relative w-full flex-1 min-h-[260px] overflow-hidden'
+              : 'relative w-full flex-1 h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md')
+          }
         />
       ) : mapProvider === 'google' && !googleMapsApiKey ? (
         <div
           className={
             fullBleed
-              ? 'relative w-full h-full flex flex-col items-center justify-center text-center p-6 bg-slate-100 dark:bg-slate-900'
-              : 'relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md p-6 flex flex-col items-center justify-center text-center bg-slate-100 dark:bg-slate-900'
+              ? 'relative w-full flex-1 min-h-[260px] flex flex-col items-center justify-center text-center p-6 bg-slate-100 dark:bg-slate-900'
+              : 'relative w-full flex-1 h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md p-6 flex flex-col items-center justify-center text-center bg-slate-100 dark:bg-slate-900'
           }
         >
           <MapPin className="w-8 h-8 text-blue-500 mb-2 opacity-60" />
@@ -439,20 +466,20 @@ export const BusMap: React.FC<BusMapProps> = ({
         <div
           className={
             fullBleed
-              ? `${className || 'relative w-full h-full overflow-hidden'}`
+              ? `${className || 'relative w-full flex-1 min-h-[260px] overflow-hidden'}`
               : `${
                   className ||
-                  'relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md'
+                  'relative w-full flex-1 min-h-[280px] h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md'
                 }`
           }
         >
-          <div ref={mapContainerRef} className="w-full h-full z-0" />
+          <div ref={mapContainerRef} className="w-full h-full min-h-[260px] z-0" />
 
           {/* Floating map status badge */}
           <div
             className={`absolute ${
               fullBleed ? 'top-3 left-3' : 'top-3 left-3'
-            } z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-md text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/50 dark:border-slate-700/50`}
+            } z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/60`}
           >
             <span
               className={`w-2 h-2 rounded-full ${
@@ -466,21 +493,21 @@ export const BusMap: React.FC<BusMapProps> = ({
                 ? `${busesCountWithGps} ${
                     busesCountWithGps === 1 ? 'autobús' : 'autobuses'
                   } en mapa`
-                : 'Sin autobuses con GPS activo'}
+                : 'Mapa de parada activo'}
             </span>
           </div>
 
           {/* Map Action Controls */}
           <div
             className={`absolute ${
-              fullBleed ? 'top-14 right-3' : 'top-3 right-3'
+              fullBleed ? 'top-14 left-3' : 'top-14 left-3'
             } z-10 flex flex-col gap-2`}
           >
             <button
               type="button"
               onClick={handleCenterOnTarget}
               title={metroStation ? 'Centrar en la estación' : 'Centrar en la parada'}
-              className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/50 dark:border-slate-700/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/60 dark:border-slate-700/60 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <Crosshair className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </button>
@@ -489,7 +516,7 @@ export const BusMap: React.FC<BusMapProps> = ({
                 type="button"
                 onClick={handleFitAll}
                 title="Ver todos los autobuses"
-                className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/50 dark:border-slate-700/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                className="p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/60 dark:border-slate-700/60 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <Layers className="w-4 h-4 text-slate-600 dark:text-slate-300" />
               </button>
@@ -498,7 +525,7 @@ export const BusMap: React.FC<BusMapProps> = ({
 
           {/* Selected Bus Floating Indicator */}
           {selectedBus && (
-            <div className="absolute bottom-3 left-3 right-14 z-10 p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border border-amber-500/40 flex items-center justify-between text-xs animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div className="absolute top-14 right-3 left-16 sm:left-auto sm:w-72 z-10 p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border border-amber-500/50 flex items-center justify-between text-xs animate-in fade-in duration-200">
               <div className="flex items-center gap-2 overflow-hidden">
                 <span className="px-2 py-0.5 bg-amber-500 text-white font-bold rounded-lg shrink-0 tabular-nums">
                   {selectedBus.line}

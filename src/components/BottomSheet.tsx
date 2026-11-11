@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { ChevronUp, ChevronDown, Map as MapIcon, List } from 'lucide-react';
 import { triggerHaptic } from '../utils/haptics';
 
 export type SnapPoint = 'peek' | 'half' | 'full';
@@ -17,7 +18,7 @@ const VELOCITY_THRESHOLD = 0.45; // px/ms
 export const BottomSheet: React.FC<BottomSheetProps> = ({
   snap,
   onSnapChange,
-  peekHeight = 96,
+  peekHeight = 148,
   headerContent,
   children,
   className = '',
@@ -55,10 +56,10 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Compute snap heights
-  const resolvedPeekHeight = Math.max(72, peekHeight);
-  const halfHeight = Math.round(windowHeight * 0.52);
-  const fullHeight = Math.round(Math.min(windowHeight - 56, windowHeight * 0.9));
+  // Compute snap heights so the map at the top of the screen is ALWAYS clearly visible in 'half' and 'peek'
+  const resolvedPeekHeight = Math.max(130, peekHeight);
+  const halfHeight = Math.round(windowHeight * 0.50);
+  const fullHeight = Math.round(Math.min(windowHeight - 68, windowHeight * 0.88));
 
   // Translate offset per snap point (0 = fully expanded to fullHeight)
   const getTranslateYForSnap = useCallback(
@@ -132,7 +133,6 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
   // --- Pointer Drag on Header / Pill ---
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Only primary button
     if (e.button !== 0) return;
 
     // Allow child buttons/links inside headerContent to be clicked normally
@@ -144,7 +144,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
-      // Graceful fallback in environments without full pointer capture
+      // Graceful fallback
     }
 
     setIsDragging(true);
@@ -208,7 +208,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     commitSnap(0, dragOffset);
   };
 
-  // --- Scroll Decoupling for Content Container ---
+  // --- Scroll Decoupling for Content Container (Upward & Downward) ---
   const handleContentTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (e.touches.length !== 1) return;
     contentTouchStartYRef.current = e.touches[0].clientY;
@@ -232,9 +232,16 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     lastYRef.current = currentY;
     lastTimeRef.current = now;
 
-    // Only initiate sheet drag from content if at the very top and dragging downward
     if (!isContentDraggingSheetRef.current) {
-      if (scrollTop <= 0 && deltaY > 6) {
+      // 1. If sheet is in 'peek' or 'half' and user swipes UP, expand the sheet first
+      if (snap !== 'full' && deltaY < -8 && scrollTop <= 0) {
+        isContentDraggingSheetRef.current = true;
+        setIsDragging(true);
+        isDraggingRef.current = true;
+        startYRef.current = currentY;
+      }
+      // 2. If content is scrolled to the very top and user swipes DOWN, collapse the sheet
+      else if (scrollTop <= 0 && deltaY > 8) {
         isContentDraggingSheetRef.current = true;
         setIsDragging(true);
         isDraggingRef.current = true;
@@ -244,7 +251,17 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
     if (isContentDraggingSheetRef.current) {
       const rawDelta = currentY - startYRef.current;
-      setDragOffset(Math.max(0, rawDelta));
+      const baseTranslateY = getTranslateYForSnap(snap);
+      const candidateTranslateY = baseTranslateY + rawDelta;
+      const maxTranslateY = getTranslateYForSnap('peek');
+
+      if (candidateTranslateY < 0) {
+        setDragOffset(-baseTranslateY + candidateTranslateY * 0.25);
+      } else if (candidateTranslateY > maxTranslateY) {
+        setDragOffset(maxTranslateY - baseTranslateY + (candidateTranslateY - maxTranslateY) * 0.25);
+      } else {
+        setDragOffset(rawDelta);
+      }
     }
   };
 
@@ -254,6 +271,11 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
     }
     contentTouchStartYRef.current = null;
     isContentDraggingSheetRef.current = false;
+  };
+
+  const handleSelectSnap = (targetSnap: SnapPoint) => {
+    triggerHaptic('selection');
+    onSnapChange(targetSnap);
   };
 
   // Calculate final translateY
@@ -269,7 +291,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       aria-label="Detalles de parada y llegadas"
       data-snap={snap}
       data-testid="bottom-sheet"
-      className={`max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 flex flex-col max-lg:rounded-t-[22px] max-lg:bg-white/92 max-lg:dark:bg-slate-900/92 max-lg:border-t max-lg:border-slate-200/80 max-lg:dark:border-slate-800/80 max-lg:shadow-2xl transition-colors will-change-transform select-none lg:static lg:h-auto! lg:transform-none! lg:bg-transparent! lg:dark:bg-transparent! lg:border-0! lg:shadow-none! lg:backdrop-blur-none! lg:select-auto ${className}`}
+      className={`max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 flex flex-col max-lg:rounded-t-[24px] max-lg:bg-white/95 max-lg:dark:bg-slate-900/95 max-lg:border-t max-lg:border-slate-200/90 max-lg:dark:border-slate-800/90 max-lg:shadow-[0_-10px_35px_-5px_rgba(0,0,0,0.2)] transition-colors will-change-transform select-none lg:static lg:h-auto! lg:transform-none! lg:bg-transparent! lg:dark:bg-transparent! lg:border-0! lg:shadow-none! lg:backdrop-blur-none! lg:select-auto ${className}`}
       style={{
         height: `${fullHeight}px`,
         transform: `translate3d(0, ${activeTranslateY}px, 0)`,
@@ -280,21 +302,70 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         WebkitBackdropFilter: 'blur(24px) saturate(190%)',
       }}
     >
-      {/* Drag Pill Handle Header */}
+      {/* Drag Pill Handle + Quick Snap Switcher Bar (Mobile/Tablet) */}
       <div
         data-testid="bottom-sheet-handle"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
-        className="w-full max-lg:pt-2 max-lg:pb-1 flex flex-col items-center max-lg:cursor-grab max-lg:active:cursor-grabbing shrink-0"
+        className="w-full max-lg:pt-2 max-lg:pb-2 max-lg:px-4 flex flex-col items-center max-lg:cursor-grab max-lg:active:cursor-grabbing shrink-0 max-lg:border-b max-lg:border-slate-100 max-lg:dark:border-slate-800/80"
         style={{ touchAction: 'none' }}
       >
+        {/* iOS Pill Indicator */}
         <div
-          className="w-10 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 mx-auto my-2 lg:hidden"
+          className="w-10 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 mx-auto mb-2 lg:hidden"
           style={{ touchAction: 'none' }}
         />
-        {headerContent && <div className="w-full px-3 sm:px-4 lg:px-0">{headerContent}</div>}
+
+        {/* Quick 1-Tap Snap Mode Bar on Mobile so the user doesn't have to struggle with gestures */}
+        <div className="flex lg:hidden items-center justify-between w-full gap-2">
+          <button
+            type="button"
+            onClick={() => handleSelectSnap(snap === 'peek' ? 'half' : 'peek')}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ios-press ${
+              snap === 'peek'
+                ? 'bg-blue-600 text-white shadow-2xs'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+            }`}
+          >
+            <MapIcon className="w-3.5 h-3.5" />
+            <span>{snap === 'peek' ? 'Mapa ampliado' : 'Ver más mapa'}</span>
+          </button>
+
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => handleSelectSnap('half')}
+              className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ios-press ${
+                snap === 'half'
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              Mitad
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectSnap(snap === 'full' ? 'half' : 'full')}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ios-press ${
+                snap === 'full'
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>{snap === 'full' ? 'Reducir' : 'Lista completa'}</span>
+              {snap === 'full' ? (
+                <ChevronDown className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronUp className="w-3.5 h-3.5" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {headerContent && <div className="w-full mt-1 lg:mt-0">{headerContent}</div>}
       </div>
 
       {/* Decoupled Content Scroll Container */}
@@ -304,11 +375,11 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         onTouchStart={handleContentTouchStart}
         onTouchMove={handleContentTouchMove}
         onTouchEnd={handleContentTouchEnd}
-        className="flex-1 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:px-3 max-lg:sm:px-4 max-lg:pt-2 select-auto flex flex-col gap-3.5"
+        className="flex-1 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:px-3 max-lg:sm:px-4 max-lg:pt-2.5 select-auto flex flex-col gap-3.5"
         style={{
           overscrollBehaviorY: 'contain',
           WebkitOverflowScrolling: 'touch',
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.5rem)',
         }}
       >
         {children}

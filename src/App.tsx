@@ -473,14 +473,17 @@ export const App: React.FC = () => {
           <>
             {currentMetroStation ? (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                {/* Spatial Map Canvas (Full-bleed on iPhone/mobile, sticky card on desktop) */}
-                <div className="lg:col-span-5 order-2 lg:order-1 max-lg:fixed max-lg:inset-x-0 max-lg:top-[56px] max-lg:bottom-[60px] max-lg:z-10">
-                  <div className="lg:sticky lg:top-20 flex flex-col gap-2 w-full h-full">
+                {/* Spatial Map Canvas (Top viewport on iPhone/mobile, sticky left column on desktop) */}
+                <div
+                  className="lg:col-span-5 order-2 lg:order-1 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[56px] max-lg:z-10 flex flex-col"
+                  style={{ top: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}
+                >
+                  <div className="lg:sticky lg:top-20 flex flex-col flex-1 w-full h-full">
                     <BusMap
                       metroStation={currentMetroStation}
                       userLocation={userLocation}
                       isDark={isDark}
-                      className="max-lg:w-full max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md"
+                      className="max-lg:w-full max-lg:flex-1 max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md"
                     />
                   </div>
                 </div>
@@ -506,10 +509,13 @@ export const App: React.FC = () => {
         ) : (
           /* EMT Bus Stop View & Spatial Map + BottomSheet */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-            {/* Spatial Map Canvas (Full-bleed on iPhone/mobile, sticky card on desktop) */}
+            {/* Spatial Map Canvas (Top viewport on iPhone/mobile, sticky left column on desktop) */}
             {currentStop && (
-              <div className="lg:col-span-5 order-2 lg:order-1 max-lg:fixed max-lg:inset-x-0 max-lg:top-[56px] max-lg:bottom-[60px] max-lg:z-10">
-                <div className="lg:sticky lg:top-20 flex flex-col gap-2 w-full h-full">
+              <div
+                className="lg:col-span-5 order-2 lg:order-1 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[56px] max-lg:z-10 flex flex-col"
+                style={{ top: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}
+              >
+                <div className="lg:sticky lg:top-20 flex flex-col flex-1 w-full h-full gap-2">
                   <div className="hidden lg:flex items-center justify-between px-1">
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       Mapa de la parada y autobuses
@@ -522,7 +528,7 @@ export const App: React.FC = () => {
                     selectedBus={selectedBus}
                     onClearSelectedBus={() => setSelectedBus(null)}
                     isDark={isDark}
-                    className="max-lg:w-full max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md"
+                    className="max-lg:w-full max-lg:flex-1 max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md"
                   />
                 </div>
               </div>
