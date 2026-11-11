@@ -132,7 +132,7 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
                     <div
                       key={stop.id}
                       onClick={() => onSelectStop(stop.id)}
-                      className="p-3 rounded-2xl hover:bg-blue-50/70 dark:hover:bg-slate-800/80 border border-transparent hover:border-blue-200 dark:hover:border-blue-900 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                      className="p-3 rounded-2xl hover:bg-blue-50/70 dark:hover:bg-slate-800/80 border border-transparent hover:border-blue-200 dark:hover:border-blue-900 transition-all cursor-pointer flex items-center justify-between gap-3 group ios-press"
                     >
                       <div className="flex items-start gap-3 min-w-0">
                         <div className="w-12 h-12 rounded-xl bg-blue-100/70 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex flex-col items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -201,7 +201,7 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
               <button
                 key={fav.id}
                 onClick={() => onSelectStop(fav.id)}
-                className="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-left transition-all flex items-center justify-between gap-3 group cursor-pointer"
+                className="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-left transition-all flex items-center justify-between gap-3 group cursor-pointer ios-press"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
@@ -232,7 +232,7 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
               <button
                 key={hub.id}
                 onClick={() => onSelectStop(hub.id)}
-                className="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/80 text-left transition-all flex items-center justify-between gap-2.5 group cursor-pointer"
+                className="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/80 text-left transition-all flex items-center justify-between gap-2.5 group cursor-pointer ios-press"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs flex items-center justify-center shrink-0">

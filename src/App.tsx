@@ -17,6 +17,8 @@ import { BusMap } from './components/BusMap';
 import { EstimatesList } from './components/EstimatesList';
 import { SearchModal } from './components/SearchModal';
 import { NearestStopsModal } from './components/NearestStopsModal';
+import { FavoritesModal } from './components/FavoritesModal';
+import { MobileTabBar } from './components/MobileTabBar';
 import { HomeSearchLanding } from './components/HomeSearchLanding';
 
 const REFRESH_INTERVAL_SECONDS = 30;
@@ -56,6 +58,7 @@ export const App: React.FC = () => {
   const [selectedBus, setSelectedBus] = useState<BusEstimate | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isNearestOpen, setIsNearestOpen] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [nearestStops, setNearestStops] = useState<NearestStop[]>([]);
   const [isLocating, setIsLocating] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
@@ -222,6 +225,19 @@ export const App: React.FC = () => {
     setFavorites(updated);
   };
 
+  const handleRemoveFavorite = (stopId: string) => {
+    const found = favorites.find((f) => f.id === stopId);
+    if (found) {
+      const { favorites: updated } = toggleFavorite({
+        id: stopId,
+        name: found.name,
+        address: found.address || '',
+        lines: found.lines || [],
+      });
+      setFavorites(updated);
+    }
+  };
+
   const isCurrentFav = favorites.some((f) => f.id === currentStopId);
 
   // Select stop from search, modal, or pill
@@ -276,7 +292,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors overscroll-none">
       {/* Top Header */}
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}
@@ -290,8 +306,8 @@ export const App: React.FC = () => {
         onSelectStop={handleSelectStop}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-4 sm:py-6 flex flex-col gap-4">
+      {/* Main Content Area: pb-24 on mobile gives breathing room for bottom tab bar */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-4 sm:py-6 pb-24 md:pb-8 flex flex-col gap-4">
         {!currentStopId ? (
           /* Search & Discovery Landing when no stop is selected */
           <HomeSearchLanding
@@ -379,8 +395,8 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400 dark:text-slate-500">
+      {/* Footer on desktop */}
+      <footer className="mt-auto py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400 dark:text-slate-500 pb-20 md:pb-6">
         <p>
           Datos oficiales en tiempo real de{' '}
           <a
@@ -393,8 +409,22 @@ export const App: React.FC = () => {
           </a>{' '}
           • Open Data & PMV
         </p>
-        <p className="mt-1">PWA moderna, rápida e instalable para móviles y escritorio.</p>
+        <p className="mt-1">PWA moderna adaptada para iPhone y navegación nativa.</p>
       </footer>
+
+      {/* Mobile iOS Tab Bar */}
+      <MobileTabBar
+        currentTab={currentStopId ? 'home' : 'search'}
+        onGoHome={handleGoHome}
+        onOpenSearch={() => setIsSearchOpen(true)}
+        onNearMe={handleNearMe}
+        onOpenFavorites={() => setIsFavoritesOpen(true)}
+        isLocating={isLocating}
+        favoritesCount={favorites.length}
+        isDark={isDark}
+        onToggleTheme={toggleTheme}
+        hasActiveStop={Boolean(currentStopId)}
+      />
 
       {/* Search Modal */}
       <SearchModal
@@ -410,6 +440,16 @@ export const App: React.FC = () => {
         onClose={() => setIsNearestOpen(false)}
         stops={nearestStops}
         onSelectStop={handleSelectStop}
+      />
+
+      {/* Favorites Modal for Mobile */}
+      <FavoritesModal
+        isOpen={isFavoritesOpen}
+        onClose={() => setIsFavoritesOpen(false)}
+        favorites={favorites}
+        onSelectStop={handleSelectStop}
+        onRemoveFavorite={handleRemoveFavorite}
+        currentStopId={currentStopId}
       />
     </div>
   );

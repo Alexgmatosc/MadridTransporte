@@ -71,6 +71,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       onClick={handleDialogClick}
       className="fixed inset-0 m-auto z-50 p-0 w-[calc(100%-2rem)] max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-col max-h-[85vh] animate-in zoom-in-95 duration-150 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm open:flex"
     >
+      {/* iOS Drag Handle indicator on mobile */}
+      <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-2.5 sm:hidden" />
+
       {/* Top Search Input inside semantic <search> */}
       <search className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
         <Search className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
