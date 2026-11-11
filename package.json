@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "generate:stops": "python3 scripts/generate_stops.py",
     "lint": "oxlint",
-    "test": "vitest run",
+    "test": "vitest run --project unit",
+    "test:unit": "vitest run --project unit",
+    "test:e2e": "vitest run --project e2e",
+    "test:all": "vitest run",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,12 +23,15 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.5",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@types/google.maps": "^3.66.10",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "happy-dom": "^21.0.4",
     "oxlint": "^1.90.0",
     "puppeteer-core": "^25.17.0",
     "tailwindcss": "^4.3.5",

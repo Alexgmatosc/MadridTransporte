@@ -145,6 +145,20 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // 0. Listen to browser history navigation (back/forward popstate)
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const stopParam = urlParams.get('stop') || window.location.hash.replace('#', '');
+      const metroParam = urlParams.get('metro');
+      setCurrentStopId(stopParam || null);
+      setCurrentMetroStationId(metroParam || null);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // 1. Initial datasets load
   useEffect(() => {
     loadStops()
@@ -240,15 +254,19 @@ export const App: React.FC = () => {
           setErrorEstimates(res.error);
         }
         if (res.stopName && (!currentStop || !currentStop.lines.length)) {
-          setCurrentStop((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  name: res.stopName || prev.name,
-                  address: res.address || prev.address,
-                }
-              : null
-          );
+          setCurrentStop((prev) => {
+            if (!prev) return null;
+            const newName = res.stopName || prev.name;
+            const newAddress = res.address || prev.address;
+            if (prev.name === newName && prev.address === newAddress) {
+              return prev;
+            }
+            return {
+              ...prev,
+              name: newName,
+              address: newAddress,
+            };
+          });
         }
       } catch (err: unknown) {
         const errorMsg =
@@ -411,7 +429,7 @@ export const App: React.FC = () => {
     : null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors overscroll-none">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors overscroll-none">
       {/* Top Header */}
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}

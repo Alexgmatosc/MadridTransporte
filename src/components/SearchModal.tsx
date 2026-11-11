@@ -19,8 +19,8 @@ interface SearchModalProps {
 const POPULAR_HUBS = [
   { type: 'metro' as const, id: '0112', name: 'Sol', lines: ['1', '2', '3'] },
   { type: 'metro' as const, id: '0209', name: 'Ópera', lines: ['2', '5', 'R'] },
-  { type: 'metro' as const, id: '0106', name: 'Atocha', lines: ['1'] },
-  { type: 'metro' as const, id: '0310', name: 'Moncloa', lines: ['3', '6'] },
+  { type: 'metro' as const, id: '0116', name: 'Atocha', lines: ['1'] },
+  { type: 'metro' as const, id: '0311', name: 'Moncloa', lines: ['3', '6'] },
   { type: 'metro' as const, id: '0618', name: 'Nuevos Ministerios', lines: ['6', '8', '10'] },
   { type: 'bus' as const, id: '72', name: 'Cibeles', lines: ['1', '2', '202'] },
   { type: 'bus' as const, id: '4514', name: 'Cristo Rey', lines: ['1', '82'] },

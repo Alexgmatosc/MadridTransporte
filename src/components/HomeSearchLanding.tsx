@@ -52,14 +52,14 @@ const POPULAR_HUBS: Array<{
   },
   {
     type: 'metro',
-    id: '0106',
+    id: '0116',
     name: 'Atocha',
     desc: 'Estación Central / Renfe • L1',
     lines: ['1'],
   },
   {
     type: 'metro',
-    id: '0310',
+    id: '0311',
     name: 'Moncloa',
     desc: 'Intercambiador Poniente • L3, L6',
     lines: ['3', '6'],
