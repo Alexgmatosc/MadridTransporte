@@ -25,178 +25,199 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   userLocation,
 }) => {
   const [query, setQuery] = useState('');
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
     if (isOpen) {
+      if (!dialog.open) {
+        dialog.showModal();
+      }
       setTimeout(() => inputRef.current?.focus(), 50);
+    } else {
+      if (dialog.open) {
+        dialog.close();
+      }
     }
   }, [isOpen]);
 
-  // Handle escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  // Click outside to dismiss (dialog backdrop click detection per modern-web-guidance)
+  const handleDialogClick = (e: React.MouseEvent<HTMLDialogElement>) => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const r = dialog.getBoundingClientRect();
+    const isOutside =
+      e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    if (isOutside) {
+      onClose();
+    }
+  };
 
   // Derive results directly during render
   const results = query.trim() ? searchStops(query, 30) : [];
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
+    <dialog
+      ref={dialogRef}
       aria-label="Buscador de paradas y líneas"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-8 sm:pt-16 px-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150"
-      onClick={onClose}
+      onClose={onClose}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
+      onClick={handleDialogClick}
+      className="fixed inset-0 m-auto z-50 p-0 w-[calc(100%-2rem)] max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-col max-h-[85vh] animate-in zoom-in-95 duration-150 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm open:flex"
     >
-      <div
-        className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150 overscroll-contain"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Top Search Input */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
-          <Search className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
-          <input
-            ref={inputRef}
-            type="search"
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Nº parada (ej. 72), calle o línea..."
-            aria-label="Buscar por parada, calle o línea"
-            className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 text-base outline-none font-medium"
-          />
-          {query ? (
-            <button
-              onClick={() => setQuery('')}
-              className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          ) : (
-            <kbd className="hidden sm:inline-block px-2 py-0.5 text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 rounded font-mono">
-              ESC
-            </kbd>
-          )}
+      {/* Top Search Input inside semantic <search> */}
+      <search className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+        <Search className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+        <input
+          ref={inputRef}
+          type="search"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Nº parada (ej. 72), calle o línea..."
+          aria-label="Buscar por parada, calle o línea"
+          className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 text-base outline-none font-medium"
+        />
+        {query ? (
           <button
-            onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-1"
+            type="button"
+            onClick={() => setQuery('')}
+            className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Limpiar búsqueda"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
-        </div>
-
-        {/* Popular Hubs / Quick chips */}
-        {!query && (
-          <div className="p-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50">
-            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2">
-              Paradas populares:
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {POPULAR_STOPS.map((hub) => (
-                <button
-                  key={hub.id}
-                  onClick={() => {
-                    onSelectStop(hub.id);
-                    setQuery('');
-                    onClose();
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all cursor-pointer shadow-2xs"
-                >
-                  <span className="text-blue-600 dark:text-blue-400 font-bold">{hub.id}</span>
-                  <span>{hub.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+        ) : (
+          <kbd className="hidden sm:inline-block px-2 py-0.5 text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 rounded font-mono">
+            ESC
+          </kbd>
         )}
+        <button
+          type="button"
+          onClick={onClose}
+          className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-1"
+          aria-label="Cerrar buscador"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </search>
 
-        {/* Results List */}
-        <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60 p-2">
-          {query && results.length === 0 && (
-            <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-              <Bus className="w-8 h-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm font-semibold">No se encontraron paradas</p>
-              <p className="text-xs mt-1">Prueba buscando por número de parada (ej: 72) o nombre de calle.</p>
-            </div>
-          )}
+      {/* Popular Hubs / Quick chips */}
+      {!query && (
+        <div className="p-4 border-b border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-950/30">
+          <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
+            Intercambiadores Populares
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {POPULAR_STOPS.map((hub) => (
+              <button
+                type="button"
+                key={hub.id}
+                onClick={() => {
+                  onSelectStop(hub.id);
+                  onClose();
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-medium bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-xs flex items-center gap-1.5"
+              >
+                <span>{hub.name}</span>
+                <span className="text-[10px] text-slate-400 font-mono">#{hub.id}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-          {results.map((stop) => {
-            let distanceText = '';
-            if (userLocation && stop.lat && stop.lon) {
-              const meters = calculateDistanceMeters(
-                userLocation.lat,
-                userLocation.lon,
-                stop.lat,
-                stop.lon
-              );
-              distanceText = meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`;
-            }
+      {/* Results List */}
+      <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60 p-2">
+        {query.trim() && results.length === 0 ? (
+          <div className="p-8 text-center text-slate-500">
+            <Bus className="w-8 h-8 mx-auto mb-2 opacity-40" />
+            <p className="text-sm font-semibold">No se encontraron paradas</p>
+            <p className="text-xs text-slate-400 mt-1">
+              Prueba con el número de parada, nombre de calle o número de línea.
+            </p>
+          </div>
+        ) : (
+          results.map((stop) => {
+            const distance =
+              userLocation && stop.lat && stop.lon
+                ? calculateDistanceMeters(
+                    userLocation.lat,
+                    userLocation.lon,
+                    stop.lat,
+                    stop.lon
+                  )
+                : null;
 
             return (
               <div
                 key={stop.id}
                 onClick={() => {
                   onSelectStop(stop.id);
-                  setQuery('');
                   onClose();
                 }}
-                className="p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex items-center justify-between gap-3 group"
+                className="p-3.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors cursor-pointer flex items-center justify-between gap-3 group"
               >
                 <div className="flex items-start gap-3 min-w-0">
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 flex items-center justify-center font-bold text-sm shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    {stop.id}
+                  <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 flex flex-col items-center justify-center font-bold text-xs shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <span className="text-[9px] uppercase tracking-wider opacity-75">Parada</span>
+                    <span className="text-sm font-black">{stop.id}</span>
                   </div>
+
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                        {stop.name}
-                      </h4>
-                      {distanceText && (
-                        <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded shrink-0">
-                          a {distanceText}
-                        </span>
-                      )}
-                    </div>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                      {stop.name}
+                    </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
                       {stop.address}
                     </p>
-
-                    {/* Lines Served Chips */}
-                    {stop.lines && stop.lines.length > 0 && (
+                    {stop.lines && (
                       <div className="flex items-center gap-1 mt-1.5 flex-wrap">
-                        {stop.lines.slice(0, 8).map((line) => (
+                        {stop.lines.slice(0, 6).map((l) => (
                           <span
-                            key={line}
+                            key={l}
                             className="px-1.5 py-0.2 bg-slate-100 dark:bg-slate-800 text-[10px] font-bold rounded text-slate-600 dark:text-slate-300"
                           >
-                            {line}
+                            {l}
                           </span>
                         ))}
-                        {stop.lines.length > 8 && (
-                          <span className="text-[10px] text-slate-400 font-semibold">
-                            +{stop.lines.length - 8} más
+                        {stop.lines.length > 6 && (
+                          <span className="text-[10px] text-slate-400 font-medium">
+                            +{stop.lines.length - 6} más
                           </span>
                         )}
                       </div>
                     )}
                   </div>
                 </div>
+
+                {distance !== null && (
+                  <div className="text-right shrink-0">
+                    <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                      {distance < 1000 ? `${distance} m` : `${(distance / 1000).toFixed(1)} km`}
+                    </span>
+                  </div>
+                )}
               </div>
             );
-          })}
-        </div>
+          })
+        )}
       </div>
-    </div>
+
+      {/* Footer Info */}
+      <div className="p-3 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+        <span>4.933 paradas de la EMT Madrid indexadas</span>
+        <span>Pulsa ESC para salir</span>
+      </div>
+    </dialog>
   );
 };
