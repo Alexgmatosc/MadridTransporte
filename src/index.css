@@ -79,8 +79,42 @@
   dialog::backdrop {
     overflow: hidden;
     overscroll-behavior: contain;
-    background-color: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
+    background-color: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(6px);
+  }
+
+  /* iOS Bottom Sheet modal styling: fixes notch collision and centering on iPhone */
+  @media (max-width: 639px) {
+    dialog.ios-sheet {
+      position: fixed !important;
+      top: auto !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      max-height: calc(82dvh - env(safe-area-inset-top, 0px)) !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      border-top-left-radius: 1.75rem !important;
+      border-top-right-radius: 1.75rem !important;
+      border-left: none !important;
+      border-right: none !important;
+      border-bottom: none !important;
+    }
+  }
+
+  @media (min-width: 640px) {
+    dialog.ios-sheet {
+      position: fixed !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      margin: auto !important;
+      max-height: 85vh !important;
+    }
   }
 }
 
@@ -95,10 +129,10 @@
 
 /* Safe area utilities */
 .pt-safe {
-  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.85rem);
 }
 .pb-safe {
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
 }
 .pl-safe {
   padding-left: max(1rem, env(safe-area-inset-left, 0px));

@@ -69,13 +69,13 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         onClose();
       }}
       onClick={handleDialogClick}
-      className="fixed inset-0 m-auto z-50 p-0 w-[calc(100%-2rem)] max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-col max-h-[85vh] animate-in zoom-in-95 duration-150 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm open:flex"
+      className="ios-sheet fixed inset-x-0 bottom-0 sm:inset-0 sm:m-auto z-50 p-0 w-full sm:w-[calc(100%-2rem)] max-w-xl bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-col max-h-[82vh] animate-in slide-in-from-bottom duration-200 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm open:flex"
     >
       {/* iOS Drag Handle indicator on mobile */}
-      <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-2.5 sm:hidden" />
+      <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
 
       {/* Top Search Input inside semantic <search> */}
-      <search className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+      <search className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3 shrink-0">
         <Search className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
         <input
           ref={inputRef}
@@ -216,10 +216,19 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         )}
       </div>
 
-      {/* Footer Info */}
-      <div className="p-3 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-        <span>4.933 paradas de la EMT Madrid indexadas</span>
-        <span>Pulsa ESC para salir</span>
+      {/* Footer Info with iOS safe area padding */}
+      <div
+        className="p-3 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 shrink-0"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
+      >
+        <span>4.933 paradas indexadas</span>
+        <button
+          type="button"
+          onClick={onClose}
+          className="font-bold text-blue-600 dark:text-blue-400 px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/40"
+        >
+          Cerrar
+        </button>
       </div>
     </dialog>
   );

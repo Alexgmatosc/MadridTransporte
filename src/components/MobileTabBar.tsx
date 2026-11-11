@@ -30,7 +30,8 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
       aria-label="Navegación principal inferior"
       className="fixed bottom-0 inset-x-0 z-40 md:hidden bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl border-t border-slate-200/80 dark:border-slate-800/80 transition-colors"
       style={{
-        paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)',
+        height: 'calc(3.75rem + env(safe-area-inset-bottom, 0px))',
       }}
     >
       <div className="flex items-center justify-around h-14 px-2 max-w-md mx-auto">
