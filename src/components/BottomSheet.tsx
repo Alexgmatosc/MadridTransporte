@@ -1,0 +1,318 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { triggerHaptic } from '../utils/haptics';
+
+export type SnapPoint = 'peek' | 'half' | 'full';
+
+export interface BottomSheetProps {
+  snap: SnapPoint;
+  onSnapChange: (snap: SnapPoint) => void;
+  peekHeight?: number;
+  headerContent?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+}
+
+const VELOCITY_THRESHOLD = 0.45; // px/ms
+
+export const BottomSheet: React.FC<BottomSheetProps> = ({
+  snap,
+  onSnapChange,
+  peekHeight = 96,
+  headerContent,
+  children,
+  className = '',
+}) => {
+  const [windowHeight, setWindowHeight] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerHeight || 844;
+    }
+    return 844;
+  });
+
+  const [dragOffset, setDragOffset] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Drag tracking refs
+  const startYRef = useRef<number>(0);
+  const lastYRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(0);
+  const velocityYRef = useRef<number>(0);
+  const isDraggingRef = useRef<boolean>(false);
+
+  // Content touch decoupling refs
+  const contentTouchStartYRef = useRef<number | null>(null);
+  const isContentDraggingSheetRef = useRef<boolean>(false);
+
+  // Window resize tracking
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight || 844);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Compute snap heights
+  const resolvedPeekHeight = Math.max(72, peekHeight);
+  const halfHeight = Math.round(windowHeight * 0.52);
+  const fullHeight = Math.round(Math.min(windowHeight - 56, windowHeight * 0.9));
+
+  // Translate offset per snap point (0 = fully expanded to fullHeight)
+  const getTranslateYForSnap = useCallback(
+    (point: SnapPoint): number => {
+      switch (point) {
+        case 'full':
+          return 0;
+        case 'half':
+          return Math.max(0, fullHeight - halfHeight);
+        case 'peek':
+          return Math.max(0, fullHeight - resolvedPeekHeight);
+      }
+    },
+    [fullHeight, halfHeight, resolvedPeekHeight]
+  );
+
+  const currentSnapTranslateY = getTranslateYForSnap(snap);
+
+  // Calculate commit snap based on velocity or distance
+  const calculateTargetSnap = useCallback(
+    (velocity: number, currentOffset: number): SnapPoint => {
+      // 1. High-velocity flick commit (|v| > 0.45 px/ms)
+      if (Math.abs(velocity) > VELOCITY_THRESHOLD) {
+        if (velocity > 0) {
+          // Downward swipe -> lower snap point
+          if (snap === 'full') return 'half';
+          if (snap === 'half') return 'peek';
+          return 'peek';
+        } else {
+          // Upward swipe -> higher snap point
+          if (snap === 'peek') return 'half';
+          if (snap === 'half') return 'full';
+          return 'full';
+        }
+      }
+
+      // 2. Slow release: distance commit to closest snap point
+      const currentVisualTranslateY = currentSnapTranslateY + currentOffset;
+      const currentVisibleHeight = fullHeight - currentVisualTranslateY;
+
+      const distPeek = Math.abs(currentVisibleHeight - resolvedPeekHeight);
+      const distHalf = Math.abs(currentVisibleHeight - halfHeight);
+      const distFull = Math.abs(currentVisibleHeight - fullHeight);
+
+      if (distPeek <= distHalf && distPeek <= distFull) {
+        return 'peek';
+      }
+      if (distHalf <= distPeek && distHalf <= distFull) {
+        return 'half';
+      }
+      return 'full';
+    },
+    [snap, currentSnapTranslateY, fullHeight, resolvedPeekHeight, halfHeight]
+  );
+
+  // Commit snap change with haptic feedback
+  const commitSnap = useCallback(
+    (velocity: number, offset: number) => {
+      const nextSnap = calculateTargetSnap(velocity, offset);
+      if (nextSnap !== snap) {
+        triggerHaptic('selection');
+        onSnapChange(nextSnap);
+      }
+      setDragOffset(0);
+      setIsDragging(false);
+      isDraggingRef.current = false;
+      velocityYRef.current = 0;
+    },
+    [calculateTargetSnap, snap, onSnapChange]
+  );
+
+  // --- Pointer Drag on Header / Pill ---
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Only primary button
+    if (e.button !== 0) return;
+
+    // Allow child buttons/links inside headerContent to be clicked normally
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('button, a, input, [role="button"]')) {
+      return;
+    }
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Graceful fallback in environments without full pointer capture
+    }
+
+    setIsDragging(true);
+    isDraggingRef.current = true;
+    startYRef.current = e.clientY;
+    lastYRef.current = e.clientY;
+    lastTimeRef.current = performance.now();
+    velocityYRef.current = 0;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+
+    const now = performance.now();
+    const dt = now - lastTimeRef.current;
+    const dy = e.clientY - lastYRef.current;
+
+    if (dt > 0) {
+      velocityYRef.current = dy / dt;
+    }
+    lastYRef.current = e.clientY;
+    lastTimeRef.current = now;
+
+    const rawDelta = e.clientY - startYRef.current;
+    const baseTranslateY = getTranslateYForSnap(snap);
+    const candidateTranslateY = baseTranslateY + rawDelta;
+
+    // Rubber-band resistance if dragged beyond full or peek bounds
+    let adjustedDelta = rawDelta;
+    if (candidateTranslateY < 0) {
+      const overshoot = -candidateTranslateY;
+      adjustedDelta = -baseTranslateY - overshoot * 0.25;
+    } else {
+      const maxTranslateY = getTranslateYForSnap('peek');
+      if (candidateTranslateY > maxTranslateY) {
+        const overshoot = candidateTranslateY - maxTranslateY;
+        adjustedDelta = maxTranslateY - baseTranslateY + overshoot * 0.25;
+      }
+    }
+
+    setDragOffset(adjustedDelta);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignored
+    }
+    commitSnap(velocityYRef.current, dragOffset);
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      // Ignored
+    }
+    commitSnap(0, dragOffset);
+  };
+
+  // --- Scroll Decoupling for Content Container ---
+  const handleContentTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length !== 1) return;
+    contentTouchStartYRef.current = e.touches[0].clientY;
+    lastYRef.current = e.touches[0].clientY;
+    lastTimeRef.current = performance.now();
+    velocityYRef.current = 0;
+    isContentDraggingSheetRef.current = false;
+  };
+
+  const handleContentTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (contentTouchStartYRef.current === null) return;
+    const currentY = e.touches[0].clientY;
+    const deltaY = currentY - contentTouchStartYRef.current;
+    const scrollTop = contentRef.current?.scrollTop ?? 0;
+
+    const now = performance.now();
+    const dt = now - lastTimeRef.current;
+    if (dt > 0) {
+      velocityYRef.current = (currentY - lastYRef.current) / dt;
+    }
+    lastYRef.current = currentY;
+    lastTimeRef.current = now;
+
+    // Only initiate sheet drag from content if at the very top and dragging downward
+    if (!isContentDraggingSheetRef.current) {
+      if (scrollTop <= 0 && deltaY > 6) {
+        isContentDraggingSheetRef.current = true;
+        setIsDragging(true);
+        isDraggingRef.current = true;
+        startYRef.current = currentY;
+      }
+    }
+
+    if (isContentDraggingSheetRef.current) {
+      const rawDelta = currentY - startYRef.current;
+      setDragOffset(Math.max(0, rawDelta));
+    }
+  };
+
+  const handleContentTouchEnd = () => {
+    if (isContentDraggingSheetRef.current) {
+      commitSnap(velocityYRef.current, dragOffset);
+    }
+    contentTouchStartYRef.current = null;
+    isContentDraggingSheetRef.current = false;
+  };
+
+  // Calculate final translateY
+  const activeTranslateY = Math.max(
+    -24,
+    currentSnapTranslateY + (isDragging ? dragOffset : 0)
+  );
+
+  return (
+    <div
+      ref={sheetRef}
+      role="region"
+      aria-label="Detalles de parada y llegadas"
+      data-snap={snap}
+      data-testid="bottom-sheet"
+      className={`max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 flex flex-col max-lg:rounded-t-[22px] max-lg:bg-white/92 max-lg:dark:bg-slate-900/92 max-lg:border-t max-lg:border-slate-200/80 max-lg:dark:border-slate-800/80 max-lg:shadow-2xl transition-colors will-change-transform select-none lg:static lg:h-auto! lg:transform-none! lg:bg-transparent! lg:dark:bg-transparent! lg:border-0! lg:shadow-none! lg:backdrop-blur-none! lg:select-auto ${className}`}
+      style={{
+        height: `${fullHeight}px`,
+        transform: `translate3d(0, ${activeTranslateY}px, 0)`,
+        transition: isDragging
+          ? 'none'
+          : 'transform 280ms cubic-bezier(0.2, 0.9, 0.4, 1.0)',
+        backdropFilter: 'blur(24px) saturate(190%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(190%)',
+      }}
+    >
+      {/* Drag Pill Handle Header */}
+      <div
+        data-testid="bottom-sheet-handle"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+        className="w-full max-lg:pt-2 max-lg:pb-1 flex flex-col items-center max-lg:cursor-grab max-lg:active:cursor-grabbing shrink-0"
+        style={{ touchAction: 'none' }}
+      >
+        <div
+          className="w-10 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 mx-auto my-2 lg:hidden"
+          style={{ touchAction: 'none' }}
+        />
+        {headerContent && <div className="w-full px-3 sm:px-4 lg:px-0">{headerContent}</div>}
+      </div>
+
+      {/* Decoupled Content Scroll Container */}
+      <div
+        ref={contentRef}
+        data-testid="bottom-sheet-content"
+        onTouchStart={handleContentTouchStart}
+        onTouchMove={handleContentTouchMove}
+        onTouchEnd={handleContentTouchEnd}
+        className="flex-1 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:px-3 max-lg:sm:px-4 max-lg:pt-2 select-auto flex flex-col gap-3.5"
+        style={{
+          overscrollBehaviorY: 'contain',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.25rem)',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};

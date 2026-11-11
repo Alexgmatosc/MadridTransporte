@@ -98,6 +98,8 @@ if (typeof navigator !== 'undefined') {
 vi.mock('leaflet', () => {
   const mockMap: any = {
     remove: vi.fn(),
+    invalidateSize: vi.fn(),
+    flyTo: vi.fn(),
     setView() { return this; },
     fitBounds() { return this; },
     panTo() { return this; },

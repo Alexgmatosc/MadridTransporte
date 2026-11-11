@@ -56,11 +56,12 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onGoHome}
             title="Ir al inicio"
+            aria-label="Ir al inicio"
             className="flex items-center gap-2.5 shrink-0 text-left hover:opacity-85 transition-opacity cursor-pointer group ios-press"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 via-indigo-600 to-blue-600 text-white flex items-center justify-center gap-0.5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-              <Train className="w-3.5 h-3.5 text-white" />
-              <Bus className="w-3.5 h-3.5 text-white" />
+            <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-slate-800 text-white flex items-center justify-center gap-1 shadow-sm border border-slate-200/20 dark:border-slate-700/50 group-hover:scale-105 transition-transform">
+              <Train className="w-3.5 h-3.5 text-rose-500" />
+              <Bus className="w-3.5 h-3.5 text-blue-500" />
             </div>
             <div>
               <div className="flex items-center gap-1.5 leading-none">
@@ -68,11 +69,11 @@ export const Header: React.FC<HeaderProps> = ({
                   Madrid<span className="text-rose-600 dark:text-rose-400">Metro</span>
                   <span className="text-blue-600 dark:text-blue-400">&</span>Bus
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   PWA
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
                 Metro de Madrid & EMT en tiempo real
               </span>
             </div>
@@ -99,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="truncate flex-1 text-sm">
               Buscar estación, parada, calle o línea...
             </span>
-            <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-400">
+            <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-400">
               ⌘K
             </kbd>
           </button>
@@ -116,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <MapPin
                 className={`w-4 h-4 text-blue-600 dark:text-blue-400 ${
-                  isLocating ? 'animate-bounce text-emerald-500' : ''
+                  isLocating ? 'animate-spin text-emerald-500' : ''
                 }`}
               />
               <span>{isLocating ? 'Buscando...' : 'Cerca de mí'}</span>
@@ -127,12 +128,13 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               onClick={onToggleTheme}
               title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 transition-all cursor-pointer ios-press"
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              className="ios-touch-target min-w-[44px] min-h-[44px] p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 transition-all cursor-pointer ios-press"
             >
               {isDark ? (
                 <Sun className="w-4 h-4 text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-slate-700" />
+                <Moon className="w-4 h-4 text-slate-700 dark:text-slate-300" />
               )}
             </button>
           </div>
@@ -144,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({
                 type="button"
                 onClick={onOpenSearch}
                 aria-label="Buscar parada o estación"
-                className="p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all active:scale-90 cursor-pointer"
+                className="ios-touch-target min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all active:scale-90 cursor-pointer ios-press"
               >
                 <Search className="w-4 h-4" />
               </button>
@@ -155,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Favorites Quick Access Row (desktop/tablet) */}
         {totalFavorites > 0 && (
           <div className="hidden sm:flex mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 items-center gap-2 overflow-x-auto no-scrollbar py-0.5 overscroll-contain">
-            <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 pr-1">
+            <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 pr-1">
               <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> Favoritos:
             </span>
             <div className="flex items-center gap-1.5 flex-nowrap">
@@ -174,7 +176,7 @@ export const Header: React.FC<HeaderProps> = ({
                     }`}
                   >
                     <span
-                      className={`font-black text-[10px] ${
+                      className={`font-black text-xs ${
                         isActive ? 'text-rose-100' : 'text-rose-600 dark:text-rose-400'
                       }`}
                     >

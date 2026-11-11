@@ -469,7 +469,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                           {/* Primary ETA Badge */}
                           <div className="text-right shrink-0">
                             <div
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-sm sm:text-base shadow-xs ${
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-sm sm:text-base shadow-xs tabular-nums ${
                                 isArriving
                                   ? 'bg-emerald-600 text-white'
                                   : est.proximoMinutes !== null
@@ -486,7 +486,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                         </div>
 
                         {/* Bottom: Secondary Train & Time */}
-                        <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 tabular-nums">
                           <div className="flex items-center gap-1.5">
                             {hasSecondTrain ? (
                               <span className="inline-flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
@@ -501,7 +501,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                           </div>
 
                           {est.timestamp && (
-                            <span className="text-[10px] text-slate-400 font-mono">
+                            <span className="text-[10px] text-slate-400 font-mono tabular-nums">
                               {new Date(est.timestamp).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',

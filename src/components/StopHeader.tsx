@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star, MapPin, Share2, Check, ArrowLeft } from 'lucide-react';
 import type { Stop } from '../types/emt';
+import { triggerHaptic } from '../utils/haptics';
 
 interface StopHeaderProps {
   stop: Stop;
@@ -22,6 +23,7 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
+    triggerHaptic('selection');
     const url = window.location.href;
     const shareText = `Parada EMT Madrid ${stop.id}: ${stop.name} (${stop.address})`;
 
@@ -48,27 +50,31 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
       {onBackToSearch && (
         <div className="mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
           <button
-            onClick={onBackToSearch}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer group"
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              onBackToSearch();
+            }}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer group ios-press"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             <span>Volver al buscador de paradas</span>
           </button>
-          <span className="text-[11px] text-slate-400">EMT Madrid PMV</span>
+          <span className="text-[11px] font-medium text-slate-400">EMT Madrid PMV</span>
         </div>
       )}
       <div className="flex items-start justify-between gap-3">
         {/* Stop ID Badge + Title */}
-        <div className="flex items-start gap-3.5">
-          <div className="shrink-0 flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-md shadow-blue-600/20">
-            <span className="text-[10px] font-bold tracking-wider opacity-80 uppercase leading-none">
+        <div className="flex items-start gap-3.5 min-w-0">
+          <div className="shrink-0 flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-600 text-white shadow-xs border border-blue-500/30">
+            <span className="text-[10px] font-bold tracking-wider opacity-85 uppercase leading-none">
               Parada
             </span>
-            <span className="text-xl sm:text-2xl font-black tracking-tight leading-tight">
+            <span className="text-xl sm:text-2xl font-black tracking-tight leading-tight tabular-nums">
               {stop.id}
             </span>
           </div>
@@ -87,9 +93,13 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
         {/* Action Buttons: Star + Share */}
         <div className="flex items-center gap-1.5 shrink-0">
           <button
-            onClick={onToggleFavorite}
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              onToggleFavorite();
+            }}
             title={isFav ? 'Quitar de favoritos' : 'Guardar en favoritos'}
-            className={`p-2.5 rounded-xl border transition-all active:scale-90 cursor-pointer ${
+            className={`ios-touch-target min-w-[44px] min-h-[44px] p-2.5 rounded-xl border transition-all active:scale-90 cursor-pointer ios-press ${
               isFav
                 ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-500'
                 : 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-200/80 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
@@ -103,9 +113,10 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
           </button>
 
           <button
+            type="button"
             onClick={handleShare}
             title="Compartir parada"
-            className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 transition-all active:scale-90 cursor-pointer"
+            className="ios-touch-target min-w-[44px] min-h-[44px] p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 transition-all active:scale-90 cursor-pointer ios-press"
           >
             {copied ? (
               <Check className="w-5 h-5 text-emerald-500" />
@@ -125,7 +136,11 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
             </span>
             {selectedLineFilter && (
               <button
-                onClick={() => onSelectLineFilter(null)}
+                type="button"
+                onClick={() => {
+                  triggerHaptic('selection');
+                  onSelectLineFilter(null);
+                }}
                 className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer"
               >
                 Mostrar todas
@@ -138,12 +153,14 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
               const isSelected = selectedLineFilter === line;
               return (
                 <button
+                  type="button"
                   key={line}
-                  onClick={() =>
-                    onSelectLineFilter(isSelected ? null : line)
-                  }
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    onSelectLineFilter(isSelected ? null : line);
+                  }}
                   title={`Filtrar por línea ${line}`}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-bold tabular-nums transition-all cursor-pointer ios-press ${
                     isSelected
                       ? 'bg-blue-600 text-white shadow-xs scale-105'
                       : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/60'

@@ -537,7 +537,7 @@ describe('Tier 3: User Journeys & End-to-End Workflows (50 Tests)', () => {
       await renderApp({ url: 'http://localhost/?metro=0209', theme: 'dark' });
 
       await waitFor(() => {
-        expect(screen.getByRole('heading', { name: 'Ópera' })).toBeDefined();
+        expect(screen.getByRole('heading', { level: 2, name: 'Ópera' })).toBeDefined();
       });
 
       expect(document.documentElement.classList.contains('dark')).toBe(true);
@@ -644,19 +644,13 @@ describe('Tier 3: User Journeys & End-to-End Workflows (50 Tests)', () => {
       });
 
       const dialog = document.querySelector('dialog[aria-label="Buscador universal de transporte de Madrid"]') as HTMLDialogElement;
-      const searchInput = within(dialog).getByPlaceholderText(/Estación de metro, parada de autobús/i);
+      const operaBtn = within(dialog).getByRole('button', { name: /Ópera/i });
       await act(async () => {
-        fireEvent.change(searchInput, { target: { value: 'Ópera' } });
-      });
-
-      const operaHeading = await within(dialog).findByRole('heading', { level: 4, name: 'Ópera' });
-      const operaItem = operaHeading.closest('[class*="cursor-pointer"]')!;
-      await act(async () => {
-        fireEvent.click(operaItem);
+        fireEvent.click(operaBtn);
       });
 
       await waitFor(() => {
-        expect(screen.getByRole('heading', { name: 'Ópera' })).toBeDefined();
+        expect(screen.getByRole('heading', { level: 2, name: 'Ópera' })).toBeDefined();
         expect(screen.getByText('Plaza de Isabel II 9')).toBeDefined();
       });
     });

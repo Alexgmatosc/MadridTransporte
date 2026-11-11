@@ -3,8 +3,10 @@ import L from 'leaflet';
 import type { BusEstimate, Stop } from '../types/emt';
 import type { MetroStation } from '../types/metro';
 import { Crosshair, Layers, MapPin, Train } from 'lucide-react';
-import { GoogleBusMap } from './GoogleBusMap';
+import { GoogleBusMap, GOOGLE_MAPS_API_KEY } from './GoogleBusMap';
 import { formatMetroLineBadge } from '../data/metroLines';
+
+export { GOOGLE_MAPS_API_KEY };
 
 interface BusMapProps {
   stop?: Stop | null;
@@ -14,6 +16,8 @@ interface BusMapProps {
   selectedBus?: BusEstimate | null;
   onClearSelectedBus?: () => void;
   isDark: boolean;
+  fullBleed?: boolean;
+  className?: string;
 }
 
 export const BusMap: React.FC<BusMapProps> = ({
@@ -24,12 +28,14 @@ export const BusMap: React.FC<BusMapProps> = ({
   selectedBus = null,
   onClearSelectedBus = () => {},
   isDark,
+  fullBleed = false,
+  className = '',
 }) => {
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  const googleMapsApiKey = GOOGLE_MAPS_API_KEY;
 
-  // Default to Google Maps if API key exists, otherwise fallback to Leaflet
+  // Default to Google Maps whenever VITE_GOOGLE_MAPS_API_KEY (GOOGLE_MAPS_API_KEY) is present
   const [mapProvider, setMapProvider] = useState<'google' | 'leaflet'>(() =>
-    googleMapsApiKey && stop ? 'google' : 'leaflet'
+    googleMapsApiKey ? 'google' : 'leaflet'
   );
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -76,11 +82,31 @@ export const BusMap: React.FC<BusMapProps> = ({
 
     mapInstanceRef.current = map;
 
+    // Invalidate size on initial mount safely
+    const timer = setTimeout(() => {
+      map.invalidateSize?.();
+    }, 150);
+
     return () => {
+      clearTimeout(timer);
       map.remove();
       mapInstanceRef.current = null;
     };
   }, [mapProvider]);
+
+  // Handle container resizing and full-bleed transitions
+  useEffect(() => {
+    if (mapProvider !== 'leaflet' || !mapContainerRef.current || !mapInstanceRef.current) return;
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(() => {
+      mapInstanceRef.current?.invalidateSize?.();
+    });
+
+    observer.observe(mapContainerRef.current);
+
+    return () => observer.disconnect();
+  }, [mapProvider, fullBleed]);
 
   // Update Leaflet Tile Layer when Dark Mode changes
   useEffect(() => {
@@ -109,17 +135,17 @@ export const BusMap: React.FC<BusMapProps> = ({
           const badge = formatMetroLineBadge(lineId);
           return `<span style="background-color: ${badge.bg}; color: ${
             badge.text
-          };" class="inline-block px-1.5 py-0.2 rounded text-[10px] font-black mr-1 shadow-2xs">${badge.label}</span>`;
+          };" class="inline-block px-1.5 py-0.2 rounded text-xs font-black mr-1 shadow-2xs">${badge.label}</span>`;
         })
         .join('');
 
       const metroHtml = `
         <div class="relative flex items-center justify-center cursor-pointer group">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-600 to-red-600 border-2 border-white dark:border-slate-900 shadow-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-rose-500/30 group-hover:scale-110 transition-transform">
+          <div class="w-10 h-10 rounded-2xl bg-rose-600 border-2 border-white dark:border-slate-900 shadow-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-rose-500/30 group-hover:scale-110 transition-transform">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 12l10 10 10-10L12 2z"/>
             </svg>
-            <span class="absolute text-[9px] font-black">M</span>
+            <span class="absolute text-xs font-black">M</span>
           </div>
           <div class="absolute -bottom-1 w-2.5 h-2.5 bg-rose-600 rotate-45"></div>
         </div>
@@ -136,7 +162,7 @@ export const BusMap: React.FC<BusMapProps> = ({
       L.marker([metroStation.lat, metroStation.lon], { icon: metroIcon })
         .bindPopup(
           `<div class="p-1 text-slate-900">
-            <div class="text-[10px] font-black text-rose-600 uppercase tracking-wider">Metro de Madrid</div>
+            <div class="text-xs font-black text-rose-600 uppercase tracking-wider">Metro de Madrid</div>
             <div class="font-bold text-sm text-slate-900">${metroStation.name}</div>
             <div class="text-xs text-slate-500 mt-0.5">${metroStation.address || ''}</div>
             <div class="mt-2 flex flex-wrap gap-1">${lineBadgesHtml}</div>
@@ -149,7 +175,7 @@ export const BusMap: React.FC<BusMapProps> = ({
     if (stop) {
       const stopHtml = `
         <div class="relative flex items-center justify-center">
-          <div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-bold text-xs ring-4 ring-blue-500/30">
+          <div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-bold text-xs ring-4 ring-blue-500/30 tabular-nums">
             <span>${stop.id}</span>
           </div>
           <div class="absolute -bottom-1 w-2 h-2 bg-blue-600 rotate-45"></div>
@@ -199,7 +225,7 @@ export const BusMap: React.FC<BusMapProps> = ({
               ? '<span class="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping"></span>'
               : ''
           }
-          <div class="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-md text-xs font-bold text-white border border-white/60 ${
+          <div class="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-md text-xs font-bold text-white border border-white/60 tabular-nums ${
             isSelected
               ? 'bg-amber-600 ring-2 ring-amber-400'
               : isArriving
@@ -259,7 +285,7 @@ export const BusMap: React.FC<BusMapProps> = ({
 
     // Camera adjustment
     if (selectedBus && selectedBus.coordinates) {
-      map.flyTo([selectedBus.coordinates.lat, selectedBus.coordinates.lon], 17, {
+      map.flyTo?.([selectedBus.coordinates.lat, selectedBus.coordinates.lon], 17, {
         animate: true,
         duration: 0.8,
       });
@@ -276,7 +302,7 @@ export const BusMap: React.FC<BusMapProps> = ({
 
   const handleCenterOnTarget = () => {
     if (!mapInstanceRef.current) return;
-    mapInstanceRef.current.flyTo([targetLat, targetLon], 16, { animate: true });
+    mapInstanceRef.current.flyTo?.([targetLat, targetLon], 16, { animate: true });
     onClearSelectedBus();
   };
 
@@ -298,60 +324,101 @@ export const BusMap: React.FC<BusMapProps> = ({
   const busesCountWithGps = estimates.filter((e) => e.coordinates !== null).length;
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Map Provider Selector Header */}
-      <div className="flex items-center justify-between px-1">
-        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-          {metroStation ? (
-            <Train className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-          ) : (
-            <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          )}
-          <span>
-            {metroStation ? 'Ubicación de la Estación' : 'Mapa en Tiempo Real'}
+    <div className={fullBleed ? 'relative w-full h-full' : 'flex flex-col gap-2'}>
+      {/* Map Provider Selector Header (card mode) */}
+      {!fullBleed && (
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            {metroStation ? (
+              <Train className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
+            ) : (
+              <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            )}
+            <span>
+              {metroStation ? 'Ubicación de la Estación' : 'Mapa en Tiempo Real'}
+            </span>
           </span>
-        </span>
 
-        {/* Toggle between Google Maps and OpenStreetMap (if bus stop has google map key) */}
-        {stop && (
-          <div className="flex items-center p-0.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 text-[11px] font-bold">
-            <button
-              onClick={() => setMapProvider('google')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                mapProvider === 'google'
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              Google Maps
-            </button>
-            <button
-              onClick={() => setMapProvider('leaflet')}
-              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                mapProvider === 'leaflet'
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              OpenStreetMap
-            </button>
-          </div>
-        )}
-      </div>
+          {/* Toggle between Google Maps and OpenStreetMap for both Bus stops and Metro stations */}
+          {(stop || metroStation) && (
+            <div className="flex items-center p-0.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setMapProvider('google')}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  mapProvider === 'google'
+                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Google Maps
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapProvider('leaflet')}
+                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                  mapProvider === 'leaflet'
+                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                OpenStreetMap
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Floating Provider Switcher in Full-Bleed Mode */}
+      {fullBleed && (stop || metroStation) && (
+        <div className="absolute top-3 right-3 z-20 flex items-center p-0.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 shadow-md text-[11px] font-bold">
+          <button
+            type="button"
+            onClick={() => setMapProvider('google')}
+            className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+              mapProvider === 'google'
+                ? 'bg-blue-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300'
+            }`}
+          >
+            Google
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapProvider('leaflet')}
+            className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+              mapProvider === 'leaflet'
+                ? 'bg-blue-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300'
+            }`}
+          >
+            OSM
+          </button>
+        </div>
+      )}
 
       {/* Render selected map provider */}
-      {mapProvider === 'google' && googleMapsApiKey && stop ? (
+      {mapProvider === 'google' && googleMapsApiKey && (stop || metroStation) ? (
         <GoogleBusMap
           apiKey={googleMapsApiKey}
           stop={stop}
+          metroStation={metroStation}
           estimates={estimates}
           userLocation={userLocation}
           selectedBus={selectedBus}
           onClearSelectedBus={onClearSelectedBus}
           isDark={isDark}
+          fullBleed={fullBleed}
+          className={className}
         />
       ) : mapProvider === 'google' && !googleMapsApiKey ? (
-        <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md p-6 flex flex-col items-center justify-center text-center bg-slate-100 dark:bg-slate-900">
+        <div
+          className={
+            fullBleed
+              ? 'relative w-full h-full flex flex-col items-center justify-center text-center p-6 bg-slate-100 dark:bg-slate-900'
+              : 'relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md p-6 flex flex-col items-center justify-center text-center bg-slate-100 dark:bg-slate-900'
+          }
+        >
           <MapPin className="w-8 h-8 text-blue-500 mb-2 opacity-60" />
           <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">
             Google Maps no configurado
@@ -361,6 +428,7 @@ export const BusMap: React.FC<BusMapProps> = ({
             <strong>OpenStreetMap</strong> para ver el mapa libre sin clave.
           </p>
           <button
+            type="button"
             onClick={() => setMapProvider('leaflet')}
             className="mt-3 px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white cursor-pointer"
           >
@@ -368,11 +436,24 @@ export const BusMap: React.FC<BusMapProps> = ({
           </button>
         </div>
       ) : (
-        <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md">
+        <div
+          className={
+            fullBleed
+              ? `${className || 'relative w-full h-full overflow-hidden'}`
+              : `${
+                  className ||
+                  'relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md'
+                }`
+          }
+        >
           <div ref={mapContainerRef} className="w-full h-full z-0" />
 
           {/* Floating map status badge */}
-          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-md text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/50 dark:border-slate-700/50">
+          <div
+            className={`absolute ${
+              fullBleed ? 'top-3 left-3' : 'top-3 left-3'
+            } z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-md text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200/50 dark:border-slate-700/50`}
+          >
             <span
               className={`w-2 h-2 rounded-full ${
                 metroStation ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse'
@@ -390,8 +471,13 @@ export const BusMap: React.FC<BusMapProps> = ({
           </div>
 
           {/* Map Action Controls */}
-          <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
+          <div
+            className={`absolute ${
+              fullBleed ? 'top-14 right-3' : 'top-3 right-3'
+            } z-10 flex flex-col gap-2`}
+          >
             <button
+              type="button"
               onClick={handleCenterOnTarget}
               title={metroStation ? 'Centrar en la estación' : 'Centrar en la parada'}
               className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/50 dark:border-slate-700/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
@@ -400,6 +486,7 @@ export const BusMap: React.FC<BusMapProps> = ({
             </button>
             {busesCountWithGps > 0 && (
               <button
+                type="button"
                 onClick={handleFitAll}
                 title="Ver todos los autobuses"
                 className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-900/90 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/50 dark:border-slate-700/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
@@ -413,17 +500,18 @@ export const BusMap: React.FC<BusMapProps> = ({
           {selectedBus && (
             <div className="absolute bottom-3 left-3 right-14 z-10 p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border border-amber-500/40 flex items-center justify-between text-xs animate-in fade-in slide-in-from-bottom-2 duration-200">
               <div className="flex items-center gap-2 overflow-hidden">
-                <span className="px-2 py-0.5 bg-amber-500 text-white font-bold rounded-lg shrink-0">
+                <span className="px-2 py-0.5 bg-amber-500 text-white font-bold rounded-lg shrink-0 tabular-nums">
                   {selectedBus.line}
                 </span>
                 <span className="font-semibold truncate text-slate-800 dark:text-slate-200">
                   {selectedBus.destination}
                 </span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 tabular-nums">
                   {selectedBus.eta}
                 </span>
               </div>
               <button
+                type="button"
                 onClick={onClearSelectedBus}
                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-2 text-xs font-semibold px-2 py-1 cursor-pointer"
               >

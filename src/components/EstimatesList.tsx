@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bus, Navigation, AlertCircle, RefreshCw } from 'lucide-react';
 import type { BusEstimate } from '../types/emt';
+import { triggerHaptic } from '../utils/haptics';
 
 interface EstimatesListProps {
   estimates: BusEstimate[];
@@ -37,8 +38,9 @@ export const EstimatesList: React.FC<EstimatesListProps> = ({
           {error}
         </p>
         <button
+          type="button"
           onClick={onRefresh}
-          className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5"
+          className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5 ios-press"
         >
           <RefreshCw className="w-3.5 h-3.5" /> Reintentar
         </button>
@@ -61,8 +63,9 @@ export const EstimatesList: React.FC<EstimatesListProps> = ({
           Es posible que la línea no esté prestando servicio a esta hora o que no haya autobuses en ruta actualmente.
         </p>
         <button
+          type="button"
           onClick={onRefresh}
-          className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition-all cursor-pointer inline-flex items-center gap-1.5"
+          className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition-all cursor-pointer inline-flex items-center gap-1.5 ios-press"
         >
           <RefreshCw className="w-3.5 h-3.5" /> Comprobar de nuevo
         </button>
@@ -75,13 +78,13 @@ export const EstimatesList: React.FC<EstimatesListProps> = ({
       <div className="flex items-center justify-between px-1">
         <h2 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
           <span>Próximas Llegadas</span>
-          <span className="px-2 py-0.5 rounded-full text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold">
+          <span className="px-2 py-0.5 rounded-full text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold tabular-nums">
             {filtered.length} {filtered.length === 1 ? 'bus' : 'buses'}
           </span>
         </h2>
         {selectedLineFilter && (
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            Filtro: <strong className="text-blue-600 dark:text-blue-400">Línea {selectedLineFilter}</strong>
+            Filtro: <strong className="text-blue-600 dark:text-blue-400 tabular-nums">Línea {selectedLineFilter}</strong>
           </span>
         )}
       </div>
@@ -121,7 +124,7 @@ export const EstimatesList: React.FC<EstimatesListProps> = ({
               {/* Left: Line Badge & Destination */}
               <div className="flex items-center gap-3 min-w-0">
                 {/* Line Badge */}
-                <div className="w-12 h-12 rounded-xl bg-blue-600 text-white font-black text-base flex items-center justify-center shadow-xs shrink-0 tracking-tight">
+                <div className="w-12 h-12 rounded-xl bg-blue-600 text-white font-black text-base flex items-center justify-center shadow-xs shrink-0 tracking-tight tabular-nums">
                   {bus.line}
                 </div>
 
@@ -144,7 +147,7 @@ export const EstimatesList: React.FC<EstimatesListProps> = ({
               {/* Right: ETA Badge & Map button */}
               <div className="flex items-center gap-2 shrink-0">
                 {/* ETA Badge */}
-                <div className={`px-3 py-1.5 rounded-xl border text-xs sm:text-sm text-center flex flex-col items-center justify-center min-w-[76px] ${badgeBg}`}>
+                <div className={`px-3 py-1.5 rounded-xl border text-xs sm:text-sm text-center flex flex-col items-center justify-center min-w-[76px] tabular-nums ${badgeBg}`}>
                   <span className="tracking-tight">{bus.eta}</span>
                   {isArriving && (
                     <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 leading-none">
@@ -156,9 +159,13 @@ export const EstimatesList: React.FC<EstimatesListProps> = ({
                 {/* Map Button */}
                 {hasGps && (
                   <button
-                    onClick={() => onSelectBusOnMap(bus)}
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('selection');
+                      onSelectBusOnMap(bus);
+                    }}
                     title="Ver autobús en el mapa"
-                    className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                    className={`ios-touch-target min-w-[44px] min-h-[44px] p-2 rounded-xl border transition-all cursor-pointer ios-press ${
                       isSelected
                         ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
                         : 'bg-slate-50 hover:bg-blue-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 hover:text-blue-600 dark:text-slate-300 dark:hover:text-blue-400 border-slate-200 dark:border-slate-700'

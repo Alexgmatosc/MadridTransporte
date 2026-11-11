@@ -8,25 +8,40 @@ import {
   useMap,
 } from '@vis.gl/react-google-maps';
 import type { BusEstimate, Stop } from '../types/emt';
+import type { MetroStation } from '../types/metro';
 import { Bus } from 'lucide-react';
+import { formatMetroLineBadge } from '../data/metroLines';
 
-interface GoogleBusMapProps {
-  apiKey: string;
-  stop: Stop;
-  estimates: BusEstimate[];
+/**
+ * Constant referencing the Google Maps API key configured in environment variables (Vercel / .env)
+ */
+export const GOOGLE_MAPS_API_KEY: string =
+  (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined)?.trim() || '';
+
+export interface GoogleBusMapProps {
+  apiKey?: string;
+  stop?: Stop | null;
+  metroStation?: MetroStation | null;
+  estimates?: BusEstimate[];
   userLocation: { lat: number; lon: number } | null;
-  selectedBus: BusEstimate | null;
-  onClearSelectedBus: () => void;
+  selectedBus?: BusEstimate | null;
+  onClearSelectedBus?: () => void;
   isDark: boolean;
+  fullBleed?: boolean;
+  className?: string;
 }
 
-// Helper component to auto-pan and fit bounds
+// Helper component to auto-pan and fit bounds for Bus Stop or Metro Station
 const MapBoundsController: React.FC<{
-  stop: Stop;
+  stop?: Stop | null;
+  metroStation?: MetroStation | null;
   estimates: BusEstimate[];
   selectedBus: BusEstimate | null;
-}> = ({ stop, estimates, selectedBus }) => {
+}> = ({ stop, metroStation, estimates, selectedBus }) => {
   const map = useMap();
+
+  const targetLat = metroStation?.lat ?? stop?.lat ?? 40.4168;
+  const targetLon = metroStation?.lon ?? stop?.lon ?? -3.7038;
 
   useEffect(() => {
     if (!map) return;
@@ -37,8 +52,14 @@ const MapBoundsController: React.FC<{
       return;
     }
 
+    if (typeof google === 'undefined' || !google.maps?.LatLngBounds) {
+      map.panTo({ lat: targetLat, lng: targetLon });
+      map.setZoom(16);
+      return;
+    }
+
     const bounds = new google.maps.LatLngBounds();
-    bounds.extend({ lat: stop.lat, lng: stop.lon });
+    bounds.extend({ lat: targetLat, lng: targetLon });
 
     let hasBuses = false;
     estimates.forEach((bus) => {
@@ -51,93 +72,161 @@ const MapBoundsController: React.FC<{
     if (hasBuses) {
       map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
     } else {
-      map.panTo({ lat: stop.lat, lng: stop.lon });
+      map.panTo({ lat: targetLat, lng: targetLon });
       map.setZoom(16);
     }
-  }, [map, stop, estimates, selectedBus]);
+  }, [map, stop, metroStation, estimates, selectedBus, targetLat, targetLon]);
 
   return null;
 };
 
 export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
-  apiKey,
-  stop,
-  estimates,
+  apiKey = GOOGLE_MAPS_API_KEY,
+  stop = null,
+  metroStation = null,
+  estimates = [],
   userLocation,
-  selectedBus,
-  onClearSelectedBus,
+  selectedBus = null,
+  onClearSelectedBus = () => {},
   isDark,
+  fullBleed = false,
+  className = '',
 }) => {
-  const [activeInfoWindow, setActiveInfoWindow] = useState<'stop' | string | null>(null);
+  const [activeInfoWindow, setActiveInfoWindow] = useState<'stop' | 'metro' | string | null>(null);
+
+  const targetLat = metroStation?.lat ?? stop?.lat ?? 40.4168;
+  const targetLon = metroStation?.lon ?? stop?.lon ?? -3.7038;
 
   // Buses with valid GPS coordinates
   const busesWithGps = estimates.filter((e) => e.coordinates !== null);
 
+  const containerClassName = fullBleed
+    ? className || 'relative w-full h-full overflow-hidden bg-slate-100 dark:bg-slate-900'
+    : className ||
+      'relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-900';
+
   return (
-    <div className="relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-900">
-      <APIProvider
-        apiKey={apiKey}
-        language="es"
-        region="ES"
-      >
+    <div className={containerClassName} data-testid="google-bus-map">
+      <APIProvider apiKey={apiKey} language="es" region="ES">
         <Map
           mapId="DEMO_MAP_ID"
-          defaultCenter={{ lat: stop.lat, lng: stop.lon }}
+          defaultCenter={{ lat: targetLat, lng: targetLon }}
           defaultZoom={16}
           gestureHandling="greedy"
-          disableDefaultUI={false}
+          disableDefaultUI={fullBleed}
           colorScheme={isDark ? 'DARK' : 'LIGHT'}
           style={{ width: '100%', height: '100%' }}
         >
           <MapBoundsController
             stop={stop}
+            metroStation={metroStation}
             estimates={estimates}
             selectedBus={selectedBus}
           />
 
-          {/* 1. Stop Advanced Marker */}
-          <AdvancedMarker
-            position={{ lat: stop.lat, lng: stop.lon }}
-            title={`Parada ${stop.id} - ${stop.name}`}
-            onClick={() => setActiveInfoWindow('stop')}
-          >
-            <div className="relative flex items-center justify-center cursor-pointer group">
-              <div className="w-9 h-9 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-black text-xs ring-4 ring-blue-500/30 group-hover:scale-110 transition-transform">
-                <span>{stop.id}</span>
-              </div>
-              <div className="absolute -bottom-1 w-2.5 h-2.5 bg-blue-600 rotate-45"></div>
-            </div>
-          </AdvancedMarker>
-
-          {/* Stop InfoWindow */}
-          {activeInfoWindow === 'stop' && (
-            <InfoWindow
-              position={{ lat: stop.lat, lng: stop.lon }}
-              onCloseClick={() => setActiveInfoWindow(null)}
-            >
-              <div className="p-1 text-slate-900">
-                <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
-                  Parada EMT {stop.id}
-                </span>
-                <h4 className="font-bold text-sm text-slate-900 mt-0.5">{stop.name}</h4>
-                <p className="text-xs text-slate-600 mt-0.5">{stop.address}</p>
-                {stop.lines && stop.lines.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {stop.lines.map((l) => (
-                      <span
-                        key={l}
-                        className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-slate-100 text-slate-700"
-                      >
-                        {l}
-                      </span>
-                    ))}
+          {/* 1. Metro Station Advanced Marker */}
+          {metroStation && (
+            <>
+              <AdvancedMarker
+                position={{ lat: metroStation.lat, lng: metroStation.lon }}
+                title={`Metro ${metroStation.name}`}
+                onClick={() => setActiveInfoWindow('metro')}
+              >
+                <div className="relative flex items-center justify-center cursor-pointer group">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-600 border-2 border-white dark:border-slate-900 shadow-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-rose-500/30 group-hover:scale-110 transition-transform">
+                    <span className="text-sm font-black">M</span>
                   </div>
-                )}
-              </div>
-            </InfoWindow>
+                  <div className="absolute -bottom-1 w-2.5 h-2.5 bg-rose-600 rotate-45"></div>
+                </div>
+              </AdvancedMarker>
+
+              {activeInfoWindow === 'metro' && (
+                <InfoWindow
+                  position={{ lat: metroStation.lat, lng: metroStation.lon }}
+                  onCloseClick={() => setActiveInfoWindow(null)}
+                >
+                  <div className="p-1 text-slate-900">
+                    <span className="text-[10px] font-black text-rose-600 uppercase tracking-wider block">
+                      Metro de Madrid {metroStation.zone ? `• Zona ${metroStation.zone}` : ''}
+                    </span>
+                    <h4 className="font-bold text-sm text-slate-900 mt-0.5">
+                      {metroStation.name}
+                    </h4>
+                    {metroStation.address && (
+                      <p className="text-xs text-slate-600 mt-0.5">{metroStation.address}</p>
+                    )}
+                    {metroStation.lines && metroStation.lines.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {metroStation.lines.map((lineId) => {
+                          const badge = formatMetroLineBadge(lineId);
+                          return (
+                            <span
+                              key={lineId}
+                              style={{
+                                backgroundColor: badge.bg,
+                                color: badge.text,
+                              }}
+                              className="px-1.5 py-0.5 rounded text-[10px] font-black"
+                            >
+                              {badge.label}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </InfoWindow>
+              )}
+            </>
           )}
 
-          {/* 2. Approaching Bus Advanced Markers */}
+          {/* 2. Bus Stop Advanced Marker */}
+          {stop && (
+            <>
+              <AdvancedMarker
+                position={{ lat: stop.lat, lng: stop.lon }}
+                title={`Parada ${stop.id} - ${stop.name}`}
+                onClick={() => setActiveInfoWindow('stop')}
+              >
+                <div className="relative flex items-center justify-center cursor-pointer group">
+                  <div className="w-9 h-9 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-black text-xs ring-4 ring-blue-500/30 group-hover:scale-110 transition-transform tabular-nums">
+                    <span>{stop.id}</span>
+                  </div>
+                  <div className="absolute -bottom-1 w-2.5 h-2.5 bg-blue-600 rotate-45"></div>
+                </div>
+              </AdvancedMarker>
+
+              {/* Stop InfoWindow */}
+              {activeInfoWindow === 'stop' && (
+                <InfoWindow
+                  position={{ lat: stop.lat, lng: stop.lon }}
+                  onCloseClick={() => setActiveInfoWindow(null)}
+                >
+                  <div className="p-1 text-slate-900">
+                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
+                      Parada EMT {stop.id}
+                    </span>
+                    <h4 className="font-bold text-sm text-slate-900 mt-0.5">{stop.name}</h4>
+                    <p className="text-xs text-slate-600 mt-0.5">{stop.address}</p>
+                    {stop.lines && stop.lines.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {stop.lines.map((l) => (
+                          <span
+                            key={l}
+                            className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700"
+                          >
+                            {l}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </InfoWindow>
+              )}
+            </>
+          )}
+
+          {/* 3. Approaching Bus Advanced Markers */}
           {busesWithGps.map((bus, idx) => {
             if (!bus.coordinates) return null;
             const markerKey = `bus-${bus.line}-${idx}`;
@@ -164,7 +253,7 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                       <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
                     )}
                     <div
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full shadow-lg text-xs font-bold text-white border border-white/70 ${
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full shadow-lg text-xs font-bold text-white border border-white/70 tabular-nums ${
                         isSelected
                           ? 'bg-amber-600 ring-4 ring-amber-400/40'
                           : isArriving
@@ -194,12 +283,14 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                         <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-600 text-white">
                           Línea {bus.line}
                         </span>
-                        <span className="text-xs font-bold text-emerald-600">{bus.eta}</span>
+                        <span className="text-xs font-bold text-emerald-600 tabular-nums">
+                          {bus.eta}
+                        </span>
                       </div>
                       <p className="text-xs text-slate-700">
                         Hacia: <strong>{bus.destination}</strong>
                       </p>
-                      <p className="text-[11px] text-slate-500 mt-1">
+                      <p className="text-[11px] text-slate-500 mt-1 tabular-nums">
                         GPS en tiempo real: {bus.coordinates.lat.toFixed(5)},{' '}
                         {bus.coordinates.lon.toFixed(5)}
                       </p>
@@ -210,7 +301,7 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
             );
           })}
 
-          {/* 3. User Geolocation Marker (if available) */}
+          {/* 4. User Geolocation Marker (if available) */}
           {userLocation && (
             <AdvancedMarker
               position={{ lat: userLocation.lat, lng: userLocation.lon }}
@@ -225,12 +316,23 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
         </Map>
       </APIProvider>
 
-      {/* Map Header Overlay: Bus count pill */}
-      <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 text-xs font-bold shadow-xs">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      {/* Map Header Overlay: Status pill */}
+      <div
+        className={`absolute ${
+          fullBleed ? 'top-3 left-3' : 'top-2 left-2'
+        } z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 text-xs font-bold shadow-xs`}
+      >
+        <span
+          className={`w-2 h-2 rounded-full ${
+            metroStation ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse'
+          }`}
+        ></span>
         <span className="text-slate-800 dark:text-slate-200">
-          Google Maps • {busesWithGps.length}{' '}
-          {busesWithGps.length === 1 ? 'autobús' : 'autobuses'} en vivo
+          {metroStation
+            ? `Google Maps • Metro ${metroStation.name}`
+            : `Google Maps • ${busesWithGps.length} ${
+                busesWithGps.length === 1 ? 'autobús' : 'autobuses'
+              } en vivo`}
         </span>
       </div>
     </div>
