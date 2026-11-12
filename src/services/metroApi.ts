@@ -65,6 +65,16 @@ export function formatMetroEstimate(raw: {
     raw.FECHAHORAEMISIONPREVISION ||
     new Date().toISOString();
 
+  let isStale = false;
+  try {
+    const timeMs = new Date(timestamp).getTime();
+    if (!isNaN(timeMs) && Date.now() - timeMs > 20 * 60 * 1000) {
+      isStale = true;
+    }
+  } catch {
+    // ignore
+  }
+
   return {
     line,
     rawLine,
@@ -80,6 +90,7 @@ export function formatMetroEstimate(raw: {
     secondaryEta,
     timestamp,
     updatedAt: timestamp,
+    isStale,
   };
 }
 
@@ -292,6 +303,7 @@ export async function fetchMetroEstimates(stationCode: string): Promise<MetroSta
     try {
       const isGetWrapper = endpoint.includes('/get?url=');
       const response = await fetch(endpoint, {
+        cache: 'no-store',
         headers: {
           Accept: 'application/json',
         },

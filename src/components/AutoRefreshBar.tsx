@@ -42,17 +42,19 @@ export const AutoRefreshBar: React.FC<AutoRefreshBarProps> = ({
   return (
     <div className="w-full bg-white dark:bg-slate-900 rounded-xl px-4 py-2.5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col gap-1.5 transition-colors">
       <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-        <div className="flex items-center gap-1.5 tabular-nums">
-          <Clock className="w-3.5 h-3.5 text-slate-400" />
-          <span>
+        <div className="flex items-center gap-1.5 tabular-nums min-w-0">
+          <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span className="truncate">
             {isLoading
               ? 'Actualizando estimaciones...'
               : isPaused
               ? 'Actualización automática pausada'
               : `Actualización automática en ${countdown}s`}
           </span>
-          <span className="text-slate-300 dark:text-slate-600">•</span>
-          <span className="hidden sm:inline">Última: {relativeTime}</span>
+          <span className="text-slate-300 dark:text-slate-600 shrink-0">•</span>
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 shrink-0">
+            Última: {relativeTime}
+          </span>
         </div>
 
         <div className="flex items-center gap-1">

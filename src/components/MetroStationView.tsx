@@ -363,6 +363,16 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
         </div>
       )}
 
+      {/* Stale data warning */}
+      {estimates.some((e) => e.isStale) && (
+        <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span>
+            Aviso de teleindicadores: Las previsiones de Metro recibidas tienen más de 20 minutos de antigüedad.
+          </span>
+        </div>
+      )}
+
       {/* Live Arrivals Grouped by Line & Platform */}
       {isLoading && estimates.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -501,11 +511,25 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                           </div>
 
                           {est.timestamp && (
-                            <span className="text-[10px] text-slate-400 font-mono tabular-nums">
-                              {new Date(est.timestamp).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
+                            <span
+                              title={
+                                est.isStale
+                                  ? 'Aviso: Previsión de Metro con más de 20 minutos de antigüedad'
+                                  : undefined
+                              }
+                              className={`text-[10px] font-mono tabular-nums inline-flex items-center gap-1 ${
+                                est.isStale
+                                  ? 'text-amber-600 dark:text-amber-400 font-bold'
+                                  : 'text-slate-400'
+                              }`}
+                            >
+                              <span>
+                                {new Date(est.timestamp).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                              {est.isStale && <span className="text-[9px]">(antiguo)</span>}
                             </span>
                           )}
                         </div>

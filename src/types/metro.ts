@@ -73,6 +73,7 @@ export interface MetroPlatformEstimate {
   secondaryEta?: string; // Secondary train indicator: e.g. "Sig: 5 min"
   timestamp: string; // ISO 8601 emission timestamp
   updatedAt: string; // Alias for timestamp
+  isStale?: boolean; // Flagged true if timestamp is older than 20 minutes
 }
 
 /**

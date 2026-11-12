@@ -195,6 +195,7 @@ export async function fetchStopEstimates(stopId: string): Promise<StopEstimatesR
   for (const endpoint of endpoints) {
     try {
       const response = await fetch(endpoint, {
+        cache: 'no-store',
         headers: {
           Accept: 'text/html,application/xhtml+xml,application/xml',
         },
