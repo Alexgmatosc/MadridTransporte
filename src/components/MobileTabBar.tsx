@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Navigation, Star, Moon, Sun, Home } from 'lucide-react';
 import { triggerHaptic } from '../utils/haptics';
-import { MetroDiamondMark, EmtBusLogo } from './TransitIcons';
+import { MetroDiamondMark, EmtBusLogo, CercaniasMark } from './TransitIcons';
 
 interface MobileTabBarProps {
   currentTab?: 'home' | 'search' | 'near' | 'favorites';
@@ -14,7 +14,7 @@ interface MobileTabBarProps {
   isDark: boolean;
   onToggleTheme: () => void;
   hasActiveStop?: boolean;
-  activeType?: 'bus' | 'metro' | null;
+  activeType?: 'bus' | 'metro' | 'cercanias' | null;
 }
 
 export const MobileTabBar: React.FC<MobileTabBarProps> = ({
@@ -30,7 +30,9 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
   activeType = null,
 }) => {
   const isMetroActive = activeType === 'metro';
-  const isBusActive = activeType === 'bus' || (hasActiveStop && !isMetroActive);
+  const isCercaniasActive = activeType === 'cercanias';
+  const isBusActive =
+    activeType === 'bus' || (hasActiveStop && !isMetroActive && !isCercaniasActive);
 
   const handlePress = (action: () => void) => {
     triggerHaptic('selection');
@@ -58,6 +60,8 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
           <div className="relative h-5 flex items-center justify-center">
             {isMetroActive ? (
               <MetroDiamondMark className="w-6 h-4.5" />
+            ) : isCercaniasActive ? (
+              <CercaniasMark className="w-5 h-5" />
             ) : isBusActive ? (
               <EmtBusLogo className="w-5 h-5" />
             ) : (
@@ -68,12 +72,20 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
             className={`text-[11px] mt-0.5 font-medium leading-tight ${
               isMetroActive
                 ? 'text-[#E30613] dark:text-[#FF5A5A] font-bold'
+                : isCercaniasActive
+                ? 'text-[#E4002B] dark:text-[#FF5C75] font-bold'
                 : isBusActive
                 ? 'text-[#0072CE] dark:text-[#389BFF] font-bold'
                 : 'text-zinc-900 dark:text-white font-semibold'
             }`}
           >
-            {isMetroActive ? 'Estación' : isBusActive ? 'Parada' : 'Inicio'}
+            {isMetroActive
+              ? 'Estación'
+              : isCercaniasActive
+              ? 'Cercanías'
+              : isBusActive
+              ? 'Parada'
+              : 'Inicio'}
           </span>
         </button>
 

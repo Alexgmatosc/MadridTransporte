@@ -2,17 +2,27 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Layers } from 'lucide-react';
 import { searchStops, calculateDistanceMeters } from '../services/stopsService';
 import { searchMetroStations } from '../services/metroService';
+import { searchCercaniasStations } from '../services/cercaniasService';
 import { formatMetroLineBadge } from '../data/metroLines';
+import { formatCercaniasLineBadge } from '../data/cercaniasLines';
 import type { MetroStation } from '../types/metro';
+import type { CercaniasStation } from '../types/cercanias';
 import type { Stop } from '../types/emt';
 import type { TransportMode } from '../types/transport';
-import { MetroDiamondLogo, MetroDiamondMark, EmtBusLogo } from './TransitIcons';
+import {
+  MetroDiamondLogo,
+  MetroDiamondMark,
+  EmtBusLogo,
+  CercaniasLogo,
+  CercaniasMark,
+} from './TransitIcons';
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectStop: (stopId: string) => void;
   onSelectMetroStation?: (stationId: string) => void;
+  onSelectCercaniasStation?: (stationId: string) => void;
   userLocation: { lat: number; lon: number } | null;
   activeMode?: TransportMode;
 }
@@ -23,6 +33,8 @@ const POPULAR_HUBS = [
   { type: 'metro' as const, id: '0116', name: 'Atocha', lines: ['1'] },
   { type: 'metro' as const, id: '0311', name: 'Moncloa', lines: ['3', '6'] },
   { type: 'metro' as const, id: '0618', name: 'Nuevos Ministerios', lines: ['6', '8', '10'] },
+  { type: 'cercanias' as const, id: '18000', name: 'Atocha Cercanías', lines: ['C1', 'C2', 'C3', 'C4', 'C5', 'C7', 'C10'] },
+  { type: 'cercanias' as const, id: '18101', name: 'Sol Cercanías', lines: ['C3', 'C4', 'C4a', 'C4b'] },
   { type: 'bus' as const, id: '72', name: 'Cibeles', lines: ['1', '2', '202'] },
   { type: 'bus' as const, id: '4514', name: 'Cristo Rey', lines: ['1', '82'] },
 ];
@@ -32,13 +44,17 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   onClose,
   onSelectStop,
   onSelectMetroStation,
+  onSelectCercaniasStation,
   userLocation,
   activeMode = 'all',
 }) => {
   const [query, setQuery] = useState('');
-  const [userFilterTab, setUserFilterTab] = useState<'all' | 'metro' | 'bus' | null>(null);
+  const [userFilterTab, setUserFilterTab] = useState<
+    'all' | 'metro' | 'cercanias' | 'bus' | null
+  >(null);
   const filterTab = userFilterTab ?? activeMode;
   const [metroResults, setMetroResults] = useState<MetroStation[]>([]);
+  const [cercaniasResults, setCercaniasResults] = useState<CercaniasStation[]>([]);
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,19 +85,28 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         setMetroResults(stations);
       }
     });
+    searchCercaniasStations(trimmed, 25).then((stations) => {
+      if (isMounted) {
+        setCercaniasResults(stations);
+      }
+    });
     return () => {
       isMounted = false;
     };
   }, [query]);
 
   const activeMetroResults = query.trim() ? metroResults : [];
+  const activeCercaniasResults = query.trim() ? cercaniasResults : [];
   const busResults: Stop[] = query.trim() ? searchStops(query, 25) : [];
 
   const showMetro = filterTab === 'all' || filterTab === 'metro';
+  const showCercanias = filterTab === 'all' || filterTab === 'cercanias';
   const showBus = filterTab === 'all' || filterTab === 'bus';
 
   const totalResultsCount =
-    (showMetro ? activeMetroResults.length : 0) + (showBus ? busResults.length : 0);
+    (showMetro ? activeMetroResults.length : 0) +
+    (showCercanias ? activeCercaniasResults.length : 0) +
+    (showBus ? busResults.length : 0);
 
   const handleDialogClick = (e: React.MouseEvent<HTMLDialogElement>) => {
     const dialog = dialogRef.current;
@@ -150,11 +175,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       </search>
 
       {/* Mode Filter Tabs within search modal */}
-      <div className="px-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/50 flex items-center gap-1.5 shrink-0">
+      <div className="px-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/50 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
         <button
           type="button"
           onClick={() => setUserFilterTab('all')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
             filterTab === 'all'
               ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-2xs'
               : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -164,7 +189,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           <span>Todos</span>
           {query.trim() && (
             <span className="opacity-80 text-[10px] tabular-nums">
-              ({activeMetroResults.length + busResults.length})
+              ({activeMetroResults.length + activeCercaniasResults.length + busResults.length})
             </span>
           )}
         </button>
@@ -172,7 +197,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         <button
           type="button"
           onClick={() => setUserFilterTab('metro')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
             filterTab === 'metro'
               ? 'bg-[#E30613] text-white shadow-2xs'
               : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -187,8 +212,26 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
         <button
           type="button"
+          onClick={() => setUserFilterTab('cercanias')}
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+            filterTab === 'cercanias'
+              ? 'bg-[#E4002B] text-white shadow-2xs'
+              : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
+          }`}
+        >
+          <CercaniasMark className="w-3.5 h-3.5" />
+          <span>Cercanías</span>
+          {query.trim() && (
+            <span className="opacity-80 text-[10px] tabular-nums">
+              ({activeCercaniasResults.length})
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
           onClick={() => setUserFilterTab('bus')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
             filterTab === 'bus'
               ? 'bg-[#0072CE] text-white shadow-2xs'
               : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -216,6 +259,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 onClick={() => {
                   if (hub.type === 'metro') {
                     onSelectMetroStation?.(hub.id);
+                  } else if (hub.type === 'cercanias') {
+                    onSelectCercaniasStation?.(hub.id);
                   } else {
                     onSelectStop(hub.id);
                   }
@@ -225,12 +270,18 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               >
                 {hub.type === 'metro' ? (
                   <MetroDiamondMark className="w-4 h-3" />
+                ) : hub.type === 'cercanias' ? (
+                  <CercaniasMark className="w-3.5 h-3.5" />
                 ) : (
                   <EmtBusLogo className="w-3.5 h-3.5" />
                 )}
                 <span>{hub.name}</span>
                 <span className="text-[10px] text-zinc-400 font-mono">
-                  {hub.type === 'metro' ? hub.lines.map((l) => `L${l}`).join(' ') : `#${hub.id}`}
+                  {hub.type === 'metro'
+                    ? hub.lines.map((l) => `L${l}`).join(' ')
+                    : hub.type === 'cercanias'
+                    ? hub.lines.slice(0, 3).join(' ')
+                    : `#${hub.id}`}
                 </span>
               </button>
             ))}
@@ -329,6 +380,82 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 );
               })}
 
+            {/* Cercanías Stations Results */}
+            {showCercanias &&
+              activeCercaniasResults.map((station) => {
+                const distance =
+                  userLocation && station.lat && station.lon
+                    ? calculateDistanceMeters(
+                        userLocation.lat,
+                        userLocation.lon,
+                        station.lat,
+                        station.lon
+                      )
+                    : null;
+
+                return (
+                  <div
+                    key={`cercanias-${station.id}`}
+                    onClick={() => {
+                      onSelectCercaniasStation?.(station.id);
+                      onClose();
+                    }}
+                    className="p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-between gap-3 group ios-press"
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-11 h-11 rounded-xl bg-[#E4002B]/10 dark:bg-[#E4002B]/15 border border-[#E4002B]/20 dark:border-[#E4002B]/30 flex items-center justify-center shrink-0">
+                        <CercaniasLogo className="w-7 h-7" />
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h4 className="font-semibold text-sm text-zinc-950 dark:text-white truncate">
+                            {station.name}
+                          </h4>
+                          {station.zone && (
+                            <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                              Z.{station.zone}
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                          {station.address || 'Renfe Cercanías Madrid'}
+                        </p>
+
+                        {station.lines && station.lines.length > 0 && (
+                          <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                            {station.lines.map((lineId) => {
+                              const badge = formatCercaniasLineBadge(lineId);
+                              return (
+                                <span
+                                  key={lineId}
+                                  style={{
+                                    backgroundColor: badge.bg,
+                                    color: badge.text,
+                                  }}
+                                  className="px-1.5 py-0.2 text-[10px] font-black rounded-md border border-black/10 dark:border-white/10"
+                                >
+                                  {badge.label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {distance !== null && (
+                      <div className="text-right shrink-0">
+                        <span className="inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 tabular-nums">
+                          {distance < 1000 ? `${distance} m` : `${(distance / 1000).toFixed(1)} km`}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
             {/* EMT Bus Stops Results */}
             {showBus &&
               busResults.map((stop) => {
@@ -405,7 +532,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         className="p-3 bg-zinc-50 dark:bg-zinc-900/60 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-500 shrink-0"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)' }}
       >
-        <span>Metro de Madrid (242 estaciones) • EMT (4.933 paradas)</span>
+        <span>Metro (242) • Cercanías (95 estaciones) • EMT (4.933 paradas)</span>
         <button
           type="button"
           onClick={onClose}

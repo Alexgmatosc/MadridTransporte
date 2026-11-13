@@ -13,6 +13,7 @@ import { fetchMetroEstimates } from '../services/metroApi';
 import { formatMetroLineBadge, getMetroLine } from '../data/metroLines';
 import { AutoRefreshBar } from './AutoRefreshBar';
 import { MetroDiamondLogo } from './TransitIcons';
+import { NearbyConnectionsStrip } from './NearbyConnectionsStrip';
 import { triggerHaptic } from '../utils/haptics';
 
 export interface MetroStationViewProps {
@@ -21,6 +22,8 @@ export interface MetroStationViewProps {
   onToggleFavorite: () => void;
   onBackToSearch?: () => void;
   onSelectStation?: (stationId: string) => void;
+  onSelectStop?: (stopId: string) => void;
+  onSelectCercaniasStation?: (stationId: string) => void;
   isDark?: boolean;
 }
 
@@ -31,6 +34,8 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
   isFav,
   onToggleFavorite,
   onBackToSearch,
+  onSelectStop,
+  onSelectCercaniasStation,
 }) => {
   const [estimates, setEstimates] = useState<MetroPlatformEstimate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -334,6 +339,20 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
             })}
           </div>
         )}
+
+        {/* Nearby Multimodal Connections (< 200 m) */}
+        {Number.isFinite(station.lat) &&
+          Number.isFinite(station.lon) &&
+          (station.lat !== 0 || station.lon !== 0) && (
+            <NearbyConnectionsStrip
+              lat={station.lat}
+              lon={station.lon}
+              currentType="metro"
+              currentId={station.id}
+              onSelectStop={onSelectStop}
+              onSelectCercaniasStation={onSelectCercaniasStation}
+            />
+          )}
       </div>
 
       {/* Auto Refresh Bar */}

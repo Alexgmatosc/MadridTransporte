@@ -4,6 +4,15 @@
   "outputDirectory": "dist",
   "routes": [
     {
+      "src": "/api/cercanias/?$",
+      "continue": true,
+      "headers": {
+        "cache-control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        "pragma": "no-cache",
+        "expires": "0"
+      }
+    },
+    {
       "src": "/api/metro/(.*)",
       "dest": "https://serviciosapp.metromadrid.es/servicios/rest/teleindicadores/$1",
       "headers": {

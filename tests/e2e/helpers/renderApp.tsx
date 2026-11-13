@@ -9,8 +9,9 @@ export interface RenderAppOptions {
   url?: string;
   busFavorites?: Array<{ id: string; name: string; address?: string; lines?: string[]; addedAt?: number }>;
   metroFavorites?: Array<{ id: string; name: string; address?: string; lines?: string[]; addedAt?: number }>;
+  cercaniasFavorites?: Array<{ id: string; name: string; address?: string; lines?: string[]; addedAt?: number }>;
   theme?: 'light' | 'dark' | 'system';
-  transportMode?: 'all' | 'bus' | 'metro';
+  transportMode?: 'all' | 'bus' | 'metro' | 'cercanias';
   useFullFixtures?: boolean;
 }
 
@@ -29,6 +30,13 @@ export async function renderApp(options: RenderAppOptions = {}) {
     window.localStorage.setItem(
       'metro_madrid_favorites_v1',
       JSON.stringify(options.metroFavorites)
+    );
+  }
+
+  if (options.cercaniasFavorites) {
+    window.localStorage.setItem(
+      'cercanias_madrid_favorites_v1',
+      JSON.stringify(options.cercaniasFavorites)
     );
   }
 

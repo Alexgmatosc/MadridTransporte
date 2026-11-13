@@ -3,6 +3,7 @@ import { Star, MapPin, Share2, Check, ArrowLeft } from 'lucide-react';
 import type { Stop } from '../types/emt';
 import { triggerHaptic } from '../utils/haptics';
 import { EmtBusLogo } from './TransitIcons';
+import { NearbyConnectionsStrip } from './NearbyConnectionsStrip';
 
 interface StopHeaderProps {
   stop: Stop;
@@ -11,6 +12,8 @@ interface StopHeaderProps {
   selectedLineFilter: string | null;
   onSelectLineFilter: (line: string | null) => void;
   onBackToSearch?: () => void;
+  onSelectMetroStation?: (stationId: string) => void;
+  onSelectCercaniasStation?: (stationId: string) => void;
 }
 
 export const StopHeader: React.FC<StopHeaderProps> = ({
@@ -20,6 +23,8 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
   selectedLineFilter,
   onSelectLineFilter,
   onBackToSearch,
+  onSelectMetroStation,
+  onSelectCercaniasStation,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -177,6 +182,20 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
           </div>
         </div>
       )}
+
+      {/* Nearby Multimodal Connections (< 200 m) */}
+      {Number.isFinite(stop.lat) &&
+        Number.isFinite(stop.lon) &&
+        (stop.lat !== 0 || stop.lon !== 0) && (
+          <NearbyConnectionsStrip
+            lat={stop.lat}
+            lon={stop.lon}
+            currentType="bus"
+            currentId={stop.id}
+            onSelectMetroStation={onSelectMetroStation}
+            onSelectCercaniasStation={onSelectCercaniasStation}
+          />
+        )}
     </div>
   );
 };

@@ -9,7 +9,7 @@ export default defineConfig({
       {
         test: {
           name: 'unit',
-          include: ['src/**/*.test.{ts,tsx}'],
+          include: ['src/**/*.test.{ts,tsx}', 'api/**/*.test.ts'],
           environment: 'node',
         },
       },

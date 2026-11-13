@@ -48,6 +48,11 @@ export function setMockMetroError(err: string | null) {
   mockMetroError = err;
 }
 
+let mockCercaniasError: string | null = null;
+export function setMockCercaniasError(err: string | null) {
+  mockCercaniasError = err;
+}
+
 // Mock navigator.clipboard
 if (typeof navigator !== 'undefined') {
   Object.defineProperty(navigator, 'clipboard', {
@@ -86,6 +91,7 @@ if (typeof navigator !== 'undefined') {
 
   beforeEach(() => {
     mockMetroError = null;
+    mockCercaniasError = null;
     Object.defineProperty(navigator, 'geolocation', {
       writable: true,
       configurable: true,
@@ -144,9 +150,11 @@ vi.mock('leaflet', () => {
 // Load static dataset fixtures once
 const STOPS_DATA_PATH = path.resolve(__dirname, '../../public/data/stops.json');
 const METRO_DATA_PATH = path.resolve(__dirname, '../../public/data/metro_stations.json');
+const CERCANIAS_DATA_PATH = path.resolve(__dirname, '../../public/data/cercanias_stations.json');
 
 const stopsData = JSON.parse(fs.readFileSync(STOPS_DATA_PATH, 'utf-8'));
 const metroStationsData = JSON.parse(fs.readFileSync(METRO_DATA_PATH, 'utf-8'));
+const cercaniasStationsData = JSON.parse(fs.readFileSync(CERCANIAS_DATA_PATH, 'utf-8'));
 
 // Helper for PMV HTML generation
 export function generatePMVHtml(stopId: string, stopName = 'Cibeles', address = 'Paseo de Recoletos') {
@@ -310,6 +318,218 @@ export function generateMetroTeleindicadores(code: string) {
   };
 }
 
+// Helper for Renfe Cercanías Madrid /api/cercanias mock response
+export function generateCercaniasStationResponse(stationId: string) {
+  const now = Date.now();
+  const nowSec = Math.floor(now / 1000);
+
+  if (stationId === '18000') {
+    return {
+      stationId: '18000',
+      stationName: 'Madrid-Atocha Cercanías',
+      arrivals: [
+        {
+          tripId: '1016V20703C5',
+          routeId: '10T0017C5',
+          line: 'C5',
+          destination: 'Móstoles-El Soto',
+          scheduledTime: '09:10',
+          estimatedTime: '09:10',
+          etaMinutes: 0,
+          eta: 'Llegando',
+          delaySeconds: 0,
+          delayMinutes: 0,
+          status: 'EN_HORA',
+          platform: '5',
+          trainId: '20703',
+          isRealtime: true,
+        },
+        {
+          tripId: '1016V20411C4a',
+          routeId: '10T0013C4a',
+          line: 'C4a',
+          destination: 'Alcobendas-S.S. de los Reyes',
+          scheduledTime: '09:14',
+          estimatedTime: '09:14',
+          etaMinutes: 4,
+          eta: '4 min',
+          delaySeconds: 0,
+          delayMinutes: 0,
+          status: 'EN_HORA',
+          platform: '3',
+          trainId: '20411',
+          isRealtime: true,
+        },
+        {
+          tripId: '1016V20319C3',
+          routeId: '10T0009C3',
+          line: 'C3',
+          destination: 'Aranjuez',
+          scheduledTime: '09:17',
+          estimatedTime: '09:20',
+          etaMinutes: 10,
+          eta: '10 min',
+          delaySeconds: 180,
+          delayMinutes: 3,
+          status: 'RETRASO',
+          platform: '7',
+          trainId: '20319',
+          isRealtime: true,
+        },
+      ],
+      alerts: [
+        {
+          id: 'alert-c3-atocha',
+          lines: ['C3'],
+          header: 'Demora puntual en línea C3',
+          description: 'Circulación con demoras de 3 minutos en el tramo Atocha - Aranjuez.',
+          severity: 'warning',
+        },
+      ],
+      trains: [
+        {
+          vehicleId: 'train-20703',
+          label: '20703',
+          tripId: '1016V20703C5',
+          routeId: '10T0017C5',
+          line: 'C5',
+          lat: 40.4055,
+          lon: -3.6915,
+          currentStatus: 'INCOMING_AT',
+          stopId: '18000',
+          stopName: 'Madrid-Atocha Cercanías',
+          platform: '5',
+          timestamp: nowSec,
+        },
+        {
+          vehicleId: 'train-20411',
+          label: '20411',
+          tripId: '1016V20411C4a',
+          routeId: '10T0013C4a',
+          line: 'C4a',
+          lat: 40.4095,
+          lon: -3.6952,
+          currentStatus: 'IN_TRANSIT_TO',
+          stopId: '18000',
+          stopName: 'Madrid-Atocha Cercanías',
+          platform: '3',
+          timestamp: nowSec,
+        },
+      ],
+      timestamp: now,
+      feedTimestamp: nowSec,
+      isStale: false,
+      source: 'realtime',
+    };
+  }
+
+  if (stationId === '18101') {
+    return {
+      stationId: '18101',
+      stationName: 'Sol',
+      arrivals: [
+        {
+          tripId: '1016V20412C4',
+          routeId: '10T0012C4',
+          line: 'C4',
+          destination: 'Parla',
+          scheduledTime: '09:12',
+          estimatedTime: '09:12',
+          etaMinutes: 2,
+          eta: '2 min',
+          delaySeconds: 0,
+          delayMinutes: 0,
+          status: 'EN_HORA',
+          platform: '2',
+          trainId: '20412',
+          isRealtime: true,
+        },
+        {
+          tripId: '1016V20321C3',
+          routeId: '10T0009C3',
+          line: 'C3',
+          destination: 'Madrid-Chamartín-Clara Campoamor',
+          scheduledTime: '09:18',
+          estimatedTime: '09:18',
+          etaMinutes: 8,
+          eta: '8 min',
+          delaySeconds: 0,
+          delayMinutes: 0,
+          status: 'EN_HORA',
+          platform: '1',
+          trainId: '20321',
+          isRealtime: true,
+        },
+      ],
+      alerts: [],
+      trains: [
+        {
+          vehicleId: 'train-20412',
+          label: '20412',
+          tripId: '1016V20412C4',
+          routeId: '10T0012C4',
+          line: 'C4',
+          lat: 40.4152,
+          lon: -3.7015,
+          currentStatus: 'INCOMING_AT',
+          stopId: '18101',
+          stopName: 'Sol',
+          platform: '2',
+          timestamp: nowSec,
+        },
+      ],
+      timestamp: now,
+      feedTimestamp: nowSec,
+      isStale: false,
+      source: 'realtime',
+    };
+  }
+
+  return {
+    stationId,
+    stationName: `Estación ${stationId}`,
+    arrivals: [
+      {
+        tripId: `1016V001C4-${stationId}`,
+        routeId: '10T0012C4',
+        line: 'C4',
+        destination: 'Madrid-Chamartín-Clara Campoamor',
+        scheduledTime: '09:15',
+        estimatedTime: '09:15',
+        etaMinutes: 5,
+        eta: '5 min',
+        delaySeconds: 0,
+        delayMinutes: 0,
+        status: 'EN_HORA',
+        platform: '1',
+        trainId: '21001',
+        isRealtime: true,
+      },
+    ],
+    alerts: [],
+    trains: [
+      {
+        vehicleId: 'train-21001',
+        label: '21001',
+        tripId: `1016V001C4-${stationId}`,
+        routeId: '10T0012C4',
+        line: 'C4',
+        lat: 40.42,
+        lon: -3.7,
+        currentStatus: 'IN_TRANSIT_TO',
+        stopId: stationId,
+        stopName: `Estación ${stationId}`,
+        platform: '1',
+        timestamp: nowSec,
+      },
+    ],
+    timestamp: now,
+    feedTimestamp: nowSec,
+    isStale: false,
+    source: 'realtime',
+  };
+}
+
 // Global default fetch handler
 const defaultFetch = async (input: RequestInfo | URL, _init?: RequestInit): Promise<Response> => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
@@ -323,6 +543,13 @@ const defaultFetch = async (input: RequestInfo | URL, _init?: RequestInit): Prom
 
   if (url.includes('/data/metro_stations.json') || url.endsWith('metro_stations.json')) {
     return new Response(JSON.stringify(metroStationsData), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (url.includes('/data/cercanias_stations.json') || url.endsWith('cercanias_stations.json')) {
+    return new Response(JSON.stringify(cercaniasStationsData), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -360,6 +587,58 @@ const defaultFetch = async (input: RequestInfo | URL, _init?: RequestInit): Prom
       });
     }
     const data = generateMetroTeleindicadores(code);
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  if (url.includes('/api/cercanias')) {
+    if (mockCercaniasError) {
+      return new Response(JSON.stringify({ error: mockCercaniasError }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    const urlObj = new URL(url, 'http://localhost');
+    const mode = urlObj.searchParams.get('mode');
+    if (mode === 'trains') {
+      const atocha = generateCercaniasStationResponse('18000');
+      return new Response(
+        JSON.stringify({
+          trains: atocha.trains,
+          alerts: atocha.alerts,
+          timestamp: Date.now(),
+          feedTimestamp: Math.floor(Date.now() / 1000),
+          isStale: false,
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    const stationId = urlObj.searchParams.get('station') || '18000';
+    if (stationId === '999999') {
+      return new Response(
+        JSON.stringify({
+          stationId,
+          stationName: 'Estación desconocida',
+          arrivals: [],
+          alerts: [],
+          trains: [],
+          timestamp: Date.now(),
+          source: 'realtime',
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    const data = generateCercaniasStationResponse(stationId);
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

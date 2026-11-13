@@ -132,15 +132,75 @@ export const EmtBusLogo: React.FC<IconProps> = ({ className = 'w-7 h-7', size })
 };
 
 /**
+ * Official-inspired Renfe Cercanías Madrid emblem:
+ * Crisp red circle (#E4002B) with a clean inverted white stylized "C".
+ */
+export const CercaniasLogo: React.FC<IconProps> = ({ className = 'w-7 h-7', size }) => {
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      width={size}
+      height={size}
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <circle cx="24" cy="24" r="22" fill="#E4002B" />
+      <path
+        d="M15.4 14.9A12.2 12.2 0 1 1 15.4 33.1"
+        stroke="#FFFFFF"
+        strokeWidth="6.2"
+        strokeLinecap="butt"
+      />
+    </svg>
+  );
+};
+
+/**
+ * Compact Cercanías icon for mode selector pills and tight badges
+ */
+export const CercaniasMark: React.FC<IconProps> = ({ className = 'w-4 h-4', size }) => {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      width={size}
+      height={size}
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <circle
+        cx="16"
+        cy="16"
+        r="14"
+        fill="#E4002B"
+        stroke="#FFFFFF"
+        strokeOpacity="0.88"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M10.4 10.1A8 8 0 1 1 10.4 21.9"
+        stroke="#FFFFFF"
+        strokeWidth="4.2"
+        strokeLinecap="butt"
+      />
+    </svg>
+  );
+};
+
+/**
  * Combined compact brand mark for app header
  */
 export const MadridTransitBrandMark: React.FC<{ className?: string }> = ({
-  className = 'flex items-center gap-1.5',
+  className = 'flex items-center gap-1',
 }) => {
   return (
     <div className={className} aria-hidden="true">
-      <MetroDiamondLogo className="w-8 h-6 drop-shadow-xs" />
-      <EmtBusLogo className="w-6 h-6 drop-shadow-xs" />
+      <MetroDiamondLogo className="w-7 h-5.5 sm:w-8 sm:h-6 drop-shadow-xs" />
+      <EmtBusLogo className="w-5.5 h-5.5 sm:w-6 sm:h-6 drop-shadow-xs" />
+      <CercaniasLogo className="w-5.5 h-5.5 sm:w-6 sm:h-6 drop-shadow-xs" />
     </div>
   );
 };

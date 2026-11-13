@@ -2,9 +2,10 @@ import React from 'react';
 import { Search, MapPin, Moon, Sun, Star } from 'lucide-react';
 import type { FavoriteStop } from '../types/emt';
 import type { FavoriteMetroStation } from '../types/metro';
+import type { FavoriteCercaniasStation } from '../types/cercanias';
 import type { TransportMode } from '../types/transport';
 import { TransportModeSelector } from './TransportModeSelector';
-import { MadridTransitBrandMark, MetroDiamondMark } from './TransitIcons';
+import { MadridTransitBrandMark, MetroDiamondMark, CercaniasMark } from './TransitIcons';
 
 interface HeaderProps {
   onOpenSearch: () => void;
@@ -15,10 +16,13 @@ interface HeaderProps {
   onToggleTheme: () => void;
   favorites: FavoriteStop[];
   metroFavorites?: FavoriteMetroStation[];
+  cercaniasFavorites?: FavoriteCercaniasStation[];
   currentStopId: string | null;
   currentMetroStationId?: string | null;
+  currentCercaniasStationId?: string | null;
   onSelectStop: (stopId: string) => void;
   onSelectMetroStation?: (stationId: string) => void;
+  onSelectCercaniasStation?: (stationId: string) => void;
   transportMode?: TransportMode;
   onTransportModeChange?: (mode: TransportMode) => void;
 }
@@ -32,15 +36,21 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   favorites,
   metroFavorites = [],
+  cercaniasFavorites = [],
   currentStopId,
   currentMetroStationId,
+  currentCercaniasStationId,
   onSelectStop,
   onSelectMetroStation,
+  onSelectCercaniasStation,
   transportMode = 'all',
   onTransportModeChange,
 }) => {
-  const hasActiveItem = Boolean(currentStopId || currentMetroStationId);
-  const totalFavorites = favorites.length + metroFavorites.length;
+  const hasActiveItem = Boolean(
+    currentStopId || currentMetroStationId || currentCercaniasStationId
+  );
+  const totalFavorites =
+    favorites.length + metroFavorites.length + cercaniasFavorites.length;
 
   return (
     <header
@@ -70,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
               <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium hidden sm:inline">
-                Tiempos en directo • Metro y EMT Madrid
+                Metro, Cercanías y EMT Madrid
               </span>
             </div>
           </button>
@@ -172,6 +182,26 @@ export const Header: React.FC<HeaderProps> = ({
                     }`}
                   >
                     <MetroDiamondMark className="w-4 h-3 shrink-0" />
+                    <span className="truncate max-w-[130px]">{fav.name}</span>
+                  </button>
+                );
+              })}
+
+              {/* Cercanías Favorites */}
+              {cercaniasFavorites.map((fav) => {
+                const isActive = fav.id === currentCercaniasStationId;
+                return (
+                  <button
+                    type="button"
+                    key={`hdr-cercanias-${fav.id}`}
+                    onClick={() => onSelectCercaniasStation?.(fav.id)}
+                    className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ios-press ${
+                      isActive
+                        ? 'bg-[#E4002B] text-white shadow-xs'
+                        : 'bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-700'
+                    }`}
+                  >
+                    <CercaniasMark className="w-3.5 h-3.5 shrink-0" />
                     <span className="truncate max-w-[130px]">{fav.name}</span>
                   </button>
                 );

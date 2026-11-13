@@ -1,5 +1,6 @@
 import type { FavoriteStop } from '../types/emt';
 import type { FavoriteMetroStation } from '../types/metro';
+import type { FavoriteCercaniasStation } from '../types/cercanias';
 import type { TransportMode } from '../types/transport';
 
 const FAVORITES_KEY = 'emt_madrid_favorites_v1';
@@ -219,7 +220,7 @@ export function setLastVisitedMetroStationId(stationId: string): void {
 export function getTransportModePreference(): TransportMode {
   try {
     const saved = localStorage.getItem(TRANSPORT_MODE_KEY) as TransportMode;
-    if (saved === 'all' || saved === 'bus' || saved === 'metro') {
+    if (saved === 'all' || saved === 'bus' || saved === 'metro' || saved === 'cercanias') {
       return saved;
     }
   } catch {
@@ -236,3 +237,101 @@ export function setTransportModePreference(mode: TransportMode): void {
   }
 }
 
+/* =========================================================================
+ * Renfe Cercanías Madrid Storage Extensions
+ * ========================================================================= */
+
+const CERCANIAS_FAVORITES_KEY = 'cercanias_madrid_favorites_v1';
+const LAST_CERCANIAS_STATION_KEY = 'cercanias_madrid_last_station_id_v1';
+
+export function getFavoriteCercaniasStations(): FavoriteCercaniasStation[] {
+  try {
+    const raw = localStorage.getItem(CERCANIAS_FAVORITES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+export function isFavoriteCercaniasStation(stationId: string): boolean {
+  const list = getFavoriteCercaniasStations();
+  return list.some((f) => f.id === stationId);
+}
+
+export function addFavoriteCercaniasStation(station: {
+  id: string;
+  name: string;
+  lines: string[];
+  address?: string;
+}): FavoriteCercaniasStation[] {
+  const current = getFavoriteCercaniasStations();
+  const existing = current.find((f) => f.id === station.id);
+  if (existing) {
+    return current;
+  }
+  const updated: FavoriteCercaniasStation[] = [
+    {
+      id: station.id,
+      name: station.name,
+      lines: station.lines,
+      address: station.address,
+      addedAt: Date.now(),
+    },
+    ...current,
+  ];
+  try {
+    localStorage.setItem(CERCANIAS_FAVORITES_KEY, JSON.stringify(updated));
+  } catch (e) {
+    console.error('Failed to save cercanias favorite:', e);
+  }
+  return updated;
+}
+
+export function removeFavoriteCercaniasStation(
+  stationId: string
+): FavoriteCercaniasStation[] {
+  const current = getFavoriteCercaniasStations();
+  const updated = current.filter((f) => f.id !== stationId);
+  try {
+    localStorage.setItem(CERCANIAS_FAVORITES_KEY, JSON.stringify(updated));
+  } catch (e) {
+    console.error('Failed to remove cercanias favorite:', e);
+  }
+  return updated;
+}
+
+export function toggleFavoriteCercaniasStation(station: {
+  id: string;
+  name: string;
+  lines: string[];
+  address?: string;
+}): { isFav: boolean; favorites: FavoriteCercaniasStation[] } {
+  if (isFavoriteCercaniasStation(station.id)) {
+    const favs = removeFavoriteCercaniasStation(station.id);
+    return { isFav: false, favorites: favs };
+  } else {
+    const favs = addFavoriteCercaniasStation(station);
+    return { isFav: true, favorites: favs };
+  }
+}
+
+export function getLastVisitedCercaniasStationId(): string | null {
+  try {
+    return localStorage.getItem(LAST_CERCANIAS_STATION_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setLastVisitedCercaniasStationId(stationId: string): void {
+  try {
+    localStorage.setItem(LAST_CERCANIAS_STATION_KEY, stationId);
+  } catch (e) {
+    console.error('Failed to save last cercanias station:', e);
+  }
+}

@@ -7,6 +7,7 @@ import App from './App.tsx'
 if (typeof window !== 'undefined' && 'caches' in window) {
   caches.delete('madrid-transporte-v1').catch(() => {});
   caches.delete('madrid-transporte-v2').catch(() => {});
+  caches.delete('madrid-transporte-v3').catch(() => {});
 }
 
 createRoot(document.getElementById('root')!).render(

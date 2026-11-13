@@ -129,8 +129,60 @@ describe('storageService', () => {
     setTransportModePreference('bus');
     expect(getTransportModePreference()).toBe('bus');
 
+    setTransportModePreference('cercanias');
+    expect(getTransportModePreference()).toBe('cercanias');
+
     setTransportModePreference('all');
     expect(getTransportModePreference()).toBe('all');
   });
-});
 
+  it('manages cercanias favorites correctly', async () => {
+    const {
+      getFavoriteCercaniasStations,
+      addFavoriteCercaniasStation,
+      removeFavoriteCercaniasStation,
+      isFavoriteCercaniasStation,
+      toggleFavoriteCercaniasStation,
+    } = await import('../storageService');
+
+    expect(getFavoriteCercaniasStations()).toEqual([]);
+    expect(isFavoriteCercaniasStation('18000')).toBe(false);
+
+    const station = {
+      id: '18000',
+      name: 'Madrid-Atocha Cercanías',
+      lines: ['C1', 'C2', 'C3', 'C4', 'C5', 'C7', 'C10'],
+    };
+    addFavoriteCercaniasStation(station);
+
+    expect(isFavoriteCercaniasStation('18000')).toBe(true);
+    expect(getFavoriteCercaniasStations()).toHaveLength(1);
+    expect(getFavoriteCercaniasStations()[0].id).toBe('18000');
+
+    // Duplicate add is no-op
+    addFavoriteCercaniasStation(station);
+    expect(getFavoriteCercaniasStations()).toHaveLength(1);
+
+    const res1 = toggleFavoriteCercaniasStation(station);
+    expect(res1.isFav).toBe(false);
+    expect(isFavoriteCercaniasStation('18000')).toBe(false);
+
+    const res2 = toggleFavoriteCercaniasStation(station);
+    expect(res2.isFav).toBe(true);
+    expect(isFavoriteCercaniasStation('18000')).toBe(true);
+
+    removeFavoriteCercaniasStation('18000');
+    expect(isFavoriteCercaniasStation('18000')).toBe(false);
+  });
+
+  it('persists last visited cercanias station ID', async () => {
+    const {
+      getLastVisitedCercaniasStationId,
+      setLastVisitedCercaniasStationId,
+    } = await import('../storageService');
+
+    expect(getLastVisitedCercaniasStationId()).toBeNull();
+    setLastVisitedCercaniasStationId('18101');
+    expect(getLastVisitedCercaniasStationId()).toBe('18101');
+  });
+});

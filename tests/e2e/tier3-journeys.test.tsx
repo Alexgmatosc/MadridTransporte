@@ -384,7 +384,7 @@ describe('Tier 3: User Journeys & End-to-End Workflows (50 Tests)', () => {
         expect(within(dialog).getByText('Transporte Cerca de Ti')).toBeDefined();
       });
 
-      const solItem = within(dialog).getByText('Sol').closest('div[class*="cursor-pointer"]')!;
+      const solItem = within(dialog).getAllByText('Sol')[0].closest('div[class*="cursor-pointer"]')!;
       await act(async () => {
         fireEvent.click(solItem);
       });

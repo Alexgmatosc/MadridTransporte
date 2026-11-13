@@ -1,5 +1,5 @@
 // MadridTransporte Service Worker - Auto Cache Invalidator
-const CACHE_NAME = 'madrid-transporte-v3';
+const CACHE_NAME = 'madrid-transporte-v4';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -31,6 +31,8 @@ self.addEventListener('fetch', (event) => {
     url.pathname.includes('pmv.aspx') ||
     url.hostname.includes('emtmadrid.es') ||
     url.hostname.includes('metromadrid.es') ||
+    url.hostname.includes('gtfsrt.renfe.com') ||
+    url.hostname.includes('renfe.com') ||
     url.hostname.includes('allorigins.win') ||
     url.hostname.includes('corsproxy.io') ||
     url.searchParams.has('_t')
@@ -43,6 +45,22 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate' || event.request.destination === 'document') {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // 2b. Static transit datasets (/data/*.json): Network first so catalog updates load immediately
+  if (url.pathname.startsWith('/data/') && url.pathname.endsWith('.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.status === 200 && response.type === 'basic') {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || Response.error()))
     );
     return;
   }

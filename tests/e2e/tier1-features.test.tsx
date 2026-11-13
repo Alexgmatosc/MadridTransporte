@@ -665,7 +665,7 @@ describe('Tier 1: Feature Coverage (50 Tests)', () => {
       });
 
       const dialog = document.querySelector('dialog[aria-labelledby="nearest-stops-title"]')!;
-      const solInModal = within(dialog).getByText('Sol');
+      const solInModal = within(dialog).getAllByText('Sol')[0];
       const solItem = solInModal.closest('div[class*="cursor-pointer"]');
       expect(solItem).not.toBeNull();
 

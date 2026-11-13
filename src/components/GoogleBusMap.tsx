@@ -9,8 +9,18 @@ import {
 } from '@vis.gl/react-google-maps';
 import type { BusEstimate, Stop } from '../types/emt';
 import type { MetroStation } from '../types/metro';
+import type { CercaniasStation, CercaniasTrainPosition } from '../types/cercanias';
 import { formatMetroLineBadge } from '../data/metroLines';
-import { MetroDiamondLogo, EmtBusLogo } from './TransitIcons';
+import {
+  formatCercaniasLineBadge,
+  getCercaniasLineColor,
+} from '../data/cercaniasLines';
+import {
+  MetroDiamondLogo,
+  EmtBusLogo,
+  CercaniasLogo,
+  CercaniasMark,
+} from './TransitIcons';
 
 /**
  * Constant referencing the Google Maps API key configured in environment variables (Vercel / .env)
@@ -22,6 +32,8 @@ export interface GoogleBusMapProps {
   apiKey?: string;
   stop?: Stop | null;
   metroStation?: MetroStation | null;
+  cercaniasStation?: CercaniasStation | null;
+  cercaniasTrains?: CercaniasTrainPosition[];
   estimates?: BusEstimate[];
   userLocation: { lat: number; lon: number } | null;
   selectedBus?: BusEstimate | null;
@@ -32,17 +44,33 @@ export interface GoogleBusMapProps {
   className?: string;
 }
 
-// Helper component to auto-pan and fit bounds for Bus Stop or Metro Station
+function formatTrainStatusLabel(status?: string): string {
+  if (status === 'STOPPED_AT') return 'En estación';
+  if (status === 'INCOMING_AT') return 'Llegando';
+  if (status === 'IN_TRANSIT_TO') return 'En ruta';
+  return status || 'En circulación';
+}
+
+// Helper component to auto-pan and fit bounds for Bus Stop, Metro Station, or Cercanías Station
 const MapBoundsController: React.FC<{
   stop?: Stop | null;
   metroStation?: MetroStation | null;
+  cercaniasStation?: CercaniasStation | null;
+  cercaniasTrains: CercaniasTrainPosition[];
   estimates: BusEstimate[];
   selectedBus: BusEstimate | null;
-}> = ({ stop, metroStation, estimates, selectedBus }) => {
+}> = ({
+  stop,
+  metroStation,
+  cercaniasStation,
+  cercaniasTrains,
+  estimates,
+  selectedBus,
+}) => {
   const map = useMap();
 
-  const targetLat = metroStation?.lat ?? stop?.lat ?? 40.4168;
-  const targetLon = metroStation?.lon ?? stop?.lon ?? -3.7038;
+  const targetLat = cercaniasStation?.lat ?? metroStation?.lat ?? stop?.lat ?? 40.4168;
+  const targetLon = cercaniasStation?.lon ?? metroStation?.lon ?? stop?.lon ?? -3.7038;
 
   useEffect(() => {
     if (!map) return;
@@ -70,15 +98,22 @@ const MapBoundsController: React.FC<{
     const bounds = new google.maps.LatLngBounds();
     bounds.extend({ lat: targetLat, lng: targetLon });
 
-    let hasBuses = false;
+    let hasVehicles = false;
     estimates.forEach((bus) => {
       if (bus.coordinates) {
         bounds.extend({ lat: bus.coordinates.lat, lng: bus.coordinates.lon });
-        hasBuses = true;
+        hasVehicles = true;
       }
     });
 
-    if (hasBuses) {
+    cercaniasTrains.forEach((train) => {
+      if (Number.isFinite(train.lat) && Number.isFinite(train.lon)) {
+        bounds.extend({ lat: train.lat, lng: train.lon });
+        hasVehicles = true;
+      }
+    });
+
+    if (hasVehicles) {
       map.fitBounds(bounds, {
         top: 45,
         right: 40,
@@ -89,7 +124,17 @@ const MapBoundsController: React.FC<{
       map.panTo({ lat: targetLat + latOffset, lng: targetLon });
       map.setZoom(16);
     }
-  }, [map, stop, metroStation, estimates, selectedBus, targetLat, targetLon]);
+  }, [
+    map,
+    stop,
+    metroStation,
+    cercaniasStation,
+    cercaniasTrains,
+    estimates,
+    selectedBus,
+    targetLat,
+    targetLon,
+  ]);
 
   return null;
 };
@@ -98,6 +143,8 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
   apiKey = GOOGLE_MAPS_API_KEY,
   stop = null,
   metroStation = null,
+  cercaniasStation = null,
+  cercaniasTrains = [],
   estimates = [],
   userLocation,
   selectedBus = null,
@@ -107,7 +154,9 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
   fullBleed = false,
   className = '',
 }) => {
-  const [activeInfoWindow, setActiveInfoWindow] = useState<'stop' | 'metro' | string | null>(null);
+  const [activeInfoWindow, setActiveInfoWindow] = useState<
+    'stop' | 'metro' | 'cercanias' | string | null
+  >(null);
 
   // Detect Google Maps auth/billing/key failure and auto-fallback to OpenStreetMap
   useEffect(() => {
@@ -121,8 +170,8 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
     };
   }, [onAuthError]);
 
-  const targetLat = metroStation?.lat ?? stop?.lat ?? 40.4168;
-  const targetLon = metroStation?.lon ?? stop?.lon ?? -3.7038;
+  const targetLat = cercaniasStation?.lat ?? metroStation?.lat ?? stop?.lat ?? 40.4168;
+  const targetLon = cercaniasStation?.lon ?? metroStation?.lon ?? stop?.lon ?? -3.7038;
 
   // Buses with valid GPS coordinates
   const busesWithGps = estimates.filter((e) => e.coordinates !== null);
@@ -152,9 +201,68 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
           <MapBoundsController
             stop={stop}
             metroStation={metroStation}
+            cercaniasStation={cercaniasStation}
+            cercaniasTrains={cercaniasTrains}
             estimates={estimates}
             selectedBus={selectedBus}
           />
+
+          {/* 0. Cercanías Station Advanced Marker (#E4002B) */}
+          {cercaniasStation && (
+            <>
+              <AdvancedMarker
+                position={{ lat: cercaniasStation.lat, lng: cercaniasStation.lon }}
+                title={`Cercanías ${cercaniasStation.name}`}
+                onClick={() => setActiveInfoWindow('cercanias')}
+              >
+                <div className="relative flex flex-col items-center cursor-pointer group">
+                  <div className="p-1.5 rounded-2xl bg-white dark:bg-[#14161A] border-2 border-[#E4002B] shadow-xl flex items-center justify-center ring-4 ring-[#E4002B]/25 group-hover:scale-110 transition-transform">
+                    <CercaniasLogo className="w-7 h-7" />
+                  </div>
+                  <div className="w-2.5 h-2.5 bg-[#E4002B] rotate-45 -mt-1.5 border-r border-b border-white dark:border-[#14161A]"></div>
+                </div>
+              </AdvancedMarker>
+
+              {activeInfoWindow === 'cercanias' && (
+                <InfoWindow
+                  position={{ lat: cercaniasStation.lat, lng: cercaniasStation.lon }}
+                  onCloseClick={() => setActiveInfoWindow(null)}
+                >
+                  <div className="p-1 text-zinc-900">
+                    <span className="text-[10px] font-black text-[#E4002B] uppercase tracking-wider block">
+                      Renfe Cercanías{' '}
+                      {cercaniasStation.zone ? `• Zona ${cercaniasStation.zone}` : ''}
+                    </span>
+                    <h4 className="font-bold text-sm text-zinc-900 mt-0.5">
+                      {cercaniasStation.name}
+                    </h4>
+                    {cercaniasStation.address && (
+                      <p className="text-xs text-zinc-600 mt-0.5">{cercaniasStation.address}</p>
+                    )}
+                    {cercaniasStation.lines && cercaniasStation.lines.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {cercaniasStation.lines.map((lineId) => {
+                          const badge = formatCercaniasLineBadge(lineId);
+                          return (
+                            <span
+                              key={lineId}
+                              style={{
+                                backgroundColor: badge.bg,
+                                color: badge.text,
+                              }}
+                              className="px-1.5 py-0.5 rounded text-[10px] font-black border border-black/10"
+                            >
+                              {badge.label}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </InfoWindow>
+              )}
+            </>
+          )}
 
           {/* 1. Metro Station Advanced Marker (Red/Blue Diamond Emblem) */}
           {metroStation && (
@@ -334,6 +442,85 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
             );
           })}
 
+          {/* 3b. Live Cercanías Train GPS Markers */}
+          {cercaniasTrains.map((train, idx) => {
+            if (!Number.isFinite(train.lat) || !Number.isFinite(train.lon)) return null;
+            const markerKey = `train-${train.vehicleId || train.tripId}-${idx}`;
+            const badge = formatCercaniasLineBadge(train.line);
+            const lineColor = getCercaniasLineColor(train.line);
+            const isIncoming =
+              train.currentStatus === 'INCOMING_AT' || train.currentStatus === 'STOPPED_AT';
+
+            return (
+              <React.Fragment key={markerKey}>
+                <AdvancedMarker
+                  position={{ lat: train.lat, lng: train.lon }}
+                  title={`Cercanías ${badge.label} • ${formatTrainStatusLabel(train.currentStatus)}`}
+                  onClick={() => setActiveInfoWindow(markerKey)}
+                >
+                  <div className="relative flex flex-col items-center cursor-pointer hover:scale-110 transition-transform z-30">
+                    {isIncoming && (
+                      <span className="absolute -inset-1 rounded-full bg-[#E4002B] opacity-60 animate-ping"></span>
+                    )}
+                    <div
+                      style={{
+                        backgroundColor: lineColor,
+                        color: badge.text,
+                      }}
+                      className="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-lg text-xs font-black border-2 border-white/90 tabular-nums"
+                    >
+                      <CercaniasMark className="w-3.5 h-3.5 shrink-0" />
+                      <span>{badge.label}</span>
+                      {train.platform && (
+                        <span className="text-[10px] font-bold opacity-90">
+                          V{train.platform}
+                        </span>
+                      )}
+                    </div>
+                    <div className="w-2 h-2 bg-zinc-900 rotate-45 -mt-1"></div>
+                  </div>
+                </AdvancedMarker>
+
+                {activeInfoWindow === markerKey && (
+                  <InfoWindow
+                    position={{ lat: train.lat, lng: train.lon }}
+                    onCloseClick={() => setActiveInfoWindow(null)}
+                  >
+                    <div className="p-1 text-zinc-900">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span
+                          style={{
+                            backgroundColor: badge.bg,
+                            color: badge.text,
+                          }}
+                          className="px-1.5 py-0.5 rounded text-xs font-black border border-black/10"
+                        >
+                          {badge.label}
+                        </span>
+                        <span className="text-xs font-bold text-[#E4002B]">
+                          {formatTrainStatusLabel(train.currentStatus)}
+                        </span>
+                      </div>
+                      {train.stopName && (
+                        <p className="text-xs text-zinc-700">
+                          Estación: <strong>{train.stopName}</strong>
+                        </p>
+                      )}
+                      {train.platform && (
+                        <p className="text-xs font-semibold text-zinc-700 mt-0.5">
+                          Vía {train.platform}
+                        </p>
+                      )}
+                      <p className="text-[11px] text-zinc-500 mt-1 tabular-nums">
+                        Tren {train.label || train.vehicleId}
+                      </p>
+                    </div>
+                  </InfoWindow>
+                )}
+              </React.Fragment>
+            );
+          })}
+
           {/* 4. User Geolocation Marker (if available) */}
           {userLocation && (
             <AdvancedMarker
@@ -357,12 +544,26 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
       >
         <span
           className={`w-2 h-2 rounded-full shrink-0 ${
-            metroStation ? 'bg-[#E30613]' : 'bg-emerald-500 animate-pulse'
+            cercaniasStation
+              ? 'bg-[#E4002B]'
+              : metroStation
+              ? 'bg-[#E30613]'
+              : 'bg-emerald-500 animate-pulse'
           }`}
         ></span>
         <span className="text-zinc-800 dark:text-zinc-200 truncate">
-          {metroStation
+          {cercaniasStation
+            ? cercaniasTrains.length > 0
+              ? `Cercanías • ${cercaniasStation.name} (${cercaniasTrains.length} ${
+                  cercaniasTrains.length === 1 ? 'tren' : 'trenes'
+                })`
+              : `Cercanías • ${cercaniasStation.name}`
+            : metroStation
             ? `Metro • ${metroStation.name}`
+            : cercaniasTrains.length > 0
+            ? `${cercaniasTrains.length} ${
+                cercaniasTrains.length === 1 ? 'tren' : 'trenes'
+              } en vivo`
             : `${busesWithGps.length} ${
                 busesWithGps.length === 1 ? 'bus' : 'buses'
               } en vivo`}

@@ -2,20 +2,32 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Star, X, Trash2, Layers } from 'lucide-react';
 import type { FavoriteStop } from '../types/emt';
 import type { FavoriteMetroStation } from '../types/metro';
+import type { FavoriteCercaniasStation } from '../types/cercanias';
 import { formatMetroLineBadge } from '../data/metroLines';
-import { MetroDiamondLogo, MetroDiamondMark, EmtBusLogo } from './TransitIcons';
+import { formatCercaniasLineBadge } from '../data/cercaniasLines';
+import {
+  MetroDiamondLogo,
+  MetroDiamondMark,
+  EmtBusLogo,
+  CercaniasLogo,
+  CercaniasMark,
+} from './TransitIcons';
 
 interface FavoritesModalProps {
   isOpen: boolean;
   onClose: () => void;
   favorites: FavoriteStop[];
   metroFavorites?: FavoriteMetroStation[];
+  cercaniasFavorites?: FavoriteCercaniasStation[];
   onSelectStop: (stopId: string) => void;
   onSelectMetroStation?: (stationId: string) => void;
+  onSelectCercaniasStation?: (stationId: string) => void;
   onRemoveFavorite?: (stopId: string) => void;
   onRemoveMetroFavorite?: (stationId: string) => void;
+  onRemoveCercaniasFavorite?: (stationId: string) => void;
   currentStopId: string | null;
   currentMetroStationId?: string | null;
+  currentCercaniasStationId?: string | null;
 }
 
 export const FavoritesModal: React.FC<FavoritesModalProps> = ({
@@ -23,14 +35,18 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
   onClose,
   favorites,
   metroFavorites = [],
+  cercaniasFavorites = [],
   onSelectStop,
   onSelectMetroStation,
+  onSelectCercaniasStation,
   onRemoveFavorite,
   onRemoveMetroFavorite,
+  onRemoveCercaniasFavorite,
   currentStopId,
   currentMetroStationId,
+  currentCercaniasStationId,
 }) => {
-  const [tab, setTab] = useState<'all' | 'metro' | 'bus'>('all');
+  const [tab, setTab] = useState<'all' | 'metro' | 'cercanias' | 'bus'>('all');
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -59,8 +75,10 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
     }
   };
 
-  const totalCount = favorites.length + metroFavorites.length;
+  const totalCount =
+    favorites.length + metroFavorites.length + cercaniasFavorites.length;
   const showMetro = tab === 'all' || tab === 'metro';
+  const showCercanias = tab === 'all' || tab === 'cercanias';
   const showBus = tab === 'all' || tab === 'bus';
 
   return (
@@ -105,11 +123,11 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
 
       {/* Tabs */}
       {totalCount > 0 && (
-        <div className="px-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/50 flex items-center gap-1.5 shrink-0">
+        <div className="px-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/50 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
           <button
             type="button"
             onClick={() => setTab('all')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
               tab === 'all'
                 ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-2xs'
                 : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -123,7 +141,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
           <button
             type="button"
             onClick={() => setTab('metro')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
               tab === 'metro'
                 ? 'bg-[#E30613] text-white shadow-2xs'
                 : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -136,8 +154,24 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
 
           <button
             type="button"
+            onClick={() => setTab('cercanias')}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+              tab === 'cercanias'
+                ? 'bg-[#E4002B] text-white shadow-2xs'
+                : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
+            }`}
+          >
+            <CercaniasMark className="w-3.5 h-3.5" />
+            <span>Cercanías</span>
+            <span className="opacity-80 text-[10px] tabular-nums">
+              ({cercaniasFavorites.length})
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setTab('bus')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
               tab === 'bus'
                 ? 'bg-[#0072CE] text-white shadow-2xs'
                 : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -159,7 +193,7 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
               No tienes favoritos guardados
             </p>
             <p className="text-xs text-zinc-400 mt-1 max-w-xs mx-auto">
-              Toca la estrella en cualquier estación de Metro o parada de autobús para acceder rápidamente.
+              Toca la estrella en cualquier estación de Metro, Cercanías o parada de autobús para acceder rápidamente.
             </p>
           </div>
         ) : (
@@ -231,6 +265,83 @@ export const FavoritesModal: React.FC<FavoritesModalProps> = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           onRemoveMetroFavorite(fav.id);
+                        }}
+                        title="Eliminar de favoritos"
+                        className="p-2 text-zinc-400 hover:text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors shrink-0 cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+
+            {/* Cercanías Favorites */}
+            {showCercanias &&
+              cercaniasFavorites.map((fav) => {
+                const isCurrent = fav.id === currentCercaniasStationId;
+                return (
+                  <div
+                    key={`fav-cercanias-${fav.id}`}
+                    onClick={() => {
+                      onSelectCercaniasStation?.(fav.id);
+                      onClose();
+                    }}
+                    className={`p-3 rounded-xl transition-colors cursor-pointer flex items-center justify-between gap-3 group ios-press ${
+                      isCurrent
+                        ? 'bg-[#E4002B]/8 dark:bg-[#E4002B]/15 border border-[#E4002B]/25'
+                        : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/70'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-11 h-11 rounded-xl bg-[#E4002B]/10 dark:bg-[#E4002B]/15 border border-[#E4002B]/20 dark:border-[#E4002B]/30 flex items-center justify-center shrink-0">
+                        <CercaniasLogo className="w-7 h-7" />
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold text-sm text-zinc-950 dark:text-white truncate">
+                            {fav.name}
+                          </h4>
+                          {isCurrent && (
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#E4002B] text-white">
+                              Actual
+                            </span>
+                          )}
+                        </div>
+                        {fav.address && (
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                            {fav.address}
+                          </p>
+                        )}
+                        {fav.lines && fav.lines.length > 0 && (
+                          <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                            {fav.lines.map((lineId) => {
+                              const badge = formatCercaniasLineBadge(lineId);
+                              return (
+                                <span
+                                  key={lineId}
+                                  style={{
+                                    backgroundColor: badge.bg,
+                                    color: badge.text,
+                                  }}
+                                  className="px-1.5 py-0.2 text-[10px] font-black rounded-md border border-black/10 dark:border-white/10"
+                                >
+                                  {badge.label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {onRemoveCercaniasFavorite && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRemoveCercaniasFavorite(fav.id);
                         }}
                         title="Eliminar de favoritos"
                         className="p-2 text-zinc-400 hover:text-red-500 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors shrink-0 cursor-pointer"

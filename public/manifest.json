@@ -1,12 +1,28 @@
 {
   "name": "MadridTransporte - Movilidad en Tiempo Real",
   "short_name": "MadridTransporte",
-  "description": "Consulta las llegadas de autobuses de EMT Madrid en tiempo real con mapa interactivo y geolocalización.",
+  "description": "Consulta las llegadas de Metro, Cercanías y autobuses EMT en Madrid en tiempo real con mapa interactivo y geolocalización.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#0B0C0E",
   "theme_color": "#0072ce",
   "orientation": "portrait-primary",
+  "shortcuts": [
+    {
+      "name": "Cerca de mí",
+      "short_name": "Cerca",
+      "description": "Buscar transporte cercano con GPS",
+      "url": "/?near=1",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Buscar",
+      "short_name": "Buscar",
+      "description": "Buscar en Metro, Cercanías y EMT",
+      "url": "/?search=1",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
     {
       "src": "/icons/icon-192.png",

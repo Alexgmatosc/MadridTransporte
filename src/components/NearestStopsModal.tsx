@@ -2,16 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MapPin, X, Navigation, Layers } from 'lucide-react';
 import type { NearestStop } from '../services/stopsService';
 import type { NearestMetroStation } from '../services/metroService';
+import type { NearestCercaniasStation } from '../services/cercaniasService';
 import { formatMetroLineBadge } from '../data/metroLines';
-import { MetroDiamondLogo, MetroDiamondMark, EmtBusLogo } from './TransitIcons';
+import { formatCercaniasLineBadge } from '../data/cercaniasLines';
+import {
+  MetroDiamondLogo,
+  MetroDiamondMark,
+  EmtBusLogo,
+  CercaniasLogo,
+  CercaniasMark,
+} from './TransitIcons';
 
 interface NearestStopsModalProps {
   isOpen: boolean;
   onClose: () => void;
   stops: NearestStop[];
   metroStations?: NearestMetroStation[];
+  cercaniasStations?: NearestCercaniasStation[];
   onSelectStop: (stopId: string) => void;
   onSelectMetroStation?: (stationId: string) => void;
+  onSelectCercaniasStation?: (stationId: string) => void;
 }
 
 export const NearestStopsModal: React.FC<NearestStopsModalProps> = ({
@@ -19,10 +29,12 @@ export const NearestStopsModal: React.FC<NearestStopsModalProps> = ({
   onClose,
   stops,
   metroStations = [],
+  cercaniasStations = [],
   onSelectStop,
   onSelectMetroStation,
+  onSelectCercaniasStation,
 }) => {
-  const [tab, setTab] = useState<'all' | 'metro' | 'bus'>('all');
+  const [tab, setTab] = useState<'all' | 'metro' | 'cercanias' | 'bus'>('all');
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -52,14 +64,19 @@ export const NearestStopsModal: React.FC<NearestStopsModalProps> = ({
   };
 
   const showMetro = tab === 'all' || tab === 'metro';
+  const showCercanias = tab === 'all' || tab === 'cercanias';
   const showBus = tab === 'all' || tab === 'bus';
 
   type UnifiedNearestItem =
     | ({ itemType: 'metro' } & NearestMetroStation)
+    | ({ itemType: 'cercanias' } & NearestCercaniasStation)
     | ({ itemType: 'bus' } & NearestStop);
 
   const mergedItems: UnifiedNearestItem[] = [
     ...(showMetro ? metroStations.map((m) => ({ ...m, itemType: 'metro' as const })) : []),
+    ...(showCercanias
+      ? cercaniasStations.map((c) => ({ ...c, itemType: 'cercanias' as const }))
+      : []),
     ...(showBus ? stops.map((s) => ({ ...s, itemType: 'bus' as const })) : []),
   ].sort((a, b) => a.distanceMeters - b.distanceMeters);
 
@@ -104,11 +121,11 @@ export const NearestStopsModal: React.FC<NearestStopsModalProps> = ({
       </div>
 
       {/* Filter Tabs */}
-      <div className="px-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/50 flex items-center gap-1.5 shrink-0">
+      <div className="px-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50 dark:bg-zinc-900/50 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
         <button
           type="button"
           onClick={() => setTab('all')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
             tab === 'all'
               ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-2xs'
               : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -116,13 +133,15 @@ export const NearestStopsModal: React.FC<NearestStopsModalProps> = ({
         >
           <Layers className="w-3.5 h-3.5" />
           <span>Todos</span>
-          <span className="opacity-80 text-[10px] tabular-nums">({metroStations.length + stops.length})</span>
+          <span className="opacity-80 text-[10px] tabular-nums">
+            ({metroStations.length + cercaniasStations.length + stops.length})
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => setTab('metro')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
             tab === 'metro'
               ? 'bg-[#E30613] text-white shadow-2xs'
               : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -135,8 +154,22 @@ export const NearestStopsModal: React.FC<NearestStopsModalProps> = ({
 
         <button
           type="button"
+          onClick={() => setTab('cercanias')}
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+            tab === 'cercanias'
+              ? 'bg-[#E4002B] text-white shadow-2xs'
+              : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
+          }`}
+        >
+          <CercaniasMark className="w-3.5 h-3.5" />
+          <span>Cercanías</span>
+          <span className="opacity-80 text-[10px] tabular-nums">({cercaniasStations.length})</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setTab('bus')}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer shrink-0 ${
             tab === 'bus'
               ? 'bg-[#0072CE] text-white shadow-2xs'
               : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700 hover:bg-zinc-100'
@@ -206,6 +239,68 @@ export const NearestStopsModal: React.FC<NearestStopsModalProps> = ({
                                   borderColor: badge.border || 'transparent',
                                 }}
                                 className="px-1.5 py-0.2 text-[10px] font-black rounded-md border"
+                              >
+                                {badge.label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 tabular-nums">
+                      {distanceText}
+                    </span>
+                  </div>
+                </div>
+              );
+            }
+
+            if (item.itemType === 'cercanias') {
+              return (
+                <div
+                  key={`cercanias-${item.id}`}
+                  onClick={() => {
+                    onSelectCercaniasStation?.(item.id);
+                    onClose();
+                  }}
+                  className="p-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800/70 transition-colors cursor-pointer flex items-center justify-between gap-3 group ios-press"
+                >
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="w-11 h-11 rounded-xl bg-[#E4002B]/10 dark:bg-[#E4002B]/15 border border-[#E4002B]/20 dark:border-[#E4002B]/30 flex items-center justify-center shrink-0">
+                      <CercaniasLogo className="w-7 h-7" />
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="font-semibold text-sm text-zinc-950 dark:text-white truncate">
+                          {item.name}
+                        </h4>
+                        {item.zone && (
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                            Zona {item.zone}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                        {item.address || 'Renfe Cercanías Madrid'}
+                      </p>
+
+                      {item.lines && item.lines.length > 0 && (
+                        <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                          {item.lines.map((lineId) => {
+                            const badge = formatCercaniasLineBadge(lineId);
+                            return (
+                              <span
+                                key={lineId}
+                                style={{
+                                  backgroundColor: badge.bg,
+                                  color: badge.text,
+                                }}
+                                className="px-1.5 py-0.2 text-[10px] font-black rounded-md border border-black/10 dark:border-white/10"
                               >
                                 {badge.label}
                               </span>

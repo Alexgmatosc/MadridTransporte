@@ -2,16 +2,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import type { BusEstimate, Stop } from '../types/emt';
 import type { MetroStation } from '../types/metro';
+import type { CercaniasStation, CercaniasTrainPosition } from '../types/cercanias';
 import { Crosshair, Layers, MapPin } from 'lucide-react';
 import { GoogleBusMap, GOOGLE_MAPS_API_KEY } from './GoogleBusMap';
 import { formatMetroLineBadge } from '../data/metroLines';
-import { MetroDiamondMark, EmtBusLogo } from './TransitIcons';
+import {
+  formatCercaniasLineBadge,
+  getCercaniasLineColor,
+} from '../data/cercaniasLines';
+import { MetroDiamondMark, EmtBusLogo, CercaniasMark } from './TransitIcons';
 
 export { GOOGLE_MAPS_API_KEY };
 
 interface BusMapProps {
   stop?: Stop | null;
   metroStation?: MetroStation | null;
+  cercaniasStation?: CercaniasStation | null;
+  cercaniasTrains?: CercaniasTrainPosition[];
   estimates?: BusEstimate[];
   userLocation: { lat: number; lon: number } | null;
   selectedBus?: BusEstimate | null;
@@ -21,9 +28,18 @@ interface BusMapProps {
   className?: string;
 }
 
+function formatTrainStatusLabel(status?: string): string {
+  if (status === 'STOPPED_AT') return 'En estación';
+  if (status === 'INCOMING_AT') return 'Llegando';
+  if (status === 'IN_TRANSIT_TO') return 'En ruta';
+  return status || 'En circulación';
+}
+
 export const BusMap: React.FC<BusMapProps> = ({
   stop,
   metroStation,
+  cercaniasStation,
+  cercaniasTrains = [],
   estimates = [],
   userLocation,
   selectedBus = null,
@@ -44,8 +60,8 @@ export const BusMap: React.FC<BusMapProps> = ({
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
-  const targetLat = metroStation?.lat ?? stop?.lat ?? 40.4168;
-  const targetLon = metroStation?.lon ?? stop?.lon ?? -3.7038;
+  const targetLat = cercaniasStation?.lat ?? metroStation?.lat ?? stop?.lat ?? 40.4168;
+  const targetLon = cercaniasStation?.lon ?? metroStation?.lon ?? stop?.lon ?? -3.7038;
 
   // Initialize Leaflet Map (when provider is leaflet)
   useEffect(() => {
@@ -128,6 +144,53 @@ export const BusMap: React.FC<BusMapProps> = ({
     markersGroup.clearLayers();
 
     const bounds = L.latLngBounds([targetLat, targetLon], [targetLat, targetLon]);
+
+    // 0. Cercanías Station Marker (if active)
+    if (cercaniasStation) {
+      const lineBadgesHtml = cercaniasStation.lines
+        .map((lineId) => {
+          const badge = formatCercaniasLineBadge(lineId);
+          return `<span style="background-color: ${badge.bg}; color: ${badge.text};" class="inline-block px-1.5 py-0.2 rounded text-xs font-black mr-1 shadow-2xs">${badge.label}</span>`;
+        })
+        .join('');
+
+      const cercaniasHtml = `
+        <div class="relative flex flex-col items-center cursor-pointer group">
+          <div class="p-1 rounded-2xl bg-white dark:bg-[#14161A] border-2 border-[#E4002B] shadow-xl flex items-center justify-center ring-4 ring-[#E4002B]/25 group-hover:scale-110 transition-transform">
+            <svg viewBox="0 0 48 48" class="w-6.5 h-6.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="22" fill="#E4002B"/>
+              <path d="M15.4 14.9A12.2 12.2 0 1 1 15.4 33.1" stroke="#FFFFFF" stroke-width="6.2" stroke-linecap="butt"/>
+            </svg>
+          </div>
+          <div class="w-2.5 h-2.5 bg-[#E4002B] rotate-45 -mt-1.5 border-r border-b border-white dark:border-[#14161A]"></div>
+        </div>
+      `;
+
+      const cercaniasIcon = L.divIcon({
+        html: cercaniasHtml,
+        className: 'cercanias-pin',
+        iconSize: [42, 42],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -42],
+      });
+
+      L.marker([cercaniasStation.lat, cercaniasStation.lon], { icon: cercaniasIcon })
+        .bindPopup(
+          `<div class="p-1 text-zinc-900">
+            <div class="text-xs font-black text-[#E4002B] uppercase tracking-wider">Renfe Cercanías${
+              cercaniasStation.zone ? ` • Zona ${cercaniasStation.zone}` : ''
+            }</div>
+            <div class="font-bold text-sm text-zinc-900">${cercaniasStation.name}</div>
+            ${
+              cercaniasStation.address
+                ? `<div class="text-xs text-zinc-500 mt-0.5">${cercaniasStation.address}</div>`
+                : ''
+            }
+            <div class="mt-2 flex flex-wrap gap-1">${lineBadgesHtml}</div>
+          </div>`
+        )
+        .addTo(markersGroup);
+    }
 
     // 1. Metro Station Marker (if active)
     if (metroStation) {
@@ -269,6 +332,72 @@ export const BusMap: React.FC<BusMapProps> = ({
         .addTo(markersGroup);
     });
 
+    // 3b. Live Cercanías Train GPS Markers (if any)
+    const trainsWithGps = cercaniasTrains.filter(
+      (t) => Number.isFinite(t.lat) && Number.isFinite(t.lon)
+    );
+
+    trainsWithGps.forEach((train) => {
+      bounds.extend([train.lat, train.lon]);
+      const badge = formatCercaniasLineBadge(train.line);
+      const lineColor = getCercaniasLineColor(train.line);
+      const isIncoming =
+        train.currentStatus === 'INCOMING_AT' || train.currentStatus === 'STOPPED_AT';
+      const statusLabel = formatTrainStatusLabel(train.currentStatus);
+
+      const trainHtml = `
+        <div class="group relative flex flex-col items-center cursor-pointer transition-transform duration-200 hover:scale-110 z-30">
+          ${
+            isIncoming
+              ? '<span class="absolute -inset-1 rounded-full bg-[#E4002B] opacity-60 animate-ping"></span>'
+              : ''
+          }
+          <div style="background-color: ${lineColor}; color: ${badge.text};" class="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-md text-xs font-black border border-white/85 tabular-nums">
+            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="3" width="16" height="15" rx="3"/>
+              <path d="M4 11h16"/>
+              <path d="M12 3v8"/>
+              <path d="M8 19l-2 3"/>
+              <path d="M16 19l2 3"/>
+            </svg>
+            <span>${badge.label}</span>
+            ${train.platform ? `<span class="opacity-90 font-bold">V${train.platform}</span>` : ''}
+          </div>
+          <div class="w-1.5 h-1.5 bg-zinc-900 rotate-45 -mt-0.5"></div>
+        </div>
+      `;
+
+      const trainIcon = L.divIcon({
+        html: trainHtml,
+        className: 'train-pin',
+        iconSize: [52, 26],
+        iconAnchor: [26, 26],
+        popupAnchor: [0, -26],
+      });
+
+      L.marker([train.lat, train.lon], { icon: trainIcon })
+        .bindPopup(
+          `<div class="p-1 text-zinc-900">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span style="background-color: ${badge.bg}; color: ${badge.text};" class="px-1.5 py-0.5 rounded text-xs font-black">${badge.label}</span>
+              <span class="text-xs font-bold text-[#E4002B]">${statusLabel}</span>
+            </div>
+            ${
+              train.stopName
+                ? `<div class="text-xs text-zinc-700">Estación: <strong>${train.stopName}</strong></div>`
+                : ''
+            }
+            ${
+              train.platform
+                ? `<div class="text-xs font-semibold text-zinc-700 mt-0.5">Vía ${train.platform}</div>`
+                : ''
+            }
+            <div class="text-[11px] text-zinc-500 mt-1">Tren ${train.label || train.vehicleId}</div>
+          </div>`
+        )
+        .addTo(markersGroup);
+    });
+
     // 4. User Geolocation Marker
     if (userLocation) {
       bounds.extend([userLocation.lat, userLocation.lon]);
@@ -302,7 +431,7 @@ export const BusMap: React.FC<BusMapProps> = ({
           duration: 0.8,
         }
       );
-    } else if (busesWithGps.length > 0) {
+    } else if (busesWithGps.length > 0 || trainsWithGps.length > 0) {
       map.fitBounds(bounds, {
         paddingTopLeft: [40, 40],
         paddingBottomRight: [40, isMobile ? 220 : 45],
@@ -312,7 +441,18 @@ export const BusMap: React.FC<BusMapProps> = ({
     } else {
       map.setView([targetLat + latOffset, targetLon], 16);
     }
-  }, [stop, metroStation, estimates, userLocation, selectedBus, mapProvider, targetLat, targetLon]);
+  }, [
+    stop,
+    metroStation,
+    cercaniasStation,
+    cercaniasTrains,
+    estimates,
+    userLocation,
+    selectedBus,
+    mapProvider,
+    targetLat,
+    targetLon,
+  ]);
 
   const handleCenterOnTarget = () => {
     if (!mapInstanceRef.current) return;
@@ -331,6 +471,11 @@ export const BusMap: React.FC<BusMapProps> = ({
         bounds.extend([e.coordinates.lat, e.coordinates.lon]);
       }
     });
+    cercaniasTrains.forEach((t) => {
+      if (Number.isFinite(t.lat) && Number.isFinite(t.lon)) {
+        bounds.extend([t.lat, t.lon]);
+      }
+    });
     if (userLocation) {
       bounds.extend([userLocation.lat, userLocation.lon]);
     }
@@ -343,6 +488,10 @@ export const BusMap: React.FC<BusMapProps> = ({
   };
 
   const busesCountWithGps = estimates.filter((e) => e.coordinates !== null).length;
+  const trainsCountWithGps = cercaniasTrains.filter(
+    (t) => Number.isFinite(t.lat) && Number.isFinite(t.lon)
+  ).length;
+  const hasAnyTarget = Boolean(stop || metroStation || cercaniasStation);
 
   return (
     <div
@@ -353,7 +502,7 @@ export const BusMap: React.FC<BusMapProps> = ({
       }
     >
       {/* Map Provider Selector (desktop top bar + mobile/fullBleed floating overlay) */}
-      {(!fullBleed || stop || metroStation) && (
+      {(!fullBleed || hasAnyTarget) && (
         <div
           className={
             fullBleed
@@ -363,18 +512,26 @@ export const BusMap: React.FC<BusMapProps> = ({
         >
           {!fullBleed && (
             <span className="hidden lg:flex text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider items-center gap-1.5 truncate">
-              {metroStation ? (
+              {cercaniasStation ? (
+                <CercaniasMark className="w-4 h-4 shrink-0" />
+              ) : metroStation ? (
                 <MetroDiamondMark className="w-4 h-3 shrink-0" />
               ) : (
                 <EmtBusLogo className="w-4 h-4 shrink-0" />
               )}
               <span className="truncate">
-                {metroStation ? `Estación ${metroStation.name}` : stop ? `Parada #${stop.id}` : 'Mapa en Tiempo Real'}
+                {cercaniasStation
+                  ? `Cercanías ${cercaniasStation.name}`
+                  : metroStation
+                  ? `Estación ${metroStation.name}`
+                  : stop
+                  ? `Parada #${stop.id}`
+                  : 'Mapa en Tiempo Real'}
               </span>
             </span>
           )}
 
-          {(stop || metroStation) && (
+          {hasAnyTarget && (
             <div
               className={`${
                 fullBleed
@@ -412,11 +569,13 @@ export const BusMap: React.FC<BusMapProps> = ({
       )}
 
       {/* Render selected map provider */}
-      {mapProvider === 'google' && googleMapsApiKey && (stop || metroStation) ? (
+      {mapProvider === 'google' && googleMapsApiKey && hasAnyTarget ? (
         <GoogleBusMap
           apiKey={googleMapsApiKey}
           stop={stop}
           metroStation={metroStation}
+          cercaniasStation={cercaniasStation}
+          cercaniasTrains={cercaniasTrains}
           estimates={estimates}
           userLocation={userLocation}
           selectedBus={selectedBus}
@@ -476,12 +635,26 @@ export const BusMap: React.FC<BusMapProps> = ({
           >
             <span
               className={`w-2 h-2 rounded-full shrink-0 ${
-                metroStation ? 'bg-[#E30613]' : 'bg-emerald-500 animate-pulse'
+                cercaniasStation
+                  ? 'bg-[#E4002B]'
+                  : metroStation
+                  ? 'bg-[#E30613]'
+                  : 'bg-emerald-500 animate-pulse'
               }`}
             ></span>
             <span className="truncate">
-              {metroStation
+              {cercaniasStation
+                ? trainsCountWithGps > 0
+                  ? `Cercanías • ${cercaniasStation.name} (${trainsCountWithGps} ${
+                      trainsCountWithGps === 1 ? 'tren' : 'trenes'
+                    })`
+                  : `Cercanías • ${cercaniasStation.name}`
+                : metroStation
                 ? `Metro • ${metroStation.name}`
+                : trainsCountWithGps > 0
+                ? `${trainsCountWithGps} ${
+                    trainsCountWithGps === 1 ? 'tren' : 'trenes'
+                  } en mapa`
                 : busesCountWithGps > 0
                 ? `${busesCountWithGps} ${
                     busesCountWithGps === 1 ? 'bus' : 'buses'
@@ -499,16 +672,24 @@ export const BusMap: React.FC<BusMapProps> = ({
             <button
               type="button"
               onClick={handleCenterOnTarget}
-              title={metroStation ? 'Centrar en la estación' : 'Centrar en la parada'}
+              title={
+                cercaniasStation || metroStation
+                  ? 'Centrar en la estación'
+                  : 'Centrar en la parada'
+              }
               className="p-2.5 rounded-xl bg-white/95 dark:bg-[#14161A]/95 hover:bg-white dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 shadow-md border border-zinc-200/70 dark:border-zinc-800 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <Crosshair className="w-4 h-4 text-[#0072CE] dark:text-[#3898FF]" />
             </button>
-            {busesCountWithGps > 0 && (
+            {(busesCountWithGps > 0 || trainsCountWithGps > 0) && (
               <button
                 type="button"
                 onClick={handleFitAll}
-                title="Ver todos los autobuses"
+                title={
+                  trainsCountWithGps > 0
+                    ? 'Ver estación y trenes'
+                    : 'Ver todos los autobuses'
+                }
                 className="p-2.5 rounded-xl bg-white/95 dark:bg-[#14161A]/95 hover:bg-white dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 shadow-md border border-zinc-200/70 dark:border-zinc-800 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <Layers className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "generate:stops": "python3 scripts/generate_stops.py",
+    "generate:cercanias": "python3 scripts/generate_cercanias.py",
     "lint": "oxlint",
     "test": "vitest run --project unit",
     "test:unit": "vitest run --project unit",

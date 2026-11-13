@@ -58,7 +58,7 @@ describe('Tier 4: Cross-Cutting, Performance, Offline & PWA Accessibility (50 Te
       expect(radiogroup).toBeDefined();
 
       const radios = within(radiogroup).getAllByRole('radio');
-      expect(radios.length).toBe(3);
+      expect(radios.length).toBe(4);
 
       const allRadio = radios[0];
       expect(allRadio.getAttribute('aria-checked')).toBe('true');
