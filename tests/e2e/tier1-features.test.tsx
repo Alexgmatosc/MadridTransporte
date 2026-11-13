@@ -24,8 +24,9 @@ describe('Tier 1: Feature Coverage (50 Tests)', () => {
     it('1.1 renders hero banner with headline and service descriptors', async () => {
       await renderApp();
       expect(screen.getByText('¿A dónde te mueves en Madrid?')).toBeDefined();
-      expect(screen.getByText(/MadridTransporte • Metro & Bus EMT/i)).toBeDefined();
       expect(screen.getByText(/Tiempos de llegada en tiempo real para/i)).toBeDefined();
+      expect(screen.getAllByText(/Metro de Madrid/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Autobuses EMT/i).length).toBeGreaterThan(0);
     });
 
     it('1.2 typing live search query filters and displays matching results', async () => {

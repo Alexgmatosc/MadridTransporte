@@ -1,13 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Search,
-  Bus,
-  Train,
   Star,
   Navigation,
-  ArrowRight,
+  ChevronRight,
   X,
-  Layers,
 } from 'lucide-react';
 import type { FavoriteStop } from '../types/emt';
 import type { FavoriteMetroStation, MetroStation } from '../types/metro';
@@ -16,6 +13,8 @@ import { searchStops, calculateDistanceMeters } from '../services/stopsService';
 import { searchMetroStations } from '../services/metroService';
 import { formatMetroLineBadge } from '../data/metroLines';
 import { TransportModeSelector } from './TransportModeSelector';
+import { MetroDiamondLogo, EmtBusLogo } from './TransitIcons';
+import { triggerHaptic } from '../utils/haptics';
 
 interface HomeSearchLandingProps {
   onSelectStop: (stopId: string) => void;
@@ -61,14 +60,14 @@ const POPULAR_HUBS: Array<{
     type: 'metro',
     id: '0311',
     name: 'Moncloa',
-    desc: 'Intercambiador Poniente • L3, L6',
+    desc: 'Intercambiador • L3, L6',
     lines: ['3', '6'],
   },
   {
     type: 'metro',
     id: '0618',
     name: 'Nuevos Ministerios',
-    desc: 'Castellana • L6, L8, L10',
+    desc: 'Paseo de la Castellana • L6, L8, L10',
     lines: ['6', '8', '10'],
   },
   {
@@ -116,11 +115,8 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
   }, [query]);
 
   const activeMetroResults = query.trim() ? metroResults : [];
-
-  // Bus stops search
   const busResults = query.trim() ? searchStops(query, 25) : [];
 
-  // Filter based on selected mode
   const showMetro = transportMode === 'all' || transportMode === 'metro';
   const showBus = transportMode === 'all' || transportMode === 'bus';
 
@@ -130,39 +126,36 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
   const totalFavoritesCount = favorites.length + metroFavorites.length;
 
   return (
-    <div className="flex flex-col gap-6 py-2 sm:py-6 max-w-3xl mx-auto w-full animate-in fade-in duration-200">
-      {/* Hero Welcome Card */}
-      <div className="text-center flex flex-col items-center px-4 pt-2 pb-2">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-wider mb-3">
-          <Train className="w-3.5 h-3.5 text-rose-500" />
-          <span>MadridTransporte • Metro & Bus EMT</span>
-          <Bus className="w-3.5 h-3.5 text-blue-500" />
+    <div className="flex flex-col gap-5 py-1 sm:py-4 max-w-5xl mx-auto w-full animate-in fade-in duration-200">
+      {/* Compact Search-First Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 px-1">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-950 dark:text-white tracking-tight leading-tight">
+            ¿A dónde te mueves en Madrid?
+          </h1>
+          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            Tiempos de llegada en tiempo real para{' '}
+            <span className="font-semibold text-[#E30613] dark:text-[#FF5A5A]">Metro de Madrid</span>{' '}
+            y{' '}
+            <span className="font-semibold text-[#0072CE] dark:text-[#389BFF]">Autobuses EMT</span>.
+          </p>
         </div>
 
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
-          ¿A dónde te mueves en Madrid?
-        </h1>
-        <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-xl">
-          Tiempos de llegada en tiempo real para{' '}
-          <strong className="text-rose-600 dark:text-rose-400">Metro de Madrid</strong> y{' '}
-          <strong className="text-blue-600 dark:text-blue-400">Autobuses EMT</strong>. Busca por
-          estación, parada, línea o calle.
-        </p>
-
-        {/* Transport Mode Switcher */}
-        <div className="mt-4">
-          <TransportModeSelector
-            mode={transportMode}
-            onChange={onTransportModeChange}
-            size="md"
-          />
-        </div>
+        <TransportModeSelector
+          mode={transportMode}
+          onChange={onTransportModeChange}
+          size="md"
+          className="self-start sm:self-auto"
+        />
       </div>
 
-      {/* Main Big Search Box */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-xl shadow-blue-500/5">
-        <div className="relative flex items-center gap-3 px-3 py-2 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
-          <Search className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+      {/* Primary Search Panel */}
+      <section
+        aria-label="Buscador de paradas y estaciones"
+        className="bg-white dark:bg-[#14161A] rounded-2xl p-3 sm:p-4 border border-zinc-200/90 dark:border-zinc-800/90 shadow-xs"
+      >
+        <div className="relative flex items-center gap-2.5 px-3.5 py-2.5 bg-zinc-100/80 dark:bg-zinc-900 rounded-xl border border-zinc-200/80 dark:border-zinc-800 focus-within:bg-white dark:focus-within:bg-[#0B0C0E] focus-within:border-[#0072CE] focus-within:ring-2 focus-within:ring-[#0072CE]/20 transition-all">
+          <Search className="w-5 h-5 text-zinc-400 shrink-0" />
           <input
             ref={inputRef}
             type="search"
@@ -179,54 +172,62 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
                 : 'Escribe una estación, parada, calle o línea...'
             }
             aria-label="Buscar paradas, estaciones o líneas de transporte"
-            className="flex-1 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 text-base sm:text-lg outline-none font-medium"
+            className="flex-1 bg-transparent text-zinc-950 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-base sm:text-lg outline-none font-medium"
           />
           {query && (
             <button
+              type="button"
               onClick={() => setQuery('')}
-              className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              aria-label="Limpiar búsqueda"
+              className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
-        {/* Quick GPS Action Button right under search */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1">
+        {/* Quick GPS Action Row */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           <button
-            onClick={onNearMe}
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              onNearMe();
+            }}
             disabled={isLocating}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 text-xs sm:text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 min-h-[40px] rounded-xl bg-[#0072CE]/10 hover:bg-[#0072CE]/15 dark:bg-[#0072CE]/20 dark:hover:bg-[#0072CE]/30 text-[#005AA3] dark:text-[#60B2FF] border border-[#0072CE]/20 dark:border-[#0072CE]/35 text-xs sm:text-sm font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer ios-press"
           >
             <Navigation className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} />
             <span>{isLocating ? 'Obteniendo GPS...' : 'Cerca de mí (Metro & Paradas)'}</span>
           </button>
 
-          <span className="text-xs text-slate-400 dark:text-slate-500 hidden sm:inline">
-            242 estaciones de metro • 4.933 paradas de bus
+          <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium tabular-nums">
+            242 estaciones • 4.933 paradas
           </span>
         </div>
 
         {/* Live Search Results */}
         {query.trim() && (
-          <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-3">
-            <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2 flex items-center justify-between">
+          <div className="mt-3.5 border-t border-zinc-100 dark:border-zinc-800/80 pt-3">
+            <div className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2 px-1 flex items-center justify-between">
               <span>Resultados encontrados ({totalResultsCount})</span>
               {totalResultsCount > 0 && (
-                <span className="text-[11px] font-normal lowercase">pulsa para ver llegadas</span>
+                <span className="text-[11px] font-normal lowercase">toca para ver llegadas</span>
               )}
             </div>
 
             {totalResultsCount === 0 ? (
-              <div className="py-8 text-center text-slate-500 dark:text-slate-400">
-                <Search className="w-8 h-8 mx-auto mb-2 opacity-30 text-slate-400" />
-                <p className="font-semibold text-sm">No se encontraron resultados para "{query}"</p>
-                <p className="text-xs mt-1 text-slate-400">
-                  Prueba buscando por nombre de estación (ej. <em>Sol</em>), calle (ej. <em>Alcalá</em>) o línea (ej. <em>1</em>, <em>L1</em>).
+              <div className="py-8 text-center text-zinc-500 dark:text-zinc-400">
+                <Search className="w-7 h-7 mx-auto mb-2 opacity-30" />
+                <p className="font-semibold text-sm text-zinc-800 dark:text-zinc-200">
+                  No se encontraron resultados para &quot;{query}&quot;
+                </p>
+                <p className="text-xs mt-1 text-zinc-400">
+                  Prueba buscando por estación (ej. <em>Sol</em>), calle (ej. <em>Alcalá</em>) o línea (ej. <em>1</em>, <em>L1</em>).
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-1.5 max-h-[50vh] overflow-y-auto pr-1">
+              <div className="divide-y divide-zinc-100 dark:divide-zinc-800/70 max-h-[54vh] overflow-y-auto">
                 {/* Metro Stations */}
                 {showMetro &&
                   activeMetroResults.map((station) => {
@@ -238,38 +239,40 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
                         station.lat,
                         station.lon
                       );
-                      distanceText = meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`;
+                      distanceText =
+                        meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`;
                     }
 
                     return (
                       <div
                         key={`metro-${station.id}`}
-                        onClick={() => onSelectMetroStation(station.id)}
-                        className="p-3 rounded-2xl hover:bg-rose-50/70 dark:hover:bg-slate-800/80 border border-transparent hover:border-rose-200 dark:hover:border-rose-900 transition-all cursor-pointer flex items-center justify-between gap-3 group ios-press"
+                        onClick={() => {
+                          triggerHaptic('selection');
+                          onSelectMetroStation(station.id);
+                        }}
+                        className="py-3 px-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-xl transition-colors cursor-pointer flex items-center justify-between gap-3 group ios-press"
                       >
-                        <div className="flex items-start gap-3 min-w-0">
-                          <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 flex flex-col items-center justify-center shrink-0 group-hover:bg-rose-600 group-hover:text-white transition-colors">
-                            <span className="text-[9px] uppercase font-black opacity-80">Metro</span>
-                            <Train className="w-5 h-5 mt-0.5" />
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/70 flex items-center justify-center shrink-0">
+                            <MetroDiamondLogo className="w-8 h-6" />
                           </div>
 
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <h4 className="font-bold text-slate-900 dark:text-white text-sm group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
+                              <h4 className="font-semibold text-zinc-950 dark:text-white text-sm group-hover:text-[#E30613] dark:group-hover:text-[#FF5A5A] transition-colors truncate">
                                 {station.name}
                               </h4>
                               {station.zone && (
-                                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+                                <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
                                   Zona {station.zone}
                                 </span>
                               )}
                             </div>
 
-                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
                               {station.address || 'Metro de Madrid'}
                             </p>
 
-                            {/* Metro Lines pills */}
                             {station.lines && station.lines.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-1.5">
                                 {station.lines.map((lineId) => {
@@ -282,7 +285,7 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
                                         color: badge.text,
                                         borderColor: badge.border || 'transparent',
                                       }}
-                                      className="px-1.5 py-0.2 rounded text-[10px] font-black border shadow-2xs"
+                                      className="px-1.5 py-0.2 rounded text-[10px] font-bold border"
                                     >
                                       {badge.label}
                                     </span>
@@ -295,11 +298,11 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
 
                         <div className="flex items-center gap-2 shrink-0">
                           {distanceText && (
-                            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
+                            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md tabular-nums">
                               {distanceText}
                             </span>
                           )}
-                          <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-rose-600 dark:group-hover:text-rose-400 group-hover:translate-x-0.5 transition-all" />
+                          <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
                         </div>
                       </div>
                     );
@@ -316,43 +319,48 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
                         stop.lat,
                         stop.lon
                       );
-                      distanceText = meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`;
+                      distanceText =
+                        meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`;
                     }
 
                     return (
                       <div
                         key={`bus-${stop.id}`}
-                        onClick={() => onSelectStop(stop.id)}
-                        className="p-3 rounded-2xl hover:bg-blue-50/70 dark:hover:bg-slate-800/80 border border-transparent hover:border-blue-200 dark:hover:border-blue-900 transition-all cursor-pointer flex items-center justify-between gap-3 group ios-press"
+                        onClick={() => {
+                          triggerHaptic('selection');
+                          onSelectStop(stop.id);
+                        }}
+                        className="py-3 px-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-xl transition-colors cursor-pointer flex items-center justify-between gap-3 group ios-press"
                       >
-                        <div className="flex items-start gap-3 min-w-0">
-                          <div className="w-12 h-12 rounded-xl bg-blue-100/70 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 flex flex-col items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <span className="text-[9px] uppercase font-bold opacity-70">Parada</span>
-                            <span className="font-black text-sm leading-none">{stop.id}</span>
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-11 h-11 rounded-xl bg-[#0072CE]/10 dark:bg-[#0072CE]/20 text-[#0072CE] dark:text-[#60B2FF] border border-[#0072CE]/20 dark:border-[#0072CE]/35 flex flex-col items-center justify-center shrink-0">
+                            <EmtBusLogo className="w-4.5 h-4.5" />
+                            <span className="font-bold text-[10px] leading-none mt-0.5 tabular-nums">
+                              {stop.id}
+                            </span>
                           </div>
 
                           <div className="min-w-0">
-                            <h4 className="font-bold text-slate-900 dark:text-white text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                            <h4 className="font-semibold text-zinc-950 dark:text-white text-sm group-hover:text-[#0072CE] dark:group-hover:text-[#389BFF] transition-colors truncate">
                               {stop.name}
                             </h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
                               {stop.address || 'Madrid'}
                             </p>
 
-                            {/* Lines pills */}
                             {stop.lines && stop.lines.length > 0 && (
                               <div className="flex flex-wrap gap-1 mt-1.5">
                                 {stop.lines.slice(0, 8).map((line) => (
                                   <span
                                     key={line}
-                                    className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                                    className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700 tabular-nums"
                                   >
                                     {line}
                                   </span>
                                 ))}
                                 {stop.lines.length > 8 && (
-                                  <span className="text-[10px] text-slate-400 self-center">
-                                    +{stop.lines.length - 8} más
+                                  <span className="text-[10px] text-zinc-400 self-center">
+                                    +{stop.lines.length - 8}
                                   </span>
                                 )}
                               </div>
@@ -362,11 +370,11 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
 
                         <div className="flex items-center gap-2 shrink-0">
                           {distanceText && (
-                            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">
+                            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md tabular-nums">
                               {distanceText}
                             </span>
                           )}
-                          <ArrowRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-blue-600 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+                          <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
                         </div>
                       </div>
                     );
@@ -375,143 +383,136 @@ export const HomeSearchLanding: React.FC<HomeSearchLandingProps> = ({
             )}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Favorites Section (if any saved, both Bus and Metro) */}
-      {!query && totalFavoritesCount > 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              Tus Estaciones y Paradas Favoritas
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {/* Metro Favorites */}
-            {metroFavorites.map((fav) => (
-              <button
-                key={`fav-metro-${fav.id}`}
-                onClick={() => onSelectMetroStation(fav.id)}
-                className="p-3 rounded-2xl bg-rose-50/40 hover:bg-rose-50 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-rose-200/60 dark:border-slate-700 text-left transition-all flex items-center justify-between gap-3 group cursor-pointer ios-press"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-9 h-9 rounded-xl bg-rose-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                    <Train className="w-4 h-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">
-                      {fav.name}
-                    </p>
-                    <p className="text-xs text-slate-400 truncate">
-                      Metro • Líneas {fav.lines.join(', ')}
-                    </p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-0.5 transition-all shrink-0" />
-              </button>
-            ))}
-
-            {/* Bus Favorites */}
-            {favorites.map((fav) => (
-              <button
-                key={`fav-bus-${fav.id}`}
-                onClick={() => onSelectStop(fav.id)}
-                className="p-3 rounded-2xl bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700 text-left transition-all flex items-center justify-between gap-3 group cursor-pointer ios-press"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-                    {fav.id}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-bold text-sm text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                      {fav.name}
-                    </p>
-                    <p className="text-xs text-slate-400 truncate">{fav.address || 'Autobús EMT'}</p>
-                  </div>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all shrink-0" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Suggested / Popular Hubs */}
+      {/* Desktop 2-column / Mobile stacked directory */}
       {!query && (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-3">
-            Intercambiadores y Estaciones Principales
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-            {POPULAR_HUBS.map((hub) => (
-              <button
-                key={`${hub.type}-${hub.id}`}
-                onClick={() => {
-                  if (hub.type === 'metro') {
-                    onSelectMetroStation(hub.id);
-                  } else {
-                    onSelectStop(hub.id);
-                  }
-                }}
-                className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/80 text-left transition-all flex items-center justify-between gap-2.5 group cursor-pointer ios-press"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span
-                    className={`w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 ${
-                      hub.type === 'metro'
-                        ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300'
-                        : 'bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300'
-                    }`}
+        <div
+          className={`grid grid-cols-1 ${
+            totalFavoritesCount > 0 ? 'lg:grid-cols-2' : ''
+          } gap-4 items-start`}
+        >
+          {/* Favorites Grouped List */}
+          {totalFavoritesCount > 0 && (
+            <section className="bg-white dark:bg-[#14161A] rounded-2xl border border-zinc-200/90 dark:border-zinc-800/90 overflow-hidden">
+              <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
+                <h3 className="text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
+                  Tus Estaciones y Paradas Favoritas
+                </h3>
+              </div>
+
+              <div className="divide-y divide-zinc-100 dark:divide-zinc-800/70">
+                {/* Metro Favorites */}
+                {metroFavorites.map((fav) => (
+                  <button
+                    type="button"
+                    key={`fav-metro-${fav.id}`}
+                    onClick={() => {
+                      triggerHaptic('selection');
+                      onSelectMetroStation(fav.id);
+                    }}
+                    className="w-full px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-left transition-colors flex items-center justify-between gap-3 group cursor-pointer ios-press"
                   >
-                    {hub.type === 'metro' ? <Train className="w-4 h-4" /> : hub.id}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                      {hub.name}
-                    </p>
-                    <p className="text-[11px] text-slate-400 truncate">{hub.desc}</p>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                        <MetroDiamondLogo className="w-7 h-5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-zinc-950 dark:text-white group-hover:text-[#E30613] dark:group-hover:text-[#FF5A5A] transition-colors truncate">
+                          {fav.name}
+                        </p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                          Metro • Líneas {fav.lines.join(', ')}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 shrink-0" />
+                  </button>
+                ))}
+
+                {/* Bus Favorites */}
+                {favorites.map((fav) => (
+                  <button
+                    type="button"
+                    key={`fav-bus-${fav.id}`}
+                    onClick={() => {
+                      triggerHaptic('selection');
+                      onSelectStop(fav.id);
+                    }}
+                    className="w-full px-4 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-left transition-colors flex items-center justify-between gap-3 group cursor-pointer ios-press"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-[#0072CE]/10 dark:bg-[#0072CE]/20 text-[#0072CE] dark:text-[#60B2FF] flex flex-col items-center justify-center shrink-0">
+                        <EmtBusLogo className="w-4 h-4" />
+                        <span className="font-bold text-[10px] leading-none mt-0.5 tabular-nums">
+                          {fav.id}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-zinc-950 dark:text-white group-hover:text-[#0072CE] dark:group-hover:text-[#389BFF] transition-colors truncate">
+                          {fav.name}
+                        </p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                          {fav.address || 'Autobús EMT'}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 shrink-0" />
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Popular Hubs Grouped List */}
+          <section className="bg-white dark:bg-[#14161A] rounded-2xl border border-zinc-200/90 dark:border-zinc-800/90 overflow-hidden">
+            <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800/80">
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                Intercambiadores y Estaciones Principales
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:gap-px bg-zinc-100 dark:bg-zinc-800/70">
+              {POPULAR_HUBS.map((hub) => (
+                <button
+                  type="button"
+                  key={`${hub.type}-${hub.id}`}
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    if (hub.type === 'metro') {
+                      onSelectMetroStation(hub.id);
+                    } else {
+                      onSelectStop(hub.id);
+                    }
+                  }}
+                  className="px-4 py-3 bg-white dark:bg-[#14161A] hover:bg-zinc-50 dark:hover:bg-zinc-800/60 text-left transition-colors flex items-center justify-between gap-2.5 group cursor-pointer ios-press"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {hub.type === 'metro' ? (
+                      <div className="w-9 h-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
+                        <MetroDiamondLogo className="w-7 h-5" />
+                      </div>
+                    ) : (
+                      <div className="w-9 h-9 rounded-lg bg-[#0072CE]/10 dark:bg-[#0072CE]/20 text-[#0072CE] dark:text-[#60B2FF] flex flex-col items-center justify-center shrink-0">
+                        <EmtBusLogo className="w-4 h-4" />
+                        <span className="font-bold text-[9px] leading-none mt-0.5 tabular-nums">
+                          {hub.id}
+                        </span>
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-zinc-950 dark:text-white group-hover:text-[#0072CE] dark:group-hover:text-[#389BFF] transition-colors truncate">
+                        {hub.name}
+                      </p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">{hub.desc}</p>
+                    </div>
                   </div>
-                </div>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-blue-600 transition-all shrink-0" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Multimodal Tips Cards */}
-      {!query && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-start gap-2.5">
-            <Train className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Metro de Madrid</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Estimaciones por andén en tiempo real para L1-L12, Ramal y Metro Ligero.
-              </p>
+                  <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 shrink-0" />
+                </button>
+              ))}
             </div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-start gap-2.5">
-            <Bus className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Autobuses EMT</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Posición GPS de los autobuses aproximándose y minutos de llegada.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-start gap-2.5">
-            <Layers className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs font-bold text-slate-800 dark:text-slate-200">Búsqueda Unificada</p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Escribe cualquier estación, calle o parada para encontrarla al instante.
-              </p>
-            </div>
-          </div>
+          </section>
         </div>
       )}
     </div>

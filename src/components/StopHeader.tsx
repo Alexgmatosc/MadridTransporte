@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Star, MapPin, Share2, Check, ArrowLeft } from 'lucide-react';
 import type { Stop } from '../types/emt';
 import { triggerHaptic } from '../utils/haptics';
+import { EmtBusLogo } from './TransitIcons';
 
 interface StopHeaderProps {
   stop: Stop;
@@ -50,28 +51,31 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
+    <div className="bg-white dark:bg-[#14161A] rounded-2xl p-4 sm:p-5 border border-zinc-200/90 dark:border-zinc-800/90 transition-colors">
       {onBackToSearch && (
-        <div className="mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+        <div className="mb-3 pb-2.5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
           <button
             type="button"
             onClick={() => {
               triggerHaptic('selection');
               onBackToSearch();
             }}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer group ios-press"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0072CE] dark:text-[#389BFF] hover:opacity-80 transition-opacity cursor-pointer group ios-press"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             <span>Volver al buscador de paradas</span>
           </button>
-          <span className="text-[11px] font-medium text-slate-400">EMT Madrid PMV</span>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+            <EmtBusLogo className="w-3.5 h-3.5" />
+            EMT Madrid PMV
+          </span>
         </div>
       )}
       <div className="flex items-start justify-between gap-3">
         {/* Stop ID Badge + Title */}
         <div className="flex items-start gap-3.5 min-w-0">
-          <div className="shrink-0 flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-600 text-white shadow-xs border border-blue-500/30">
-            <span className="text-[10px] font-bold tracking-wider opacity-85 uppercase leading-none">
+          <div className="shrink-0 flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#0072CE] text-white shadow-xs border border-[#005AA3]">
+            <span className="text-[10px] font-bold tracking-wider opacity-90 uppercase leading-none">
               Parada
             </span>
             <span className="text-xl sm:text-2xl font-black tracking-tight leading-tight tabular-nums">
@@ -80,11 +84,11 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
           </div>
 
           <div className="min-w-0">
-            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-snug">
+            <h1 className="text-lg sm:text-xl font-bold text-zinc-950 dark:text-white leading-snug">
               {stop.name}
             </h1>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1">
-              <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+            <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+              <MapPin className="w-3.5 h-3.5 shrink-0 text-zinc-400" />
               <span className="truncate">{stop.address || 'Madrid'}</span>
             </div>
           </div>
@@ -102,7 +106,7 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
             className={`ios-touch-target min-w-[44px] min-h-[44px] p-2.5 rounded-xl border transition-all active:scale-90 cursor-pointer ios-press ${
               isFav
                 ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-500'
-                : 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-200/80 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                : 'bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border-zinc-200/80 dark:border-zinc-700 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
             }`}
           >
             <Star
@@ -116,7 +120,7 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
             type="button"
             onClick={handleShare}
             title="Compartir parada"
-            className="ios-touch-target min-w-[44px] min-h-[44px] p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 transition-all active:scale-90 cursor-pointer ios-press"
+            className="ios-touch-target min-w-[44px] min-h-[44px] p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200/80 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all active:scale-90 cursor-pointer ios-press"
           >
             {copied ? (
               <Check className="w-5 h-5 text-emerald-500" />
@@ -129,9 +133,9 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
 
       {/* Lines Serving This Stop */}
       {stop.lines && stop.lines.length > 0 && (
-        <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800/80">
+        <div className="mt-4 pt-3.5 border-t border-zinc-100 dark:border-zinc-800/80">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
               Líneas en esta parada ({stop.lines.length}):
             </span>
             {selectedLineFilter && (
@@ -141,7 +145,7 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
                   triggerHaptic('selection');
                   onSelectLineFilter(null);
                 }}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer"
+                className="text-xs text-[#0072CE] dark:text-[#389BFF] hover:underline font-semibold cursor-pointer"
               >
                 Mostrar todas
               </button>
@@ -162,8 +166,8 @@ export const StopHeader: React.FC<StopHeaderProps> = ({
                   title={`Filtrar por línea ${line}`}
                   className={`px-2.5 py-1 rounded-lg text-xs font-bold tabular-nums transition-all cursor-pointer ios-press ${
                     isSelected
-                      ? 'bg-blue-600 text-white shadow-xs scale-105'
-                      : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/60'
+                      ? 'bg-[#0072CE] text-white shadow-xs scale-105'
+                      : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/80 dark:border-zinc-700/70'
                   }`}
                 >
                   {line}

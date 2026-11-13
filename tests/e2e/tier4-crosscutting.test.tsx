@@ -281,17 +281,17 @@ describe('Tier 4: Cross-Cutting, Performance, Offline & PWA Accessibility (50 Te
   // Suite 5: Visual Styling, Theme Consistency & Contrast (5 tests)
   // =========================================================================
   describe('Suite 5: Visual Styling, Theme Consistency & Contrast', () => {
-    it('5.1 light theme mounts with slate-50 background class', async () => {
+    it('5.1 light theme mounts with crisp architectural neutral background class', async () => {
       await renderApp({ theme: 'light' });
       const rootDiv = document.querySelector('.min-h-dvh')!;
-      expect(rootDiv.className).toContain('bg-slate-50');
+      expect(rootDiv.className).toContain('bg-[#F4F5F7]');
     });
 
-    it('5.2 dark theme mounts with dark:bg-slate-950 background class', async () => {
+    it('5.2 dark theme mounts with dark architectural charcoal background class', async () => {
       await renderApp({ theme: 'dark' });
       expect(document.documentElement.classList.contains('dark')).toBe(true);
       const rootDiv = document.querySelector('.min-h-dvh')!;
-      expect(rootDiv.className).toContain('dark:bg-slate-950');
+      expect(rootDiv.className).toContain('dark:bg-[#0B0C0E]');
     });
 
     it('5.3 metro line badges match official Metro de Madrid hex colors', () => {
@@ -323,8 +323,9 @@ describe('Tier 4: Cross-Cutting, Performance, Offline & PWA Accessibility (50 Te
       await renderApp({ url: 'http://localhost/?stop=72' });
 
       await waitFor(() => {
-        const progressIndicator = document.querySelector('.bg-blue-600') as HTMLElement;
+        const progressIndicator = screen.getByTestId('countdown-progress');
         expect(progressIndicator).not.toBeNull();
+        expect(progressIndicator.className).toContain('bg-[#0072CE]');
       });
     });
   });

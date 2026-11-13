@@ -1,6 +1,8 @@
 import React from 'react';
-import { Bus, Train, Layers } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import type { TransportMode } from '../types/transport';
+import { MetroDiamondMark, EmtBusLogo } from './TransitIcons';
+import { triggerHaptic } from '../utils/haptics';
 
 export interface TransportModeSelectorProps {
   mode: TransportMode;
@@ -13,33 +15,25 @@ const MODES: Array<{
   id: TransportMode;
   label: string;
   shortLabel: string;
-  icon: React.ComponentType<{ className?: string }>;
-  accentColor: string;
   bgActive: string;
 }> = [
   {
     id: 'all',
     label: 'Todos',
     shortLabel: 'Todos',
-    icon: Layers,
-    accentColor: 'text-indigo-600 dark:text-indigo-400',
-    bgActive: 'bg-indigo-600 text-white shadow-xs',
+    bgActive: 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs',
   },
   {
     id: 'metro',
     label: 'Metro de Madrid',
     shortLabel: 'Metro',
-    icon: Train,
-    accentColor: 'text-rose-600 dark:text-rose-400',
-    bgActive: 'bg-rose-600 text-white shadow-xs',
+    bgActive: 'bg-[#E30613] text-white shadow-xs',
   },
   {
     id: 'bus',
     label: 'Autobús EMT',
     shortLabel: 'Autobús',
-    icon: Bus,
-    accentColor: 'text-blue-600 dark:text-blue-400',
-    bgActive: 'bg-blue-600 text-white shadow-xs',
+    bgActive: 'bg-[#0072CE] text-white shadow-xs',
   },
 ];
 
@@ -55,11 +49,10 @@ export const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
     <div
       role="radiogroup"
       aria-label="Seleccionar modo de transporte"
-      className={`inline-flex items-center p-1 rounded-2xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs ${className}`}
+      className={`inline-flex items-center p-1 rounded-xl bg-zinc-200/75 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700/80 ${className}`}
     >
       {MODES.map((item) => {
         const isSelected = mode === item.id;
-        const Icon = item.icon;
 
         return (
           <button
@@ -67,22 +60,29 @@ export const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
             type="button"
             role="radio"
             aria-checked={isSelected}
-            onClick={() => onChange(item.id)}
-            className={`relative flex items-center justify-center gap-1.5 rounded-xl font-bold transition-all cursor-pointer ios-press ${
+            onClick={() => {
+              triggerHaptic('selection');
+              onChange(item.id);
+            }}
+            className={`relative flex items-center justify-center gap-1.5 rounded-lg font-semibold transition-all cursor-pointer ios-press ${
               isSmall
                 ? 'px-2.5 py-1 text-xs'
-                : 'px-3 sm:px-4 py-1.5 text-xs sm:text-sm'
+                : 'px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm min-h-[36px]'
             } ${
               isSelected
                 ? item.bgActive
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-700/50'
+                : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white'
             }`}
           >
-            <Icon
-              className={`${isSmall ? 'w-3.5 h-3.5' : 'w-4 h-4'} ${
-                isSelected ? 'text-white' : item.accentColor
-              }`}
-            />
+            {item.id === 'all' && (
+              <Layers className={isSmall ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
+            )}
+            {item.id === 'metro' && (
+              <MetroDiamondMark className={isSmall ? 'w-4 h-3' : 'w-5 h-3.5'} />
+            )}
+            {item.id === 'bus' && (
+              <EmtBusLogo className={isSmall ? 'w-4 h-4' : 'w-4.5 h-4.5'} />
+            )}
             <span className="hidden sm:inline">{item.label}</span>
             <span className="sm:hidden">{item.shortLabel}</span>
           </button>

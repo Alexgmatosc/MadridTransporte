@@ -434,7 +434,7 @@ export const App: React.FC = () => {
     : null;
 
   return (
-    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors overscroll-none">
+    <div className="min-h-dvh bg-[#F4F5F7] dark:bg-[#0B0C0E] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors overscroll-none">
       {/* Top Header */}
       <Header
         onOpenSearch={() => setIsSearchOpen(true)}
@@ -454,7 +454,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-4 sm:py-6 pb-24 md:pb-8 flex flex-col gap-4">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-24 md:pb-8 flex flex-col gap-4">
         {!hasActiveItem ? (
           /* Search & Discovery Landing when no stop/station is selected */
           <HomeSearchLanding
@@ -472,7 +472,7 @@ export const App: React.FC = () => {
           /* Metro Station View & Spatial Map + BottomSheet */
           <>
             {currentMetroStation ? (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
                 {/* Spatial Map Canvas (Top viewport on iPhone/mobile, sticky left column on desktop) */}
                 <div
                   className="lg:col-span-5 order-2 lg:order-1 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-[56px] max-lg:z-10 flex flex-col"
@@ -483,7 +483,7 @@ export const App: React.FC = () => {
                       metroStation={currentMetroStation}
                       userLocation={userLocation}
                       isDark={isDark}
-                      className="max-lg:w-full max-lg:flex-1 max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md"
+                      className="max-lg:w-full max-lg:flex-1 max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] lg:h-[calc(100vh-9.5rem)] lg:min-h-[460px] lg:max-h-[680px] rounded-2xl overflow-hidden border border-zinc-200/90 dark:border-zinc-800 shadow-sm"
                     />
                   </div>
                 </div>
@@ -503,12 +503,12 @@ export const App: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="h-48 bg-white dark:bg-slate-900 rounded-2xl animate-pulse" />
+              <div className="h-48 bg-white dark:bg-[#14161A] rounded-2xl animate-pulse border border-zinc-200/80 dark:border-zinc-800" />
             )}
           </>
         ) : (
           /* EMT Bus Stop View & Spatial Map + BottomSheet */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
             {/* Spatial Map Canvas (Top viewport on iPhone/mobile, sticky left column on desktop) */}
             {currentStop && (
               <div
@@ -516,11 +516,6 @@ export const App: React.FC = () => {
                 style={{ top: 'calc(env(safe-area-inset-top, 0px) + 3.5rem)' }}
               >
                 <div className="lg:sticky lg:top-20 flex flex-col flex-1 w-full h-full gap-2">
-                  <div className="hidden lg:flex items-center justify-between px-1">
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                      Mapa de la parada y autobuses
-                    </span>
-                  </div>
                   <BusMap
                     stop={currentStop}
                     estimates={estimates}
@@ -528,7 +523,7 @@ export const App: React.FC = () => {
                     selectedBus={selectedBus}
                     onClearSelectedBus={() => setSelectedBus(null)}
                     isDark={isDark}
-                    className="max-lg:w-full max-lg:flex-1 max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md"
+                    className="max-lg:w-full max-lg:flex-1 max-lg:h-full max-lg:rounded-none max-lg:border-0 relative w-full h-[320px] lg:h-[calc(100vh-9.5rem)] lg:min-h-[460px] lg:max-h-[680px] rounded-2xl overflow-hidden border border-zinc-200/90 dark:border-zinc-800 shadow-sm"
                   />
                 </div>
               </div>
@@ -538,7 +533,7 @@ export const App: React.FC = () => {
             <div
               className={`${
                 currentStop ? 'lg:col-span-7' : 'col-span-12'
-              } order-1 lg:order-2 flex flex-col gap-4`}
+              } order-1 lg:order-2 flex flex-col gap-3.5`}
             >
               <BottomSheet snap={sheetSnap} onSnapChange={setSheetSnap}>
                 {currentStop ? (
@@ -551,7 +546,7 @@ export const App: React.FC = () => {
                     onBackToSearch={handleGoHome}
                   />
                 ) : (
-                  <div className="h-28 bg-white dark:bg-slate-900 rounded-2xl animate-pulse" />
+                  <div className="h-28 bg-white dark:bg-[#14161A] rounded-2xl animate-pulse border border-zinc-200/80 dark:border-zinc-800" />
                 )}
 
                 {/* Auto Refresh Bar */}
@@ -585,14 +580,14 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer on desktop */}
-      <footer className="mt-auto py-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400 dark:text-slate-500 pb-20 md:pb-6">
+      <footer className="mt-auto py-6 border-t border-zinc-200/80 dark:border-zinc-800/80 text-center text-xs text-zinc-500 dark:text-zinc-400 pb-20 md:pb-6">
         <p>
           Datos oficiales en tiempo real de{' '}
           <a
             href="https://www.metromadrid.es"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-rose-600 dark:text-rose-400 font-semibold hover:underline"
+            className="text-[#E30613] dark:text-[#FF5A65] font-semibold hover:underline"
           >
             Metro de Madrid
           </a>{' '}
@@ -601,12 +596,12 @@ export const App: React.FC = () => {
             href="https://www.emtmadrid.es"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+            className="text-[#0072CE] dark:text-[#3898FF] font-semibold hover:underline"
           >
             EMT Madrid
           </a>
         </p>
-        <p className="mt-1">PWA moderna de movilidad multimodal para Madrid.</p>
+        <p className="mt-1">Aplicación web progresiva de movilidad en Madrid.</p>
       </footer>
 
       {/* Mobile iOS Tab Bar */}

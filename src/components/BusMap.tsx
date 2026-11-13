@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import type { BusEstimate, Stop } from '../types/emt';
 import type { MetroStation } from '../types/metro';
-import { Crosshair, Layers, MapPin, Train } from 'lucide-react';
+import { Crosshair, Layers, MapPin } from 'lucide-react';
 import { GoogleBusMap, GOOGLE_MAPS_API_KEY } from './GoogleBusMap';
 import { formatMetroLineBadge } from '../data/metroLines';
+import { MetroDiamondMark, EmtBusLogo } from './TransitIcons';
 
 export { GOOGLE_MAPS_API_KEY };
 
@@ -64,7 +65,7 @@ export const BusMap: React.FC<BusMapProps> = ({
       zoomControl: false,
     });
 
-    L.control.zoom({ position: 'topright' }).addTo(map);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
     const tileUrl = isDark
       ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
@@ -140,31 +141,33 @@ export const BusMap: React.FC<BusMapProps> = ({
         .join('');
 
       const metroHtml = `
-        <div class="relative flex items-center justify-center cursor-pointer group">
-          <div class="w-10 h-10 rounded-2xl bg-rose-600 border-2 border-white dark:border-slate-900 shadow-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-rose-500/30 group-hover:scale-110 transition-transform">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 12l10 10 10-10L12 2z"/>
+        <div class="relative flex flex-col items-center cursor-pointer group">
+          <div class="px-1.5 py-1 rounded-xl bg-white dark:bg-[#14161A] border-2 border-[#E30613] shadow-xl flex items-center justify-center ring-4 ring-[#E30613]/25 group-hover:scale-110 transition-transform">
+            <svg viewBox="0 0 40 30" class="w-7 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 2L38 15L20 28L2 15L20 2Z" fill="#FFFFFF" stroke="#E30613" stroke-width="4" stroke-linejoin="miter"/>
+              <rect x="2.5" y="11.2" width="35" height="7.6" rx="1" fill="#1D3C87"/>
+              <path d="M14.5 17.5V12.5H16.2L18 15.6L19.8 12.5H21.5V17.5H20V14.5L18.5 17H17.5L16 14.5V17.5H14.5Z" fill="#FFFFFF"/>
+              <rect x="22.8" y="12.5" width="3" height="5" rx="0.4" fill="#FFFFFF" fill-opacity="0.9"/>
             </svg>
-            <span class="absolute text-xs font-black">M</span>
           </div>
-          <div class="absolute -bottom-1 w-2.5 h-2.5 bg-rose-600 rotate-45"></div>
+          <div class="w-2.5 h-2.5 bg-[#E30613] rotate-45 -mt-1.5 border-r border-b border-white dark:border-[#14161A]"></div>
         </div>
       `;
 
       const metroIcon = L.divIcon({
         html: metroHtml,
         className: 'metro-pin',
-        iconSize: [40, 44],
-        iconAnchor: [20, 44],
-        popupAnchor: [0, -44],
+        iconSize: [44, 40],
+        iconAnchor: [22, 40],
+        popupAnchor: [0, -40],
       });
 
       L.marker([metroStation.lat, metroStation.lon], { icon: metroIcon })
         .bindPopup(
-          `<div class="p-1 text-slate-900">
-            <div class="text-xs font-black text-rose-600 uppercase tracking-wider">Metro de Madrid</div>
-            <div class="font-bold text-sm text-slate-900">${metroStation.name}</div>
-            <div class="text-xs text-slate-500 mt-0.5">${metroStation.address || ''}</div>
+          `<div class="p-1 text-zinc-900">
+            <div class="text-xs font-black text-[#E30613] uppercase tracking-wider">Metro de Madrid</div>
+            <div class="font-bold text-sm text-zinc-900">${metroStation.name}</div>
+            <div class="text-xs text-zinc-500 mt-0.5">${metroStation.address || ''}</div>
             <div class="mt-2 flex flex-wrap gap-1">${lineBadgesHtml}</div>
           </div>`
         )
@@ -174,28 +177,28 @@ export const BusMap: React.FC<BusMapProps> = ({
     // 2. Bus Stop Marker (if active)
     if (stop) {
       const stopHtml = `
-        <div class="relative flex items-center justify-center">
-          <div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-bold text-xs ring-4 ring-blue-500/30 tabular-nums">
+        <div class="relative flex flex-col items-center">
+          <div class="px-2 py-1 rounded-full bg-[#0072CE] border-2 border-white dark:border-[#14161A] shadow-lg flex items-center gap-1 text-white font-bold text-xs ring-4 ring-[#0072CE]/25 tabular-nums">
             <span>${stop.id}</span>
           </div>
-          <div class="absolute -bottom-1 w-2 h-2 bg-blue-600 rotate-45"></div>
+          <div class="w-2 h-2 bg-[#0072CE] rotate-45 -mt-1"></div>
         </div>
       `;
 
       const stopIcon = L.divIcon({
         html: stopHtml,
         className: 'stop-pin',
-        iconSize: [32, 36],
-        iconAnchor: [16, 36],
-        popupAnchor: [0, -36],
+        iconSize: [44, 34],
+        iconAnchor: [22, 34],
+        popupAnchor: [0, -34],
       });
 
       L.marker([stop.lat, stop.lon], { icon: stopIcon })
         .bindPopup(
-          `<div class="p-1 text-slate-900">
-            <div class="text-xs font-bold text-blue-600 uppercase">Parada ${stop.id}</div>
+          `<div class="p-1 text-zinc-900">
+            <div class="text-xs font-bold text-[#0072CE] uppercase">Parada EMT ${stop.id}</div>
             <div class="font-semibold text-sm">${stop.name}</div>
-            <div class="text-xs text-slate-500 mt-0.5">${stop.address}</div>
+            <div class="text-xs text-zinc-500 mt-0.5">${stop.address}</div>
           </div>`
         )
         .addTo(markersGroup);
@@ -225,37 +228,40 @@ export const BusMap: React.FC<BusMapProps> = ({
               ? '<span class="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping"></span>'
               : ''
           }
-          <div class="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-md text-xs font-bold text-white border border-white/60 tabular-nums ${
+          <div class="flex items-center gap-1 px-2 py-0.5 rounded-full shadow-md text-xs font-bold text-white border border-white/75 tabular-nums ${
             isSelected
               ? 'bg-amber-600 ring-2 ring-amber-400'
               : isArriving
               ? 'bg-emerald-600 ring-2 ring-emerald-400'
-              : 'bg-blue-600'
+              : 'bg-[#0072CE]'
           }">
-            <svg class="w-3 h-3 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8m-8 4h8m-5 4h2M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 shrink-0" fill="none">
+              <rect x="4" y="3" width="16" height="16" rx="3.5" fill="currentColor" fill-opacity="0.25" stroke="currentColor" stroke-width="1.8"/>
+              <rect x="6.5" y="6.5" width="11" height="5.5" rx="1" fill="currentColor"/>
+              <circle cx="8" cy="15.5" r="1.2" fill="#FEF08A"/>
+              <circle cx="16" cy="15.5" r="1.2" fill="#FEF08A"/>
             </svg>
             <span>${bus.line}</span>
             <span class="opacity-90 font-normal">(${bus.eta})</span>
           </div>
-          <div class="w-1.5 h-1.5 bg-slate-800 rotate-45 -mt-0.5"></div>
+          <div class="w-1.5 h-1.5 bg-zinc-900 rotate-45 -mt-0.5"></div>
         </div>
       `;
 
       const busIcon = L.divIcon({
         html: busHtml,
         className: 'bus-pin',
-        iconSize: [40, 24],
-        iconAnchor: [20, 24],
+        iconSize: [44, 24],
+        iconAnchor: [22, 24],
         popupAnchor: [0, -24],
       });
 
       L.marker([bus.coordinates.lat, bus.coordinates.lon], { icon: busIcon })
         .bindPopup(
-          `<div class="p-1 text-slate-900">
-            <div class="text-xs font-bold text-blue-600 uppercase">Línea ${bus.line} (${bus.eta})</div>
+          `<div class="p-1 text-zinc-900">
+            <div class="text-xs font-bold text-[#0072CE] uppercase">Línea ${bus.line} (${bus.eta})</div>
             <div class="font-semibold text-sm">Hacia: ${bus.destination}</div>
-            <div class="text-xs text-slate-500 mt-0.5">GPS: ${bus.coordinates.lat.toFixed(
+            <div class="text-xs text-zinc-500 mt-0.5">GPS: ${bus.coordinates.lat.toFixed(
               4
             )}, ${bus.coordinates.lon.toFixed(4)}</div>
           </div>`
@@ -268,8 +274,8 @@ export const BusMap: React.FC<BusMapProps> = ({
       bounds.extend([userLocation.lat, userLocation.lon]);
       const userHtml = `
         <div class="relative flex items-center justify-center">
-          <span class="absolute w-4 h-4 rounded-full bg-blue-500 opacity-75 animate-ping"></span>
-          <div class="w-3.5 h-3.5 rounded-full bg-blue-600 border-2 border-white shadow-md"></div>
+          <span class="absolute w-4 h-4 rounded-full bg-[#0072CE] opacity-75 animate-ping"></span>
+          <div class="w-3.5 h-3.5 rounded-full bg-[#0072CE] border-2 border-white shadow-md"></div>
         </div>
       `;
       const userIcon = L.divIcon({
@@ -279,7 +285,7 @@ export const BusMap: React.FC<BusMapProps> = ({
         iconAnchor: [8, 8],
       });
       L.marker([userLocation.lat, userLocation.lon], { icon: userIcon })
-        .bindPopup('<div class="text-xs font-semibold text-slate-800">Tu ubicación actual</div>')
+        .bindPopup('<div class="text-xs font-semibold text-zinc-800">Tu ubicación actual</div>')
         .addTo(markersGroup);
     }
 
@@ -343,78 +349,65 @@ export const BusMap: React.FC<BusMapProps> = ({
       className={
         fullBleed
           ? 'relative w-full h-full flex flex-col'
-          : 'flex flex-col gap-2 w-full h-full'
+          : 'relative flex flex-col gap-2 w-full h-full'
       }
     >
-      {/* Map Provider Selector Header (card / top bar mode) */}
-      {!fullBleed && (
-        <div className="flex items-center justify-between px-2.5 py-1.5 lg:px-1 lg:py-0 bg-white/90 dark:bg-slate-900/90 lg:bg-transparent lg:dark:bg-transparent backdrop-blur-md lg:backdrop-blur-none border-b lg:border-0 border-slate-200/70 dark:border-slate-800/70 shrink-0 z-20">
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5 truncate">
-            {metroStation ? (
-              <Train className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
-            ) : (
-              <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-            )}
-            <span className="truncate">
-              {metroStation ? `Estación ${metroStation.name}` : stop ? `Parada #${stop.id}` : 'Mapa en Tiempo Real'}
+      {/* Map Provider Selector (desktop top bar + mobile/fullBleed floating overlay) */}
+      {(!fullBleed || stop || metroStation) && (
+        <div
+          className={
+            fullBleed
+              ? 'flex items-center justify-end'
+              : 'flex items-center justify-between lg:px-1 shrink-0 z-20'
+          }
+        >
+          {!fullBleed && (
+            <span className="hidden lg:flex text-xs font-bold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider items-center gap-1.5 truncate">
+              {metroStation ? (
+                <MetroDiamondMark className="w-4 h-3 shrink-0" />
+              ) : (
+                <EmtBusLogo className="w-4 h-4 shrink-0" />
+              )}
+              <span className="truncate">
+                {metroStation ? `Estación ${metroStation.name}` : stop ? `Parada #${stop.id}` : 'Mapa en Tiempo Real'}
+              </span>
             </span>
-          </span>
+          )}
 
-          {/* Toggle between Google Maps and OpenStreetMap for both Bus stops and Metro stations */}
           {(stop || metroStation) && (
-            <div className="flex items-center p-0.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 border border-slate-300/60 dark:border-slate-700 text-xs font-bold shrink-0">
+            <div
+              className={`${
+                fullBleed
+                  ? 'absolute top-3 right-3 z-20 bg-white/95 dark:bg-[#14161A]/95 backdrop-blur-md shadow-md border-zinc-200/80 dark:border-zinc-700/80 text-[11px]'
+                  : 'max-lg:absolute max-lg:top-2.5 max-lg:right-2.5 max-lg:z-20 max-lg:bg-white/95 max-lg:dark:bg-[#14161A]/95 max-lg:backdrop-blur-md max-lg:shadow-md max-lg:text-[11px] lg:bg-zinc-200/80 lg:dark:bg-zinc-800 text-xs border-zinc-300/60 dark:border-zinc-700'
+              } flex items-center p-0.5 rounded-xl border font-bold shrink-0`}
+            >
               <button
                 type="button"
                 onClick={() => setMapProvider('google')}
-                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                   mapProvider === 'google'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'max-lg:bg-[#0072CE] max-lg:text-white lg:bg-white lg:dark:bg-[#14161A] lg:text-[#0072CE] lg:dark:text-[#3898FF] shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                Google Maps
+                <span className="sm:hidden">Google</span>
+                <span className="hidden sm:inline">Google Maps</span>
               </button>
               <button
                 type="button"
                 onClick={() => setMapProvider('leaflet')}
-                className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                className={`px-2 sm:px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                   mapProvider === 'leaflet'
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'max-lg:bg-[#0072CE] max-lg:text-white lg:bg-white lg:dark:bg-[#14161A] lg:text-[#0072CE] lg:dark:text-[#3898FF] shadow-xs'
+                    : 'text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
                 }`}
               >
-                OpenStreetMap
+                <span className="sm:hidden">OSM</span>
+                <span className="hidden sm:inline">OpenStreetMap</span>
               </button>
             </div>
           )}
-        </div>
-      )}
-
-      {/* Floating Provider Switcher in Full-Bleed Mode */}
-      {fullBleed && (stop || metroStation) && (
-        <div className="absolute top-3 right-3 z-20 flex items-center p-0.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 shadow-md text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => setMapProvider('google')}
-            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-              mapProvider === 'google'
-                ? 'bg-blue-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300'
-            }`}
-          >
-            Google Maps
-          </button>
-          <button
-            type="button"
-            onClick={() => setMapProvider('leaflet')}
-            className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-              mapProvider === 'leaflet'
-                ? 'bg-blue-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-300'
-            }`}
-          >
-            OpenStreetMap
-          </button>
         </div>
       )}
 
@@ -435,29 +428,29 @@ export const BusMap: React.FC<BusMapProps> = ({
             className ||
             (fullBleed
               ? 'relative w-full flex-1 min-h-[260px] overflow-hidden'
-              : 'relative w-full flex-1 h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md')
+              : 'relative w-full flex-1 h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-md')
           }
         />
       ) : mapProvider === 'google' && !googleMapsApiKey ? (
         <div
           className={
             fullBleed
-              ? 'relative w-full flex-1 min-h-[260px] flex flex-col items-center justify-center text-center p-6 bg-slate-100 dark:bg-slate-900'
-              : 'relative w-full flex-1 h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md p-6 flex flex-col items-center justify-center text-center bg-slate-100 dark:bg-slate-900'
+              ? 'relative w-full flex-1 min-h-[260px] flex flex-col items-center justify-center text-center p-6 bg-zinc-100 dark:bg-[#14161A]'
+              : 'relative w-full flex-1 h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-md p-6 flex flex-col items-center justify-center text-center bg-zinc-100 dark:bg-[#14161A]'
           }
         >
-          <MapPin className="w-8 h-8 text-blue-500 mb-2 opacity-60" />
-          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200">
+          <MapPin className="w-8 h-8 text-[#0072CE] mb-2 opacity-70" />
+          <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200">
             Google Maps no configurado
           </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mt-1">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mt-1">
             Configura la variable <code>VITE_GOOGLE_MAPS_API_KEY</code> o pulsa en{' '}
             <strong>OpenStreetMap</strong> para ver el mapa libre sin clave.
           </p>
           <button
             type="button"
             onClick={() => setMapProvider('leaflet')}
-            className="mt-3 px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white cursor-pointer"
+            className="mt-3 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0072CE] text-white cursor-pointer"
           >
             Usar OpenStreetMap
           </button>
@@ -469,7 +462,7 @@ export const BusMap: React.FC<BusMapProps> = ({
               ? `${className || 'relative w-full flex-1 min-h-[260px] overflow-hidden'}`
               : `${
                   className ||
-                  'relative w-full flex-1 min-h-[280px] h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md'
+                  'relative w-full flex-1 min-h-[280px] h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-md'
                 }`
           }
         >
@@ -478,59 +471,59 @@ export const BusMap: React.FC<BusMapProps> = ({
           {/* Floating map status badge */}
           <div
             className={`absolute ${
-              fullBleed ? 'top-3 left-3' : 'top-3 left-3'
-            } z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700/60`}
+              fullBleed ? 'top-3 left-3' : 'top-2.5 left-2.5'
+            } z-10 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/95 dark:bg-[#14161A]/95 backdrop-blur-md shadow-md text-xs font-semibold text-zinc-700 dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-800 max-lg:max-w-[calc(100%-9.5rem)]`}
           >
             <span
-              className={`w-2 h-2 rounded-full ${
-                metroStation ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse'
+              className={`w-2 h-2 rounded-full shrink-0 ${
+                metroStation ? 'bg-[#E30613]' : 'bg-emerald-500 animate-pulse'
               }`}
             ></span>
-            <span>
+            <span className="truncate">
               {metroStation
                 ? `Metro • ${metroStation.name}`
                 : busesCountWithGps > 0
                 ? `${busesCountWithGps} ${
-                    busesCountWithGps === 1 ? 'autobús' : 'autobuses'
+                    busesCountWithGps === 1 ? 'bus' : 'buses'
                   } en mapa`
-                : 'Mapa de parada activo'}
+                : 'Mapa activo'}
             </span>
           </div>
 
           {/* Map Action Controls */}
           <div
             className={`absolute ${
-              fullBleed ? 'top-14 left-3' : 'top-14 left-3'
+              fullBleed ? 'top-14 left-3' : 'top-13 left-2.5'
             } z-10 flex flex-col gap-2`}
           >
             <button
               type="button"
               onClick={handleCenterOnTarget}
               title={metroStation ? 'Centrar en la estación' : 'Centrar en la parada'}
-              className="p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/60 dark:border-slate-700/60 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="p-2.5 rounded-xl bg-white/95 dark:bg-[#14161A]/95 hover:bg-white dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 shadow-md border border-zinc-200/70 dark:border-zinc-800 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <Crosshair className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <Crosshair className="w-4 h-4 text-[#0072CE] dark:text-[#3898FF]" />
             </button>
             {busesCountWithGps > 0 && (
               <button
                 type="button"
                 onClick={handleFitAll}
                 title="Ver todos los autobuses"
-                className="p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-md border border-slate-200/60 dark:border-slate-700/60 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                className="p-2.5 rounded-xl bg-white/95 dark:bg-[#14161A]/95 hover:bg-white dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-200 shadow-md border border-zinc-200/70 dark:border-zinc-800 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
-                <Layers className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                <Layers className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
               </button>
             )}
           </div>
 
           {/* Selected Bus Floating Indicator */}
           {selectedBus && (
-            <div className="absolute top-14 right-3 left-16 sm:left-auto sm:w-72 z-10 p-2.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border border-amber-500/50 flex items-center justify-between text-xs animate-in fade-in duration-200">
+            <div className="absolute top-13 right-2.5 left-14 sm:left-auto sm:w-72 z-10 p-2.5 rounded-xl bg-white/95 dark:bg-[#14161A]/95 backdrop-blur-md shadow-lg border border-amber-500/50 flex items-center justify-between text-xs animate-in fade-in duration-200">
               <div className="flex items-center gap-2 overflow-hidden">
                 <span className="px-2 py-0.5 bg-amber-500 text-white font-bold rounded-lg shrink-0 tabular-nums">
                   {selectedBus.line}
                 </span>
-                <span className="font-semibold truncate text-slate-800 dark:text-slate-200">
+                <span className="font-semibold truncate text-zinc-800 dark:text-zinc-200">
                   {selectedBus.destination}
                 </span>
                 <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 tabular-nums">
@@ -540,7 +533,7 @@ export const BusMap: React.FC<BusMapProps> = ({
               <button
                 type="button"
                 onClick={onClearSelectedBus}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-2 text-xs font-semibold px-2 py-1 cursor-pointer"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 ml-2 text-xs font-semibold px-2 py-1 cursor-pointer"
               >
                 Cerrar
               </button>

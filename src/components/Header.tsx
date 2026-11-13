@@ -1,9 +1,10 @@
 import React from 'react';
-import { Search, MapPin, Moon, Sun, Bus, Train, Star } from 'lucide-react';
+import { Search, MapPin, Moon, Sun, Star } from 'lucide-react';
 import type { FavoriteStop } from '../types/emt';
 import type { FavoriteMetroStation } from '../types/metro';
 import type { TransportMode } from '../types/transport';
 import { TransportModeSelector } from './TransportModeSelector';
+import { MadridTransitBrandMark, MetroDiamondMark } from './TransitIcons';
 
 interface HeaderProps {
   onOpenSearch: () => void;
@@ -43,12 +44,12 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className="sticky top-0 z-30 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors"
+      className="sticky top-0 z-30 w-full bg-white/95 dark:bg-[#14161A]/95 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.85rem)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.7rem)',
       }}
     >
-      <div className="max-w-5xl mx-auto px-4 pb-2.5 sm:pb-3">
+      <div className="max-w-6xl mx-auto px-4 pb-2.5 sm:pb-3">
         {/* Navigation Bar */}
         <div className="flex items-center justify-between gap-3">
           {/* Brand Logo & Name */}
@@ -59,27 +60,22 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Ir al inicio"
             className="flex items-center gap-2.5 shrink-0 text-left hover:opacity-85 transition-opacity cursor-pointer group ios-press"
           >
-            <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-slate-800 text-white flex items-center justify-center gap-1 shadow-sm border border-slate-200/20 dark:border-slate-700/50 group-hover:scale-105 transition-transform">
-              <Train className="w-3.5 h-3.5 text-rose-500" />
-              <Bus className="w-3.5 h-3.5 text-blue-500" />
-            </div>
+            <MadridTransitBrandMark className="flex items-center gap-1 shrink-0 group-hover:scale-[1.03] transition-transform" />
             <div>
               <div className="flex items-center gap-1.5 leading-none">
-                <span className="font-black text-base sm:text-lg tracking-tight text-slate-900 dark:text-white">
-                  Madrid<span className="text-rose-600 dark:text-rose-400">Metro</span>
-                  <span className="text-blue-600 dark:text-blue-400">&</span>Bus
-                </span>
-                <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                  PWA
+                <span className="font-bold text-base sm:text-lg tracking-tight text-zinc-950 dark:text-white">
+                  Madrid<span className="text-[#E30613] dark:text-[#FF4D4D]">Metro</span>
+                  <span className="text-zinc-400 font-medium mx-0.5">&amp;</span>
+                  <span className="text-[#0072CE] dark:text-[#389BFF]">Bus</span>
                 </span>
               </div>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-                Metro de Madrid & EMT en tiempo real
+              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium hidden sm:inline">
+                Tiempos en directo • Metro y EMT Madrid
               </span>
             </div>
           </button>
 
-          {/* Mode Selector in Header for tablet/desktop */}
+          {/* Mode Selector in Header for desktop */}
           {onTransportModeChange && (
             <div className="hidden lg:flex items-center">
               <TransportModeSelector
@@ -94,29 +90,29 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onOpenSearch}
-            className="hidden md:flex flex-1 max-w-md mx-2 items-center gap-2.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200/70 dark:border-slate-700 transition-all text-sm group text-left cursor-pointer shadow-xs ios-press"
+            className="hidden md:flex flex-1 max-w-md mx-2 items-center gap-2.5 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200/70 dark:bg-zinc-800/80 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200/80 dark:border-zinc-700/70 transition-all text-sm group text-left cursor-pointer ios-press"
           >
-            <Search className="w-4 h-4 text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+            <Search className="w-4 h-4 text-zinc-400 group-hover:text-[#0072CE] dark:group-hover:text-[#389BFF] transition-colors" />
             <span className="truncate flex-1 text-sm">
               Buscar estación, parada, calle o línea...
             </span>
-            <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-400">
+            <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-mono bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-400">
               ⌘K
             </kbd>
           </button>
 
           {/* Desktop Controls */}
-          <div className="hidden md:flex items-center gap-1.5 shrink-0">
+          <div className="hidden md:flex items-center gap-2 shrink-0">
             {/* GPS Cerca de mí button */}
             <button
               type="button"
               onClick={onNearMe}
               disabled={isLocating}
               title="Buscar transportes cerca de mí"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 text-sm font-semibold transition-all disabled:opacity-50 cursor-pointer ios-press"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0072CE]/10 hover:bg-[#0072CE]/15 dark:bg-[#0072CE]/20 dark:hover:bg-[#0072CE]/30 text-[#005AA3] dark:text-[#60B2FF] border border-[#0072CE]/20 dark:border-[#0072CE]/40 text-sm font-semibold transition-all disabled:opacity-50 cursor-pointer ios-press"
             >
               <MapPin
-                className={`w-4 h-4 text-blue-600 dark:text-blue-400 ${
+                className={`w-4 h-4 text-[#0072CE] dark:text-[#389BFF] ${
                   isLocating ? 'animate-spin text-emerald-500' : ''
                 }`}
               />
@@ -129,24 +125,24 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onToggleTheme}
               title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
               aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              className="ios-touch-target min-w-[44px] min-h-[44px] p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 transition-all cursor-pointer ios-press"
+              className="ios-touch-target min-w-[44px] min-h-[44px] p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-200/80 dark:border-zinc-700 transition-all cursor-pointer ios-press"
             >
               {isDark ? (
                 <Sun className="w-4 h-4 text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                <Moon className="w-4 h-4 text-zinc-700" />
               )}
             </button>
           </div>
 
-          {/* Mobile Right Action: Subtle Quick-Search icon button */}
+          {/* Mobile Right Action: Quick-Search icon button */}
           {hasActiveItem && (
             <div className="flex md:hidden items-center gap-1">
               <button
                 type="button"
                 onClick={onOpenSearch}
                 aria-label="Buscar parada o estación"
-                className="ios-touch-target min-w-[44px] min-h-[44px] p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all active:scale-90 cursor-pointer ios-press"
+                className="ios-touch-target min-w-[40px] min-h-[40px] p-2 rounded-xl text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700 transition-all active:scale-90 cursor-pointer ios-press"
               >
                 <Search className="w-4 h-4" />
               </button>
@@ -156,9 +152,9 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Favorites Quick Access Row (desktop/tablet) */}
         {totalFavorites > 0 && (
-          <div className="hidden sm:flex mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 items-center gap-2 overflow-x-auto no-scrollbar py-0.5 overscroll-contain">
-            <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 pr-1">
-              <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> Favoritos:
+          <div className="hidden sm:flex mt-2.5 pt-2 border-t border-zinc-100 dark:border-zinc-800/80 items-center gap-2 overflow-x-auto no-scrollbar py-0.5 overscroll-contain">
+            <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 shrink-0 pr-1">
+              <Star className="w-3 h-3 text-amber-500 fill-amber-400" /> Favoritos:
             </span>
             <div className="flex items-center gap-1.5 flex-nowrap">
               {/* Metro Favorites */}
@@ -169,20 +165,14 @@ export const Header: React.FC<HeaderProps> = ({
                     type="button"
                     key={`hdr-metro-${fav.id}`}
                     onClick={() => onSelectMetroStation?.(fav.id)}
-                    className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ios-press ${
+                    className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ios-press ${
                       isActive
-                        ? 'bg-rose-600 text-white shadow-xs'
-                        : 'bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/60'
+                        ? 'bg-[#E30613] text-white shadow-xs'
+                        : 'bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-700'
                     }`}
                   >
-                    <span
-                      className={`font-black text-xs ${
-                        isActive ? 'text-rose-100' : 'text-rose-600 dark:text-rose-400'
-                      }`}
-                    >
-                      M
-                    </span>
-                    <span className="truncate max-w-[120px] font-bold">{fav.name}</span>
+                    <MetroDiamondMark className="w-4 h-3 shrink-0" />
+                    <span className="truncate max-w-[130px]">{fav.name}</span>
                   </button>
                 );
               })}
@@ -195,20 +185,20 @@ export const Header: React.FC<HeaderProps> = ({
                     type="button"
                     key={`hdr-bus-${fav.id}`}
                     onClick={() => onSelectStop(fav.id)}
-                    className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ios-press ${
+                    className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ios-press ${
                       isActive
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60'
+                        ? 'bg-[#0072CE] text-white shadow-xs'
+                        : 'bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-700'
                     }`}
                   >
                     <span
-                      className={`font-bold ${
-                        isActive ? 'text-blue-100' : 'text-blue-600 dark:text-blue-400'
+                      className={`font-bold tabular-nums ${
+                        isActive ? 'text-blue-100' : 'text-[#0072CE] dark:text-[#389BFF]'
                       }`}
                     >
                       {fav.id}
                     </span>
-                    <span className="truncate max-w-[120px]">{fav.name}</span>
+                    <span className="truncate max-w-[130px]">{fav.name}</span>
                   </button>
                 );
               })}

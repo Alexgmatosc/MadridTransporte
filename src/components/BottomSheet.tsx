@@ -291,7 +291,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
       aria-label="Detalles de parada y llegadas"
       data-snap={snap}
       data-testid="bottom-sheet"
-      className={`max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 flex flex-col max-lg:rounded-t-[24px] max-lg:bg-white/95 max-lg:dark:bg-slate-900/95 max-lg:border-t max-lg:border-slate-200/90 max-lg:dark:border-slate-800/90 max-lg:shadow-[0_-10px_35px_-5px_rgba(0,0,0,0.2)] transition-colors will-change-transform select-none lg:static lg:h-auto! lg:transform-none! lg:bg-transparent! lg:dark:bg-transparent! lg:border-0! lg:shadow-none! lg:backdrop-blur-none! lg:select-auto ${className}`}
+      className={`max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-30 flex flex-col max-lg:rounded-t-[24px] max-lg:bg-white/95 max-lg:dark:bg-[#14161A]/95 max-lg:border-t max-lg:border-zinc-200/90 max-lg:dark:border-zinc-800 max-lg:shadow-[0_-10px_35px_-5px_rgba(0,0,0,0.22)] transition-colors will-change-transform select-none lg:static lg:h-auto! lg:transform-none! lg:bg-transparent! lg:dark:bg-transparent! lg:border-0! lg:shadow-none! lg:backdrop-blur-none! lg:select-auto ${className}`}
       style={{
         height: `${fullHeight}px`,
         transform: `translate3d(0, ${activeTranslateY}px, 0)`,
@@ -309,12 +309,12 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
-        className="w-full max-lg:pt-2 max-lg:pb-2 max-lg:px-4 flex flex-col items-center max-lg:cursor-grab max-lg:active:cursor-grabbing shrink-0 max-lg:border-b max-lg:border-slate-100 max-lg:dark:border-slate-800/80"
+        className="w-full max-lg:pt-1.5 max-lg:pb-1.5 max-lg:px-3.5 flex flex-col items-center max-lg:cursor-grab max-lg:active:cursor-grabbing shrink-0 max-lg:border-b max-lg:border-zinc-100 max-lg:dark:border-zinc-800/80"
         style={{ touchAction: 'none' }}
       >
         {/* iOS Pill Indicator */}
         <div
-          className="w-10 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 mx-auto mb-2 lg:hidden"
+          className="w-9 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600 mx-auto mb-1.5 lg:hidden"
           style={{ touchAction: 'none' }}
         />
 
@@ -325,8 +325,8 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
             onClick={() => handleSelectSnap(snap === 'peek' ? 'half' : 'peek')}
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ios-press ${
               snap === 'peek'
-                ? 'bg-blue-600 text-white shadow-2xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                ? 'bg-[#0072CE] text-white shadow-2xs'
+                : 'bg-zinc-100 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300'
             }`}
           >
             <MapIcon className="w-3.5 h-3.5" />
@@ -339,8 +339,8 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
               onClick={() => handleSelectSnap('half')}
               className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ios-press ${
                 snap === 'half'
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950'
+                  : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
             >
               Mitad
@@ -350,8 +350,8 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
               onClick={() => handleSelectSnap(snap === 'full' ? 'half' : 'full')}
               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ios-press ${
                 snap === 'full'
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950'
+                  : 'bg-zinc-100 dark:bg-zinc-800/90 text-zinc-700 dark:text-zinc-300'
               }`}
             >
               <List className="w-3.5 h-3.5" />

@@ -4,7 +4,6 @@ import {
   Share2,
   Check,
   ArrowLeft,
-  Train,
   AlertCircle,
   Clock,
   Compass,
@@ -13,6 +12,8 @@ import type { MetroStation, MetroPlatformEstimate } from '../types/metro';
 import { fetchMetroEstimates } from '../services/metroApi';
 import { formatMetroLineBadge, getMetroLine } from '../data/metroLines';
 import { AutoRefreshBar } from './AutoRefreshBar';
+import { MetroDiamondLogo } from './TransitIcons';
+import { triggerHaptic } from '../utils/haptics';
 
 export interface MetroStationViewProps {
   station: MetroStation;
@@ -36,51 +37,41 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
 
-  // Auto-refresh countdown & pause
   const [countdown, setCountdown] = useState<number>(REFRESH_INTERVAL_SECONDS);
   const [isPaused, setIsPaused] = useState(false);
-
-  // Filter by line for multi-line stations
   const [selectedLineFilter, setSelectedLineFilter] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Fetch estimates
-  const loadEstimates = useCallback(
-    async (code: string) => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await fetchMetroEstimates(code);
-        setEstimates(res.estimates);
-        setLastUpdated(res.timestamp);
-        if (res.error) {
-          setError(res.error);
-        }
-      } catch (err: unknown) {
-        const msg =
-          err instanceof Error
-            ? err.message
-            : 'Error al conectar con el servicio de Metro de Madrid.';
-        setError(msg);
-      } finally {
-        setIsLoading(false);
+  const loadEstimates = useCallback(async (code: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetchMetroEstimates(code);
+      setEstimates(res.estimates);
+      setLastUpdated(res.timestamp);
+      if (res.error) {
+        setError(res.error);
       }
-    },
-    []
-  );
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Error al conectar con el servicio de Metro de Madrid.';
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  // Initial load when station.id changes
   useEffect(() => {
     setSelectedLineFilter(null);
     setCountdown(REFRESH_INTERVAL_SECONDS);
     loadEstimates(station.id);
   }, [station.id, loadEstimates]);
 
-  // Tab visibility detection
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        // Tab became active again: immediately refresh
         setCountdown(REFRESH_INTERVAL_SECONDS);
         loadEstimates(station.id);
       }
@@ -90,10 +81,8 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [station.id, loadEstimates]);
 
-  // 30-second Countdown loop
   useEffect(() => {
     const timer = setInterval(() => {
-      // If document is hidden or user paused or currently loading, skip countdown tick
       if (document.visibilityState === 'hidden' || isPaused || isLoading) {
         return;
       }
@@ -116,6 +105,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
   };
 
   const handleShare = async () => {
+    triggerHaptic('selection');
     const url = new URL(window.location.href);
     url.searchParams.set('metro', station.id);
     const shareUrl = url.toString();
@@ -132,7 +122,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
         });
         return;
       } catch {
-        // User cancelled or share failed, fallback to clipboard
+        // Fallback
       }
     }
 
@@ -145,17 +135,14 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
     }
   };
 
-  // Filter estimates by line if user tapped a specific line filter
   const filteredEstimates = useMemo(() => {
     if (!selectedLineFilter) return estimates;
     return estimates.filter((e) => e.line === selectedLineFilter);
   }, [estimates, selectedLineFilter]);
 
-  // Group estimates by Line -> Platform
   const groupedByLine = useMemo(() => {
     const map = new Map<string, MetroPlatformEstimate[]>();
 
-    // First collect all available lines from station.lines or estimates
     filteredEstimates.forEach((est) => {
       const lineKey = est.line;
       if (!map.has(lineKey)) {
@@ -164,7 +151,6 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
       map.get(lineKey)!.push(est);
     });
 
-    // Sort platforms within each line (anden 1 first, then anden 2)
     map.forEach((platformEstimates) => {
       platformEstimates.sort((a, b) => a.platform - b.platform);
     });
@@ -173,54 +159,55 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
   }, [filteredEstimates]);
 
   return (
-    <div className="flex flex-col gap-4 animate-in fade-in duration-200">
+    <div className="flex flex-col gap-3.5 animate-in fade-in duration-200">
       {/* Station Header Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+      <div className="bg-white dark:bg-[#14161A] rounded-2xl p-4 sm:p-5 border border-zinc-200/90 dark:border-zinc-800/90 transition-colors">
         {onBackToSearch && (
-          <div className="mb-3 pb-2.5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <div className="mb-3 pb-2.5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
             <button
-              onClick={onBackToSearch}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors cursor-pointer group"
+              type="button"
+              onClick={() => {
+                triggerHaptic('selection');
+                onBackToSearch();
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#E30613] dark:text-[#FF5A5A] hover:opacity-80 transition-opacity cursor-pointer group ios-press"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               <span>Volver al buscador</span>
             </button>
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <span className="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
               Metro de Madrid
             </span>
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
           <div className="flex items-start gap-3.5 min-w-0">
-            {/* Metro Rhombus Badge */}
-            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-600 to-red-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/25 border border-rose-400/40">
-              <Train className="w-6 h-6" />
-              <span className="absolute -bottom-1 -right-1 px-1 py-0.2 bg-blue-900 text-white font-black text-[9px] rounded-md border border-white/60">
-                M
-              </span>
+            {/* Iconic Metro Rhombus Emblem */}
+            <div className="w-13 h-13 rounded-2xl bg-zinc-100 dark:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/80 flex items-center justify-center shrink-0">
+              <MetroDiamondLogo className="w-10 h-7.5" />
             </div>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">
+                <h2 className="text-xl sm:text-2xl font-bold text-zinc-950 dark:text-white tracking-tight truncate">
                   {station.name}
                 </h2>
                 {station.zone && (
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                     Zona {station.zone}
                   </span>
                 )}
               </div>
 
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
                 {station.address || 'Red de Metro de Madrid'}
               </p>
 
               {/* Station Lines Badges */}
               {station.lines && station.lines.length > 0 && (
                 <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mr-1">
+                  <span className="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 mr-0.5">
                     Líneas:
                   </span>
                   {station.lines.map((lineId) => {
@@ -230,17 +217,18 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                       <button
                         key={lineId}
                         type="button"
-                        onClick={() =>
-                          setSelectedLineFilter((prev) => (prev === lineId ? null : lineId))
-                        }
+                        onClick={() => {
+                          triggerHaptic('selection');
+                          setSelectedLineFilter((prev) => (prev === lineId ? null : lineId));
+                        }}
                         title={`Filtrar por Línea ${lineId}`}
                         style={{
                           backgroundColor: badge.bg,
                           color: badge.text,
                           borderColor: badge.border || 'transparent',
                         }}
-                        className={`px-2 py-0.5 rounded-lg text-xs font-black shadow-xs transition-transform cursor-pointer border ${
-                          isSelected ? 'ring-2 ring-slate-900 dark:ring-white scale-105' : 'hover:scale-105'
+                        className={`px-2 py-0.5 rounded-md text-xs font-black shadow-2xs transition-transform cursor-pointer border ${
+                          isSelected ? 'ring-2 ring-zinc-900 dark:ring-white scale-105' : 'hover:scale-105'
                         }`}
                       >
                         {badge.label}
@@ -254,31 +242,32 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
 
           {/* Quick Actions */}
           <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-            {/* Favorite toggle */}
             <button
               type="button"
-              onClick={onToggleFavorite}
+              onClick={() => {
+                triggerHaptic('light');
+                onToggleFavorite();
+              }}
               title={isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ios-press ${
+              className={`flex items-center gap-1.5 px-3 py-2 min-h-[40px] rounded-xl text-xs font-semibold border transition-all cursor-pointer ios-press ${
                 isFav
-                  ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-600 dark:text-amber-400 shadow-xs'
-                  : 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300'
+                  ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300'
+                  : 'bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300'
               }`}
             >
               <Star
                 className={`w-4 h-4 ${
-                  isFav ? 'fill-amber-400 text-amber-500' : 'text-slate-400'
+                  isFav ? 'fill-amber-400 text-amber-500' : 'text-zinc-400'
                 }`}
               />
               <span>{isFav ? 'Favorita' : 'Guardar'}</span>
             </button>
 
-            {/* Share button */}
             <button
               type="button"
               onClick={handleShare}
               title="Compartir estación"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 text-slate-600 dark:text-slate-300 transition-all cursor-pointer ios-press"
+              className="flex items-center gap-1.5 px-3 py-2 min-h-[40px] rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer ios-press"
             >
               {copied ? (
                 <>
@@ -287,7 +276,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                 </>
               ) : (
                 <>
-                  <Share2 className="w-4 h-4 text-slate-400" />
+                  <Share2 className="w-4 h-4 text-zinc-400" />
                   <span>Compartir</span>
                 </>
               )}
@@ -295,16 +284,19 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
           </div>
         </div>
 
-        {/* Multi-line filter pills bar if station has > 1 line */}
+        {/* Multi-line filter pills bar */}
         {station.lines && station.lines.length > 1 && (
-          <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="mt-3.5 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             <button
               type="button"
-              onClick={() => setSelectedLineFilter(null)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              onClick={() => {
+                triggerHaptic('selection');
+                setSelectedLineFilter(null);
+              }}
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                 selectedLineFilter === null
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950'
+                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
               }`}
             >
               Todas las líneas ({station.lines.length})
@@ -316,11 +308,14 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                 <button
                   key={lineId}
                   type="button"
-                  onClick={() => setSelectedLineFilter(lineId)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  onClick={() => {
+                    triggerHaptic('selection');
+                    setSelectedLineFilter(lineId);
+                  }}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                     isSelected
-                      ? 'ring-2 ring-slate-900 dark:ring-white bg-slate-100 dark:bg-slate-800'
-                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400'
+                      ? 'ring-2 ring-zinc-900 dark:ring-white bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white'
+                      : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                   }`}
                 >
                   <span
@@ -341,7 +336,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
         )}
       </div>
 
-      {/* Auto Refresh Bar with 30s Countdown */}
+      {/* Auto Refresh Bar */}
       <AutoRefreshBar
         countdown={countdown}
         maxCountdown={REFRESH_INTERVAL_SECONDS}
@@ -354,7 +349,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
 
       {/* Error state alert */}
       {error && (
-        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-200 text-xs sm:text-sm flex items-start gap-2.5">
+        <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-200 text-xs sm:text-sm flex items-start gap-2.5">
           <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div className="flex-1">
             <span className="font-bold">Aviso del servicio: </span>
@@ -365,7 +360,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
 
       {/* Stale data warning */}
       {estimates.some((e) => e.isStale) && (
-        <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2">
+        <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span>
             Aviso de teleindicadores: Las previsiones de Metro recibidas tienen más de 20 minutos de antigüedad.
@@ -373,35 +368,37 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
         </div>
       )}
 
-      {/* Live Arrivals Grouped by Line & Platform */}
+      {/* Live Arrivals Grouped by Line -> Platform Rows */}
       {isLoading && estimates.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {[1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="h-32 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 animate-pulse p-4"
+              className="h-32 bg-white dark:bg-[#14161A] rounded-2xl border border-zinc-200/90 dark:border-zinc-800/90 animate-pulse p-4"
             />
           ))}
         </div>
       ) : groupedByLine.size === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 text-center">
-          <Train className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-700 mb-2" />
-          <h3 className="font-bold text-base text-slate-800 dark:text-slate-200">
+        <div className="bg-white dark:bg-[#14161A] rounded-2xl p-8 border border-zinc-200/90 dark:border-zinc-800/90 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-3">
+            <MetroDiamondLogo className="w-9 h-7 opacity-80" />
+          </div>
+          <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">
             Sin estimaciones en este momento
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">
-            El servicio de teleindicadores no reporta trenes en directo en esta estación ahora mismo (comprueba si la red está en horario de servicio de 06:00 a 01:30).
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mt-1">
+            El servicio de teleindicadores no reporta trenes en directo en esta estación ahora mismo (horario habitual de 06:00 a 01:30).
           </p>
           <button
             type="button"
             onClick={handleManualRefresh}
-            className="mt-4 px-4 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 transition-colors cursor-pointer"
+            className="mt-4 px-4 py-2 rounded-xl bg-[#E30613] text-white font-semibold text-xs hover:bg-[#B9050F] transition-colors cursor-pointer ios-press"
           >
             Reintentar actualización
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-3.5">
           {Array.from(groupedByLine.entries()).map(([lineKey, lineEstimates]) => {
             const badge = formatMetroLineBadge(lineKey);
             const lineConfig = getMetroLine(lineKey);
@@ -409,43 +406,47 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
             return (
               <div
                 key={lineKey}
-                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs"
+                className="bg-white dark:bg-[#14161A] rounded-2xl border border-zinc-200/90 dark:border-zinc-800/90 overflow-hidden"
               >
                 {/* Line Header */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center gap-2.5">
+                <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-900/50">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <span
                       style={{
                         backgroundColor: badge.bg,
                         color: badge.text,
                         borderColor: badge.border || 'transparent',
                       }}
-                      className="px-2.5 py-0.5 rounded-lg text-sm font-black border shadow-xs"
+                      className="px-2.5 py-0.5 rounded-lg text-sm font-black border shadow-2xs shrink-0"
                     >
                       {badge.label}
                     </span>
-                    <div>
-                      <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-sm sm:text-base text-zinc-950 dark:text-white truncate">
                         {lineConfig ? lineConfig.name : `Línea ${badge.label}`}
                       </h3>
                       {lineConfig?.origin && lineConfig?.destination && (
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium truncate">
                           {lineConfig.origin} ↔ {lineConfig.destination}
                         </p>
                       )}
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  <span className="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider shrink-0">
                     {lineEstimates.length}{' '}
                     {lineEstimates.length === 1 ? 'andén' : 'andenes'}
                   </span>
                 </div>
 
-                {/* Platform Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Clean Grouped Platform Rows (No heavy card nesting) */}
+                <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
                   {lineEstimates.map((est, idx) => {
                     const isArriving = est.proximoMinutes === 0 || est.eta === 'Llegando';
+                    const isSoon =
+                      est.proximoMinutes !== null &&
+                      est.proximoMinutes > 0 &&
+                      est.proximoMinutes <= 4;
                     const hasSecondTrain =
                       est.siguienteMinutes !== null &&
                       est.siguienteMinutes !== undefined &&
@@ -454,23 +455,24 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                     return (
                       <div
                         key={`${est.line}-${est.platform}-${idx}`}
-                        className={`p-3.5 sm:p-4 rounded-xl border transition-all flex flex-col justify-between gap-3 ${
-                          isArriving
-                            ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800/80 shadow-xs'
-                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/80 dark:border-slate-700/80'
+                        className={`p-4 transition-colors flex flex-col gap-2.5 ${
+                          isArriving ? 'bg-emerald-50/50 dark:bg-emerald-950/15' : ''
                         }`}
                       >
-                        {/* Top: Platform & Direction */}
-                        <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center justify-between gap-3">
                           <div className="min-w-0">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                              <Compass className="w-3 h-3 text-slate-400" />
-                              Andén {est.platform}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
+                                <Compass className="w-3 h-3 text-zinc-400" />
+                                Andén {est.platform}
+                              </span>
+                            </div>
 
-                            <div className="flex items-center gap-1.5 mt-2">
-                              <span className="text-xs text-slate-400 font-medium">Hacia:</span>
-                              <span className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                            <div className="flex items-baseline gap-1.5 mt-1.5">
+                              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium shrink-0">
+                                Hacia:
+                              </span>
+                              <span className="font-bold text-base text-zinc-950 dark:text-white truncate">
                                 {est.destination || 'Fin de línea'}
                               </span>
                             </div>
@@ -479,32 +481,37 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                           {/* Primary ETA Badge */}
                           <div className="text-right shrink-0">
                             <div
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-sm sm:text-base shadow-xs tabular-nums ${
+                              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black text-sm sm:text-base tabular-nums ${
                                 isArriving
                                   ? 'bg-emerald-600 text-white'
+                                  : isSoon
+                                  ? 'bg-[#0072CE] text-white'
                                   : est.proximoMinutes !== null
-                                  ? 'bg-blue-600 text-white'
-                                  : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                  ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950'
+                                  : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
                               }`}
                             >
                               {isArriving && (
-                                <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                                <span className="w-2 h-2 rounded-full bg-white animate-ping" />
                               )}
                               <span>{est.eta}</span>
                             </div>
                           </div>
                         </div>
 
-                        {/* Bottom: Secondary Train & Time */}
-                        <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60 dark:border-slate-700/60 text-slate-500 dark:text-slate-400 tabular-nums">
+                        {/* Bottom: Secondary Train & Timestamp */}
+                        <div className="flex items-center justify-between text-xs pt-1 text-zinc-500 dark:text-zinc-400 tabular-nums">
                           <div className="flex items-center gap-1.5">
                             {hasSecondTrain ? (
-                              <span className="inline-flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
-                                <Clock className="w-3.5 h-3.5 text-slate-400" />
-                                Sig. tren: <strong className="text-slate-900 dark:text-white">{est.siguienteMinutes} min</strong>
+                              <span className="inline-flex items-center gap-1 font-medium text-zinc-600 dark:text-zinc-300">
+                                <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                                Sig. tren:{' '}
+                                <strong className="text-zinc-950 dark:text-white">
+                                  {est.siguienteMinutes} min
+                                </strong>
                               </span>
                             ) : (
-                              <span className="text-slate-400 italic">
+                              <span className="text-zinc-400 dark:text-zinc-500 italic">
                                 Siguiente tren sin estimación
                               </span>
                             )}
@@ -520,7 +527,7 @@ export const MetroStationView: React.FC<MetroStationViewProps> = ({
                               className={`text-[10px] font-mono tabular-nums inline-flex items-center gap-1 ${
                                 est.isStale
                                   ? 'text-amber-600 dark:text-amber-400 font-bold'
-                                  : 'text-slate-400'
+                                  : 'text-zinc-400 dark:text-zinc-500'
                               }`}
                             >
                               <span>

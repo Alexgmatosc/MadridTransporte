@@ -9,8 +9,8 @@ import {
 } from '@vis.gl/react-google-maps';
 import type { BusEstimate, Stop } from '../types/emt';
 import type { MetroStation } from '../types/metro';
-import { Bus } from 'lucide-react';
 import { formatMetroLineBadge } from '../data/metroLines';
+import { MetroDiamondLogo, EmtBusLogo } from './TransitIcons';
 
 /**
  * Constant referencing the Google Maps API key configured in environment variables (Vercel / .env)
@@ -128,9 +128,9 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
   const busesWithGps = estimates.filter((e) => e.coordinates !== null);
 
   const containerClassName = fullBleed
-    ? className || 'relative w-full flex-1 min-h-[260px] h-full overflow-hidden bg-slate-100 dark:bg-slate-900'
+    ? className || 'relative w-full flex-1 min-h-[260px] h-full overflow-hidden bg-zinc-100 dark:bg-[#0B0C0E]'
     : className ||
-      'relative w-full flex-1 min-h-[280px] h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-slate-100 dark:bg-slate-900';
+      'relative w-full flex-1 min-h-[280px] h-[320px] sm:h-[380px] rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm bg-zinc-100 dark:bg-[#0B0C0E]';
 
   return (
     <div className={containerClassName} data-testid="google-bus-map">
@@ -156,7 +156,7 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
             selectedBus={selectedBus}
           />
 
-          {/* 1. Metro Station Advanced Marker */}
+          {/* 1. Metro Station Advanced Marker (Red/Blue Diamond Emblem) */}
           {metroStation && (
             <>
               <AdvancedMarker
@@ -164,11 +164,11 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                 title={`Metro ${metroStation.name}`}
                 onClick={() => setActiveInfoWindow('metro')}
               >
-                <div className="relative flex items-center justify-center cursor-pointer group">
-                  <div className="w-10 h-10 rounded-2xl bg-rose-600 border-2 border-white dark:border-slate-900 shadow-xl flex items-center justify-center text-white font-black text-xs ring-4 ring-rose-500/30 group-hover:scale-110 transition-transform">
-                    <span className="text-sm font-black">M</span>
+                <div className="relative flex flex-col items-center cursor-pointer group">
+                  <div className="px-1.5 py-1 rounded-2xl bg-white dark:bg-[#14161A] border-2 border-[#E30613] shadow-xl flex items-center justify-center ring-4 ring-[#E30613]/25 group-hover:scale-110 transition-transform">
+                    <MetroDiamondLogo className="w-8 h-6" />
                   </div>
-                  <div className="absolute -bottom-1 w-2.5 h-2.5 bg-rose-600 rotate-45"></div>
+                  <div className="w-2.5 h-2.5 bg-[#E30613] rotate-45 -mt-1.5 border-r border-b border-white dark:border-[#14161A]"></div>
                 </div>
               </AdvancedMarker>
 
@@ -177,15 +177,15 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                   position={{ lat: metroStation.lat, lng: metroStation.lon }}
                   onCloseClick={() => setActiveInfoWindow(null)}
                 >
-                  <div className="p-1 text-slate-900">
-                    <span className="text-[10px] font-black text-rose-600 uppercase tracking-wider block">
+                  <div className="p-1 text-zinc-900">
+                    <span className="text-[10px] font-black text-[#E30613] uppercase tracking-wider block">
                       Metro de Madrid {metroStation.zone ? `• Zona ${metroStation.zone}` : ''}
                     </span>
-                    <h4 className="font-bold text-sm text-slate-900 mt-0.5">
+                    <h4 className="font-bold text-sm text-zinc-900 mt-0.5">
                       {metroStation.name}
                     </h4>
                     {metroStation.address && (
-                      <p className="text-xs text-slate-600 mt-0.5">{metroStation.address}</p>
+                      <p className="text-xs text-zinc-600 mt-0.5">{metroStation.address}</p>
                     )}
                     {metroStation.lines && metroStation.lines.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -212,7 +212,7 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
             </>
           )}
 
-          {/* 2. Bus Stop Advanced Marker */}
+          {/* 2. Bus Stop Advanced Marker (EMT Municipal Blue) */}
           {stop && (
             <>
               <AdvancedMarker
@@ -220,11 +220,12 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                 title={`Parada ${stop.id} - ${stop.name}`}
                 onClick={() => setActiveInfoWindow('stop')}
               >
-                <div className="relative flex items-center justify-center cursor-pointer group">
-                  <div className="w-9 h-9 rounded-full bg-blue-600 border-2 border-white dark:border-slate-900 shadow-lg flex items-center justify-center text-white font-black text-xs ring-4 ring-blue-500/30 group-hover:scale-110 transition-transform tabular-nums">
+                <div className="relative flex flex-col items-center cursor-pointer group">
+                  <div className="px-2 py-1 rounded-full bg-[#0072CE] border-2 border-white dark:border-[#14161A] shadow-lg flex items-center gap-1 text-white font-black text-xs ring-4 ring-[#0072CE]/25 group-hover:scale-110 transition-transform tabular-nums">
+                    <EmtBusLogo className="w-4 h-4 shrink-0" />
                     <span>{stop.id}</span>
                   </div>
-                  <div className="absolute -bottom-1 w-2.5 h-2.5 bg-blue-600 rotate-45"></div>
+                  <div className="w-2.5 h-2.5 bg-[#0072CE] rotate-45 -mt-1.5"></div>
                 </div>
               </AdvancedMarker>
 
@@ -234,18 +235,18 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                   position={{ lat: stop.lat, lng: stop.lon }}
                   onCloseClick={() => setActiveInfoWindow(null)}
                 >
-                  <div className="p-1 text-slate-900">
-                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
+                  <div className="p-1 text-zinc-900">
+                    <span className="text-[10px] font-bold text-[#0072CE] uppercase tracking-wider block">
                       Parada EMT {stop.id}
                     </span>
-                    <h4 className="font-bold text-sm text-slate-900 mt-0.5">{stop.name}</h4>
-                    <p className="text-xs text-slate-600 mt-0.5">{stop.address}</p>
+                    <h4 className="font-bold text-sm text-zinc-900 mt-0.5">{stop.name}</h4>
+                    <p className="text-xs text-zinc-600 mt-0.5">{stop.address}</p>
                     {stop.lines && stop.lines.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {stop.lines.map((l) => (
                           <span
                             key={l}
-                            className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700"
+                            className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-zinc-100 text-zinc-700"
                           >
                             {l}
                           </span>
@@ -285,19 +286,19 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                       <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
                     )}
                     <div
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full shadow-lg text-xs font-bold text-white border border-white/70 tabular-nums ${
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full shadow-lg text-xs font-bold text-white border border-white/80 tabular-nums ${
                         isSelected
                           ? 'bg-amber-600 ring-4 ring-amber-400/40'
                           : isArriving
                           ? 'bg-emerald-600 ring-3 ring-emerald-400/40'
-                          : 'bg-blue-600 ring-2 ring-blue-400/30'
+                          : 'bg-[#0072CE] ring-2 ring-[#0072CE]/30'
                       }`}
                     >
-                      <Bus className="w-3.5 h-3.5" />
+                      <EmtBusLogo className="w-4 h-4 shrink-0" />
                       <span>{bus.line}</span>
                       <span className="opacity-90 font-medium">({bus.eta})</span>
                     </div>
-                    <div className="w-2 h-2 bg-slate-800 rotate-45 -mt-1"></div>
+                    <div className="w-2 h-2 bg-zinc-900 rotate-45 -mt-1"></div>
                   </div>
                 </AdvancedMarker>
 
@@ -310,19 +311,19 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
                       if (isSelected) onClearSelectedBus();
                     }}
                   >
-                    <div className="p-1 text-slate-900">
+                    <div className="p-1 text-zinc-900">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-blue-600 text-white">
+                        <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-[#0072CE] text-white">
                           Línea {bus.line}
                         </span>
                         <span className="text-xs font-bold text-emerald-600 tabular-nums">
                           {bus.eta}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-700">
+                      <p className="text-xs text-zinc-700">
                         Hacia: <strong>{bus.destination}</strong>
                       </p>
-                      <p className="text-[11px] text-slate-500 mt-1 tabular-nums">
+                      <p className="text-[11px] text-zinc-500 mt-1 tabular-nums">
                         GPS en tiempo real: {bus.coordinates.lat.toFixed(5)},{' '}
                         {bus.coordinates.lon.toFixed(5)}
                       </p>
@@ -340,8 +341,8 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
               title="Tu ubicación"
             >
               <div className="relative flex items-center justify-center">
-                <span className="absolute w-5 h-5 rounded-full bg-blue-500 opacity-60 animate-ping"></span>
-                <div className="w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-md"></div>
+                <span className="absolute w-5 h-5 rounded-full bg-[#0072CE] opacity-60 animate-ping"></span>
+                <div className="w-4 h-4 rounded-full bg-[#0072CE] border-2 border-white shadow-md"></div>
               </div>
             </AdvancedMarker>
           )}
@@ -351,19 +352,19 @@ export const GoogleBusMap: React.FC<GoogleBusMapProps> = ({
       {/* Map Header Overlay: Status pill */}
       <div
         className={`absolute ${
-          fullBleed ? 'top-3 left-3' : 'top-2 left-2'
-        } z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 text-xs font-bold shadow-xs`}
+          fullBleed ? 'top-3 left-3' : 'top-2.5 left-2.5'
+        } z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/95 dark:bg-[#14161A]/95 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800 text-xs font-bold shadow-xs max-lg:max-w-[calc(100%-9.5rem)]`}
       >
         <span
-          className={`w-2 h-2 rounded-full ${
-            metroStation ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse'
+          className={`w-2 h-2 rounded-full shrink-0 ${
+            metroStation ? 'bg-[#E30613]' : 'bg-emerald-500 animate-pulse'
           }`}
         ></span>
-        <span className="text-slate-800 dark:text-slate-200">
+        <span className="text-zinc-800 dark:text-zinc-200 truncate">
           {metroStation
-            ? `Google Maps • Metro ${metroStation.name}`
-            : `Google Maps • ${busesWithGps.length} ${
-                busesWithGps.length === 1 ? 'autobús' : 'autobuses'
+            ? `Metro • ${metroStation.name}`
+            : `${busesWithGps.length} ${
+                busesWithGps.length === 1 ? 'bus' : 'buses'
               } en vivo`}
         </span>
       </div>
